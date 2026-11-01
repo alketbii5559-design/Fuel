@@ -1799,7 +1799,7 @@ function SYNC_TEXT(){
    with the key saved in Settings. The key lives only in this phone's storage and is left out of backups. */
 const STANDALONE=!(window.claude&&typeof window.claude.use==='function');
 const apiKey=()=>{try{return localStorage.getItem('fuel-apikey')||''}catch(e){return ''}};
-const isGoogleKey=k=>/^AIza/.test(String(k||'').trim());   // Google AI Studio keys start AIza (free tier); Anthropic keys start sk-ant-
+const isGoogleKey=k=>{k=String(k||'').trim(); return !!k&&!/^sk-ant-/i.test(k)};   // Anthropic keys start sk-ant-; anything else is a Google AI Studio key (AIza… or the newer AQ.…)
 const GEMINI_MODEL='gemini-3.8-flash';
 const blobB64=b=>new Promise((res,rej)=>{const r=new FileReader(); r.onload=()=>res(String(r.result).split(',')[1]); r.onerror=rej; r.readAsDataURL(b)});
 function apiSample(){
@@ -4636,10 +4636,10 @@ function renderSettings(){
     <p class="foot">Calm keeps only the food drop and rolling numbers. Lively adds a living tank surface and more movement between tabs. Reduce Motion in iPhone settings always wins.</p>
     <p class="foot">Sounds are the soft clicks, the drop into the tank, stamps and the rest-timer chime. They follow your ringer switch and don’t stop your music.</p>
     ${STANDALONE?`<div class="gap"></div><h2 class="sec">AI Estimates</h2>
-    <ul class="list"><li><label class="row single" for="s-apikey"><span class="t">API key</span><input type="password" id="s-apikey" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="AIza… or sk-ant-…" value="${esc(apiKey())}" style="width:170px;text-align:right;border:0;background:none;color:var(--label2);font:inherit;outline:none"></label></li>
+    <ul class="list"><li><label class="row single" for="s-apikey"><span class="t">API key</span><input type="password" id="s-apikey" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="Google or Anthropic key" value="${esc(apiKey())}" style="width:170px;text-align:right;border:0;background:none;color:var(--label2);font:inherit;outline:none"></label></li>
       <li><button class="row single action" style="grid-template-columns:1fr" data-act="testKey"><span class="t">Test Key</span></button></li>
       <li><label class="row single" for="s-aiCap"><span class="t">Monthly limit</span><span style="display:flex;align-items:center;gap:4px"><input type="number" id="s-aiCap" data-p="aiCap" inputmode="numeric" placeholder="none" value="${+P.aiCap>0?esc(P.aiCap):''}"><span style="color:var(--label2)">uses</span></span></label></li></ul>
-    <p class="foot">Photo and Describe It use your own key: a free one from aistudio.google.com/apikey (starts AIza), or a paid one from console.anthropic.com. It stays on this iPhone and isn’t saved in backups. The AI only names foods and guesses grams; the numbers come from USDA and labels. This month: ${aiUse().n} use${aiUse().n===1?'':'s'}${isGoogleKey(apiKey())?', free. With a free Google key, Google may use what you send to improve its products.':`, about $${(aiUse().n*0.015).toFixed(2)}.`}</p>`:''}
+    <p class="foot">Photo and Describe It use your own key: a free one from aistudio.google.com/apikey, or a paid one from console.anthropic.com. It stays on this iPhone and isn’t saved in backups. The AI only names foods and guesses grams; the numbers come from USDA and labels. This month: ${aiUse().n} use${aiUse().n===1?'':'s'}${isGoogleKey(apiKey())?', free. With a free Google key, Google may use what you send to improve its products.':`, about $${(aiUse().n*0.015).toFixed(2)}.`}</p>`:''}
     <div class="gap"></div><h2 class="sec">Food Notes for AI</h2>
     <textarea id="s-notes" data-p="notes" aria-label="Food notes for AI">${esc(P.notes)}</textarea>
     <p class="foot">Used when the AI estimates your food.</p>
@@ -4851,7 +4851,7 @@ function renderSetup(){
   if(st==='extras'){
     h=`<h1>Last touches</h1><p class="su-lead">All optional.</p>
       <label class="su-f"><span>Food notes for AI estimates</span><textarea data-sk="notes" rows="3" placeholder="e.g. Vegetarian. No pork. I eat out a lot.">${esc(d.notes)}</textarea></label>
-      ${STANDALONE?`<label class="su-f"><span>AI key, for Snap Photo and Describe It</span><span class="su-in"><input data-sk="key" type="password" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="AIza… or sk-ant-…" value="${esc(d.key)}"></span><small class="su-hint">Free: aistudio.google.com/apikey (Google may use free-tier data to improve its products). Paid: console.anthropic.com. It stays on this phone. Search, barcodes and manual entry work without it.</small></label>`:''}
+      ${STANDALONE?`<label class="su-f"><span>AI key, for Snap Photo and Describe It</span><span class="su-in"><input data-sk="key" type="password" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="Google or Anthropic key" value="${esc(d.key)}"></span><small class="su-hint">Free: aistudio.google.com/apikey (Google may use free-tier data to improve its products). Paid: console.anthropic.com. It stays on this phone. Search, barcodes and manual entry work without it.</small></label>`:''}
       <div class="su-f"><span>Motion</span><div class="su-chips">${[['calm','Calm'],['balanced','Balanced'],['lively','Lively']].map(([v,t])=>chip('motion',v,t,(d.motion||'balanced')===v)).join('')}</div></div>
       <label class="su-sw"><span><b>Sounds</b><small>Soft clicks. They follow your silent switch.</small></span><input type="checkbox" switch data-sk="snd"${d.snd?' checked':''}></label>
       <label class="su-sw"><span><b>Haptics</b><small>Small taps when you log things</small></span><input type="checkbox" switch data-sk="hap"${d.hap?' checked':''}></label>`;
