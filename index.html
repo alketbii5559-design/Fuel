@@ -1800,16 +1800,24 @@ function SYNC_TEXT(){
 const STANDALONE=!(window.claude&&typeof window.claude.use==='function');
 const apiKey=()=>{try{return localStorage.getItem('fuel-apikey')||''}catch(e){return ''}};
 const isGoogleKey=k=>{k=String(k||'').trim(); return !!k&&!/^sk-ant-/i.test(k)};   // Anthropic keys start sk-ant-; anything else is a Google AI Studio key (AIza… or the newer AQ.…)
-const GEMINI_MODEL='gemini-3.8-flash';
+const GEMINI_MODELS=['gemini-3.8-flash','gemini-flash-latest','gemini-3.5-flash-lite','gemini-2.5-flash'];   // first that this key can use; the working one is remembered
 const blobB64=b=>new Promise((res,rej)=>{const r=new FileReader(); r.onload=()=>res(String(r.result).split(',')[1]); r.onerror=rej; r.readAsDataURL(b)});
 function apiSample(){
   const call=async(prompt,opts)=>{
     const key=apiKey(); if(!key) throw {code:'no_key'};
     if(isGoogleKey(key)){
       const parts=[]; for(const b of ((opts&&opts.images)||[])) parts.push({inline_data:{mime_type:'image/jpeg',data:await blobB64(b)}}); parts.push({text:prompt});
-      let r; try{r=await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent`,{method:'POST',headers:{'content-type':'application/json','x-goog-api-key':key.trim()},body:JSON.stringify({contents:[{role:'user',parts}],generationConfig:{maxOutputTokens:4096}})})}catch(e){throw {code:'offline'}}
-      if(r.status===401||r.status===403) throw {code:'bad_key'}; if(r.status===400){const t=await r.text().catch(()=>''); throw {code:/API_KEY|API key/i.test(t)?'bad_key':'api_error'}} if(r.status===429||r.status===503) throw {code:'rate_limited'}; if(!r.ok) throw {code:'api_error'};
-      const j=await r.json(); return {text:((j.candidates&&j.candidates[0]&&j.candidates[0].content&&j.candidates[0].content.parts)||[]).map(x=>x.text||'').join('')};
+      const body=JSON.stringify({contents:[{role:'user',parts}],generationConfig:{maxOutputTokens:4096}}); let last=null;
+      let ms=GEMINI_MODELS.slice(); try{const m0=localStorage.getItem('fuel-gmodel'); if(m0&&ms.includes(m0)) ms=[m0,...ms.filter(x=>x!==m0)]}catch(e){}
+      for(const model of ms){
+        let r; try{r=await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent`,{method:'POST',headers:{'content-type':'application/json','x-goog-api-key':key.trim()},body})}catch(e){throw {code:'offline'}}
+        if(r.ok){try{localStorage.setItem('fuel-gmodel',model)}catch(e){} const j=await r.json(); return {text:((j.candidates&&j.candidates[0]&&j.candidates[0].content&&j.candidates[0].content.parts)||[]).map(x=>x.text||'').join('')}}
+        const t=await r.text().catch(()=>''); let msg=''; try{msg=(JSON.parse(t).error||{}).message||''}catch(e){msg=t.slice(0,120)}
+        if(r.status===401||r.status===403||(r.status===400&&/API[_ ]key/i.test(msg))) throw {code:'bad_key',detail:`${r.status} ${msg}`.slice(0,140)};
+        if(r.status===429||r.status===503) throw {code:'rate_limited',detail:`${r.status} ${msg}`.slice(0,140)};
+        last={code:'api_error',detail:`${r.status} ${msg}`.slice(0,140)};          // 404 / model not available for this key: try the next model
+      }
+      throw last||{code:'api_error'};
     }
     const content=[]; for(const b of ((opts&&opts.images)||[])) content.push({type:'image',source:{type:'base64',media_type:'image/jpeg',data:await blobB64(b)}});
     content.push({type:'text',text:prompt});
@@ -5061,7 +5069,7 @@ document.addEventListener('click',async ev=>{
     case 'water': addWater(+v); break;
     case 'testKey': {const i=$('#s-apikey'); if(i&&i.value.trim()&&i.value.trim()!==apiKey()){i.dispatchEvent(new Event('change',{bubbles:true}))} if(!apiKey()){toast('Paste your key first'); break}
       b.disabled=true; b.querySelector('.t').textContent='Testing…';
-      try{const r=await apiSample()('Reply with the single word OK.'); toast(/ok/i.test(r.text)?'Key works':'Key works')}catch(e){toast(e.code==='bad_key'?'That key was turned down':e.code==='offline'?'No internet right now':'Couldn’t reach Anthropic. Try again.')}
+      try{const r=await apiSample()('Reply with the single word OK.'); toast(/ok/i.test(r.text)?'Key works':'Key works')}catch(e){toast(e.code==='bad_key'?'That key was turned down'+(e.detail?` (${e.detail})`:''):e.code==='offline'?'No internet right now':e.code==='rate_limited'?'Busy or out of free uses for now'+(e.detail?` (${e.detail})`:''):isGoogleKey(apiKey())?`Google said: ${e.detail||'no answer'}`:'Couldn’t reach Anthropic. Try again.')}
       b.disabled=false; b.querySelector('.t').textContent='Test Key'} break;
     case 'weighOpen': weighEdit=true; renderToday().then(()=>{const i=$('#wDay'); i&&(i.focus(),i.select())}); break;
     case 'weighSave': saveDayWeight(); break;
