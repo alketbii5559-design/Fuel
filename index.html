@@ -1800,7 +1800,9 @@ function SYNC_TEXT(){
 const STANDALONE=!(window.claude&&typeof window.claude.use==='function');
 const apiKey=()=>{try{return localStorage.getItem('fuel-apikey')||''}catch(e){return ''}};
 const isGoogleKey=k=>{k=String(k||'').trim(); return !!k&&!/^sk-ant-/i.test(k)};   // Anthropic keys start sk-ant-; anything else is a Google AI Studio key (AIza… or the newer AQ.…)
-const GEMINI_MODELS=['gemini-3.8-flash','gemini-flash-latest','gemini-3.5-flash-lite','gemini-2.5-flash'];   // first that this key can use; the working one is remembered
+const GEMINI_MODELS=['gemini-3.5-flash-lite','gemini-2.5-flash-lite','gemini-3.8-flash','gemini-flash-latest'];   // fastest first: naming foods doesn't need a thinking model   // first that this key can use; the working one is remembered
+/* a request that never answers must end: 25 s, then a clear message instead of "Testing…" forever */
+const fetchT=async(url,opts)=>{const c=new AbortController(), t=setTimeout(()=>c.abort(),window.__aiTimeout||25000); try{return await fetch(url,{...opts,signal:c.signal})}catch(e){throw {code:c.signal.aborted?'timeout':'offline'}}finally{clearTimeout(t)}};
 const blobB64=b=>new Promise((res,rej)=>{const r=new FileReader(); r.onload=()=>res(String(r.result).split(',')[1]); r.onerror=rej; r.readAsDataURL(b)});
 function apiSample(){
   const call=async(prompt,opts)=>{
@@ -1808,10 +1810,10 @@ function apiSample(){
     if(isGoogleKey(key)){
       const parts=[]; for(const b of ((opts&&opts.images)||[])) parts.push({inline_data:{mime_type:'image/jpeg',data:await blobB64(b)}}); parts.push({text:prompt});
       const body=JSON.stringify({contents:[{role:'user',parts}],generationConfig:{maxOutputTokens:4096}}); let last=null;
-      let ms=GEMINI_MODELS.slice(); try{const m0=localStorage.getItem('fuel-gmodel'); if(m0&&ms.includes(m0)) ms=[m0,...ms.filter(x=>x!==m0)]}catch(e){}
+      let ms=GEMINI_MODELS.slice(); try{const m0=localStorage.getItem('fuel-gmodel2'); if(m0&&ms.includes(m0)) ms=[m0,...ms.filter(x=>x!==m0)]}catch(e){}
       for(const model of ms){
-        let r; try{r=await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent`,{method:'POST',headers:{'content-type':'application/json','x-goog-api-key':key.trim()},body})}catch(e){throw {code:'offline'}}
-        if(r.ok){try{localStorage.setItem('fuel-gmodel',model)}catch(e){} const j=await r.json(); return {text:((j.candidates&&j.candidates[0]&&j.candidates[0].content&&j.candidates[0].content.parts)||[]).map(x=>x.text||'').join('')}}
+        const r=await fetchT(`https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent`,{method:'POST',headers:{'content-type':'application/json','x-goog-api-key':key.trim()},body});
+        if(r.ok){try{localStorage.setItem('fuel-gmodel2',model)}catch(e){} const j=await r.json(); return {text:((j.candidates&&j.candidates[0]&&j.candidates[0].content&&j.candidates[0].content.parts)||[]).map(x=>x.text||'').join('')}}
         const t=await r.text().catch(()=>''); let msg=''; try{msg=(JSON.parse(t).error||{}).message||''}catch(e){msg=t.slice(0,120)}
         if(r.status===401||r.status===403||(r.status===400&&/API[_ ]key/i.test(msg))) throw {code:'bad_key',detail:`${r.status} ${msg}`.slice(0,140)};
         if(r.status===429||r.status===503) throw {code:'rate_limited',detail:`${r.status} ${msg}`.slice(0,140)};
@@ -1821,8 +1823,8 @@ function apiSample(){
     }
     const content=[]; for(const b of ((opts&&opts.images)||[])) content.push({type:'image',source:{type:'base64',media_type:'image/jpeg',data:await blobB64(b)}});
     content.push({type:'text',text:prompt});
-    let r; try{r=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'content-type':'application/json','x-api-key':key,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},
-      body:JSON.stringify({model:'claude-sonnet-5-5',max_tokens:1500,messages:[{role:'user',content}]})})}catch(e){throw {code:'offline'}}
+    const r=await fetchT('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'content-type':'application/json','x-api-key':key,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},
+      body:JSON.stringify({model:'claude-sonnet-5-5',max_tokens:1500,messages:[{role:'user',content}]})});
     if(r.status===401||r.status===403) throw {code:'bad_key'}; if(r.status===429||r.status===529) throw {code:'rate_limited'}; if(!r.ok) throw {code:'api_error'};
     const j=await r.json(); return {text:(j.content||[]).filter(x=>x.type==='text').map(x=>x.text).join('')};
   };
@@ -3737,7 +3739,7 @@ function normItems(v){
   return arr.map(x=>({name:String(x.name||'Food').slice(0,60),serving:String(x.serving||'1 serving').slice(0,40),qty:+x.qty>0?+x.qty:1,...(+x.size>0?{sz:r1(x.size),un:x.unit==='ml'?'ml':'g'}:{}),
     kcal:Math.max(0,r0(x.kcal)),p:Math.max(0,r1(x.p)),c:Math.max(0,r1(x.c)),f:Math.max(0,r1(x.f)),...nutOf({fb:x.fiber!=null?r1(x.fiber):null,sg:x.sugar!=null?r1(x.sugar):null,na:x.sodium!=null?r0(x.sodium):null}),src:'ai'})).filter(x=>x.kcal>0);
 }
-function aiErrMsg(e){const c=e&&e.code; if(c==='not_granted'||c==='no_key'){sample=null;renderAI();return AI_OFF} if(c==='bad_key') return 'Your API key was turned down. Check it in Settings → AI Estimates.'; if(c==='offline') return 'No internet right now. Search or enter it manually.'; if(c==='cap') return `You’ve used this month’s ${S.profile.aiCap} AI estimates. Raise the limit in Settings, or search instead.`; return c==='rate_limited'?'Estimates are busy right now. Try again in a minute, or search instead.':'That didn’t work. Try again, or search instead.'}
+function aiErrMsg(e){const c=e&&e.code; if(c==='not_granted'||c==='no_key'){sample=null;renderAI();return AI_OFF} if(c==='bad_key') return 'Your API key was turned down. Check it in Settings → AI Estimates.'; if(c==='offline') return 'No internet right now. Search or enter it manually.'; if(c==='timeout') return 'The AI didn’t answer in time. Try again, or search instead.'; if(c==='cap') return `You’ve used this month’s ${S.profile.aiCap} AI estimates. Raise the limit in Settings, or search instead.`; return c==='rate_limited'?'Estimates are busy right now. Try again in a minute, or search instead.':'That didn’t work. Try again, or search instead.'}
 function status(html){const s=$('#status'); if(!html){s.hidden=true;s.innerHTML='';return} s.hidden=false; s.innerHTML=html}
 const busy=t=>status(`<div><span class="spinner"></span>${esc(t)}</div>`);
 
@@ -5069,7 +5071,7 @@ document.addEventListener('click',async ev=>{
     case 'water': addWater(+v); break;
     case 'testKey': {const i=$('#s-apikey'); if(i&&i.value.trim()&&i.value.trim()!==apiKey()){i.dispatchEvent(new Event('change',{bubbles:true}))} if(!apiKey()){toast('Paste your key first'); break}
       b.disabled=true; b.querySelector('.t').textContent='Testing…';
-      try{const r=await apiSample()('Reply with the single word OK.'); toast(/ok/i.test(r.text)?'Key works':'Key works')}catch(e){toast(e.code==='bad_key'?'That key was turned down'+(e.detail?` (${e.detail})`:''):e.code==='offline'?'No internet right now':e.code==='rate_limited'?'Busy or out of free uses for now'+(e.detail?` (${e.detail})`:''):isGoogleKey(apiKey())?`Google said: ${e.detail||'no answer'}`:'Couldn’t reach Anthropic. Try again.')}
+      try{const r=await apiSample()('Reply with the single word OK.'); toast(/ok/i.test(r.text)?'Key works':'Key works')}catch(e){toast(e.code==='bad_key'?'That key was turned down'+(e.detail?` (${e.detail})`:''):e.code==='offline'?'No internet right now':e.code==='timeout'?'No answer after 25 seconds. Check your connection, then try again.':e.code==='rate_limited'?'Busy or out of free uses for now'+(e.detail?` (${e.detail})`:''):isGoogleKey(apiKey())?`Google said: ${e.detail||'no answer'}`:'Couldn’t reach Anthropic. Try again.')}
       b.disabled=false; b.querySelector('.t').textContent='Test Key'} break;
     case 'weighOpen': weighEdit=true; renderToday().then(()=>{const i=$('#wDay'); i&&(i.focus(),i.select())}); break;
     case 'weighSave': saveDayWeight(); break;
