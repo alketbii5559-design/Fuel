@@ -414,6 +414,9 @@ body.in-wk .addbtn,body.in-wk .tabbar{display:none}
 .sum-grid b{font:700 17px/1.1 var(--round);font-variant-numeric:tabular-nums;white-space:nowrap}
 .rt{display:grid;gap:8px}
 .rt-h{display:flex;align-items:center;gap:8px}
+.rt-name:focus{box-shadow:inset 0 -1px 0 var(--label2)}
+.sc-top{display:flex;align-items:baseline;justify-content:space-between;gap:8px}
+.sc-ren{font-size:15px;color:var(--label2);padding:4px 0}
 .rt-name{flex:1;min-width:0;width:0;border:0;background:none;font:700 22px/1.2 var(--display);letter-spacing:-.02em;padding:4px 0;outline:none;color:var(--label)}
 .rt-ex{padding:10px 16px;display:grid;gap:8px}
 .rt-n{display:grid;gap:2px}
@@ -2336,7 +2339,7 @@ async function renderTrain(){
     <div id="trRes"></div><div id="trMain">
     <div class="weekstrip">${wd.map(d=>`<div class="wd${d===TODAY()?' today':''}"><span>${parseYmd(d).toLocaleDateString('en-GB',{weekday:'narrow'})}</span><i class="${gymDays.has(d)?'gym':actDays.has(d)?'act':''}"></i></div>`).join('')}</div>
     ${trainRecovery()}${S.active?`<section class="card start-card live"><p class="sc-k">Workout in progress</p><h2>${esc(S.active.name)}</h2><p class="sc-sub">${dur(Date.now()-S.active.start)} · ${S.active.ex.reduce((a,x)=>a+x.sets.filter(s=>s.done).length,0)} sets logged</p><button class="btn big" data-g="resume">Resume Workout</button></section>`
-    :r?`<section class="card start-card"><p class="sc-k">Up next</p><h2>${esc(r.name)}</h2>
+    :r?`<section class="card start-card"><div class="sc-top"><p class="sc-k">Up next</p><button class="txtbtn sc-ren" data-g="rRen" data-v="${r.id}" aria-label="Rename ${esc(r.name)}">Rename</button></div><h2>${esc(r.name)}</h2>
       <div class="sc-ex">${r.ex.map(x=>`<span>${esc(exById(x.eid).n.replace(/ \(.*\)$/,''))}</span>`).join('')}</div>
       <button class="btn big" data-g="start" data-v="${r.id}">Start ${esc(r.name)}</button>
       <div class="sc-alt">${S.routines.list.filter(x=>x.id!==r.id).map(x=>`<button class="chip2" data-g="start" data-v="${x.id}">${esc(x.name)} instead</button>`).join('')}<button class="chip2" data-g="start" data-v="">Blank workout</button></div></section>`
@@ -2932,7 +2935,7 @@ function saveAsRoutine(w){
   const r=routineFromSession(w); if(!r.ex.length){toast('Log at least one set first'); return}
   const first=!S.routines.list.some(q=>q.ex.length), empty=S.routines.list.filter(q=>!q.ex.length).map(q=>q.id);
   S.routines.list=[...S.routines.list.filter(q=>q.ex.length),r]; if(first) S.routines.next=S.routines.list.length-1;
-  S.routines.src='custom'; saveRoutines(); haptic('confirm'); rtDone(`Saved as “${r.name}”. Rename or change it in Edit Routines.`);
+  S.routines.src='custom'; saveRoutines(); haptic('confirm'); rtDone(`Saved as “${r.name}”. Rename it from Train.`);
   if(currentView()==='train') renderTrain();
   toastUndo(`Saved “${r.name}”`,()=>{S.routines.list=S.routines.list.filter(q=>q.id!==r.id); saveRoutines(); if(currentView()==='train') renderTrain()});
   return r;
@@ -2947,9 +2950,25 @@ function showRoutineFrom(ri){
   gSheet('Start From a Workout',ws.length?`<ul class="list">${ws.map(w=>`<li><button class="row" data-g="rFromW" data-r="${ri}" data-v="${w.id}"><span class="t">${esc(w.name)}</span><span class="d">${shortDate(w.date)} · ${w.ex.length} exercise${w.ex.length===1?'':'s'}</span><span class="k"></span>${CHEV}</button></li>`).join('')}</ul><p class="foot">Takes the exercises, their order and how many sets you did.</p>`:`<div class="card empty-state"><h3>No workouts yet</h3><p>Finish one and it shows up here.</p></div>`,
     `<button class="txtbtn r" data-g="routines">Back</button>`);
 }
+function showRename(id,back){
+  const r=S.routines.list.find(q=>q.id===id); if(!r) return;
+  gSheet('Rename Routine',`<div class="field"><label for="rnIn">Name</label><input type="text" id="rnIn" value="${esc(r.name)}" maxlength="40" autocapitalize="words" autocomplete="off" enterkeyhint="done" data-v="${r.id}" data-b="${back?1:''}"></div>
+    <button class="btn big" data-g="rRenSave">Save</button>`,
+    `<button class="txtbtn r" data-g="${back?'routines':'closeG'}">${back?'Back':'Cancel'}</button>`);
+  setTimeout(()=>{const i=$('#rnIn'); if(i){i.focus(); try{i.select()}catch(e){}}},60);
+}
+function saveRename(){
+  const i=$('#rnIn'); if(!i) return; const r=S.routines.list.find(q=>q.id===i.dataset.v); if(!r) return;
+  const n=i.value.trim().replace(/\s+/g,' ').slice(0,40), back=!!i.dataset.b;
+  if(!n){toast('Type a name first'); i.focus(); return}
+  if(n!==r.name&&S.routines.list.some(q=>q.id!==r.id&&q.name.toLowerCase()===n.toLowerCase())){toast(`You already have “${n}”`); i.focus(); return}
+  const old=r.name; if(n!==old){r.name=n; S.routines.src='custom'; saveRoutines(); haptic('confirm')}
+  if(back) showRoutines(); else {closeSheet('#gSheet'); route(true)}
+  if(n!==old) toastUndo(`Renamed to ${n}`,()=>{const q=S.routines.list.find(x=>x.id===r.id); if(q){q.name=old; saveRoutines(); if(!$('#gSheet').hidden&&back) showRoutines(); route(true)}});
+}
 function showRoutines(){
   const L=S.routines.list;
-  gSheet('Routines',`${L.map((r,ri)=>`<div class="rt"><div class="rt-h"><input class="rt-name" type="text" value="${esc(r.name)}" data-gi="rname" data-r="${ri}" aria-label="Routine name"><button class="txtbtn" style="font-size:15px" data-g="rDup" data-r="${ri}">Duplicate</button><button class="txtbtn" style="color:var(--red);font-size:15px" data-g="rDel" data-r="${ri}">Delete</button></div>
+  gSheet('Routines',`${L.map((r,ri)=>`<div class="rt"><div class="rt-h"><input class="rt-name" type="text" value="${esc(r.name)}" data-gi="rname" data-r="${ri}" aria-label="Routine name"><button class="txtbtn" style="font-size:15px" data-g="rRen" data-v="${r.id}" data-b="1">Rename</button><button class="txtbtn" style="font-size:15px" data-g="rDup" data-r="${ri}">Duplicate</button><button class="txtbtn" style="color:var(--red);font-size:15px" data-g="rDel" data-r="${ri}">Delete</button></div>
     <ul class="list">${r.ex.map((x,xi)=>`<li class="rt-li"><div class="rt-ex"><div class="rt-top"><button class="exthumb" data-g="exInfo" data-v="${esc(x.eid)}" aria-label="How to do ${esc(exById(x.eid).n)}">${exThumb(exById(x.eid),40)}</button><div class="rt-n"><b>${esc(exById(x.eid).n)}</b><span>${x.sets} × ${x.lo===x.hi?x.lo:x.lo+'–'+x.hi} · rest ${Math.floor(x.rest/60)}:${pad(x.rest%60)} · ${x.scheme==='rp'?'Reverse pyramid':'Double progression'}</span></div>${r.ex.length>1?`<button class="rt-grip" data-r="${ri}" data-x="${xi}" aria-label="Drag to reorder ${esc(exById(x.eid).n)}"><svg viewBox="0 0 12 18" aria-hidden="true"><g fill="currentColor"><circle cx="3" cy="3" r="1.6"/><circle cx="9" cy="3" r="1.6"/><circle cx="3" cy="9" r="1.6"/><circle cx="9" cy="9" r="1.6"/><circle cx="3" cy="15" r="1.6"/><circle cx="9" cy="15" r="1.6"/></g></svg></button>`:''}</div>
       <div class="rt-c"><button class="mini" data-g="rx" data-r="${ri}" data-x="${xi}" data-f="sets" data-d="-1" aria-label="Fewer sets">−</button><span>sets</span><button class="mini" data-g="rx" data-r="${ri}" data-x="${xi}" data-f="sets" data-d="1" aria-label="More sets">+</button>
       <button class="mini" data-g="rx" data-r="${ri}" data-x="${xi}" data-f="hi" data-d="-1" aria-label="Lower rep target">−</button><span>reps</span><button class="mini" data-g="rx" data-r="${ri}" data-x="${xi}" data-f="hi" data-d="1" aria-label="Higher rep target">+</button>
@@ -5326,6 +5345,8 @@ document.addEventListener('click',async ev=>{
     case 'rFrom': showRoutineFrom(+b.dataset.r); break;
     case 'rFromW': {const r=S.routines.list[+b.dataset.r], ww=S.wk[v]; if(!r||!ww) break; const nr=routineFromSession(ww); if(!nr.ex.length){toast('That workout has no logged sets'); break}
       r.ex=nr.ex; if(/^New Routine( \(\d+\))?$/.test(r.name)) r.name=routineName(ww); S.routines.src='custom'; saveRoutines(); showRoutines(); haptic('confirm'); toast(`${r.name}: ${r.ex.length} exercises from ${shortDate(ww.date)}`)} break;
+    case 'rRen': showRename(b.dataset.v,!!b.dataset.b); break;
+    case 'rRenSave': saveRename(); break;
     case 'rNew': S.routines.list.push({id:uid(),name:'New Routine',ex:[]}); S.routines.src='custom'; saveRoutines(); showRoutines(); break;
     case 'apt': toggleApt(v); break;
     case 'act': addAct(v,b.dataset.m); break;
@@ -5342,6 +5363,7 @@ document.addEventListener('change',e=>{
     catch(err){toast(err.message==='not hevy'?'That file isn’t a Hevy export. In Hevy: Settings → Export data.':'Couldn’t read that file.')}})}
 });
 document.addEventListener('focusin',e=>{const el=e.target; if(el.classList&&el.classList.contains('wk-in')&&el.value){setTimeout(()=>{try{el.select()}catch(x){}},0)}});
+document.addEventListener('keydown',e=>{if(e.key==='Enter'&&e.target.id==='rnIn'){e.preventDefault(); saveRename()}});
 document.addEventListener('keydown',e=>{if(e.key==='Enter'&&e.target.classList&&e.target.classList.contains('wk-in')){e.preventDefault(); e.target.blur()}});
 document.addEventListener('input',e=>{if(e.target.id==='trQ'){trQ=e.target.value; renderTrRes()}});
 /* swipe a set left to delete it, like Hevy. The tap that ends a swipe never reaches a button. */
