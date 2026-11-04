@@ -1520,6 +1520,77 @@ input[switch]{accent-color:var(--label2)}
 input[switch]:checked{background:var(--label2)}
 /* settings: units in one column so the numbers line up */
 .s-unit{color:var(--label2);min-width:2.2em;text-align:left}
+/* ---------- Detailed look (4 Nov, Cronometer-style layout in Fuel's own type and colour) ----------
+   Owner asked for Cronometer's calorie tracking layout: Energy Summary rings (Consumed / Burned / Remaining)
+   with target bars, a diary with per-meal subtotals, and Nutrient Targets grouped like a lab report.
+   Whole app gets denser: tighter rows, smaller headings, 14px card radius. Dark stays. Settings → Today Screen → Layout: Tank brings the tank back. */
+body[data-look="dense"]{--r:14px}
+body[data-look="dense"] .gap{height:16px}
+body[data-look="dense"] .card,body[data-look="dense"] .list,body[data-look="dense"] .dl-tile,body[data-look="dense"] .dl-weigh,body[data-look="dense"] .dl-week,body[data-look="dense"] #v-train .card,body[data-look="dense"] #v-train .list,body[data-look="dense"] .start-card,body[data-look="dense"] .wk-ex{border-radius:14px}
+body[data-look="dense"] .card{padding:14px}
+body[data-look="dense"] .row{padding:9px 14px;min-height:46px;gap:2px 10px}
+body[data-look="dense"] .row .t{font-size:16px}
+body[data-look="dense"] .row .d{font-size:13px}
+body[data-look="dense"] .row .k{font-size:16px}
+body[data-look="dense"] .sec,body[data-look="dense"] #v-train .sec{font-size:15px;margin:0 4px 6px;color:var(--label2);font-weight:600}
+body[data-look="dense"] .large,body[data-look="dense"] #v-train .large{font-size:30px}
+body[data-look="dense"] .start-card h2{font-size:28px}
+/* Energy Summary */
+.es{display:grid;gap:14px;touch-action:pan-y}
+.es-top{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;text-align:center}
+.es-c{display:grid;justify-items:center;gap:2px;min-width:0}
+.es-r{position:relative;width:84px;height:84px}
+.es-r svg{width:84px;height:84px;transform:rotate(-90deg)}
+.es-r b{position:absolute;inset:0;display:grid;place-items:center;font:700 20px var(--num);letter-spacing:-.01em}
+.es-l{font:600 13px var(--font);color:var(--label);margin-top:4px}
+.es-s{font:400 11px var(--font);color:var(--label3)}
+.tg{display:grid;gap:10px;border-top:1px solid var(--sep);padding-top:12px}
+.tg-r{display:grid;grid-template-columns:auto 1fr auto;align-items:baseline;gap:2px 10px}
+.tg-n{font:600 15px var(--font)}
+.tg-v{font:500 13px var(--font);color:var(--label2);text-align:right}
+.tg-p{font:700 15px var(--num);min-width:42px;text-align:right}
+.tg-t{grid-column:1/-1;height:6px;border-radius:3px;background:var(--fill);overflow:hidden}
+.tg-t i{display:block;height:100%;border-radius:3px}
+.tg-r.over .tg-p{color:var(--red)}
+.es-f{margin:0;font-size:12px;color:var(--label3);line-height:1.4}
+/* Diary */
+.list.dy>li.dy-h,.list.dy>li.dy-tot{padding:10px 14px 6px;background:color-mix(in srgb,var(--fill) 45%,transparent)}
+.list.dy>li.dy-h::before,.list.dy>li.dy-tot::before{left:0!important}
+.dy-h>div,.dy-tot>div{display:flex;justify-content:space-between;align-items:baseline;gap:8px}
+.dy-h b,.dy-tot b{font:600 15px var(--font)}
+.dy-h span,.dy-tot span{font:700 15px var(--num)}
+.dy-h p,.dy-tot p{margin:1px 0 0;font:400 12px var(--font);color:var(--label2);text-align:right}
+.list.dy>li.dy-h+li::before{display:none}
+.row.dy-r{min-height:44px}
+.row.dy-r .d{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.row.dy-r .k{display:grid;justify-items:end;line-height:1.15;font:600 16px var(--num)}
+.row.dy-r .k small{font:400 11px var(--font);color:var(--label3)}
+.list.dy>li.dy-tot{background:none;padding:10px 14px 10px}
+.list.dy>li.dy-tot b,.list.dy>li.dy-tot span{color:var(--cal)}
+/* Nutrient Targets */
+.nt{padding:4px 14px 12px}
+.nt-g{border-bottom:1px solid var(--sep)}
+.nt-g>summary{display:flex;justify-content:space-between;align-items:center;padding:12px 0;cursor:pointer;list-style:none}
+.nt-g>summary::-webkit-details-marker{display:none}
+.nt-g>summary b{font:600 15px var(--font)}
+.nt-g>summary b::after{content:"";display:inline-block;width:6px;height:6px;margin:0 0 3px 8px;border-right:1.6px solid var(--label3);border-bottom:1.6px solid var(--label3);transform:rotate(45deg);transition:transform .2s var(--e-out)}
+.nt-g[open]>summary b::after{transform:rotate(225deg);margin-bottom:0}
+.nt-g>summary span{font:400 12px var(--font);color:var(--label2)}
+.nt-r{display:grid;grid-template-columns:minmax(0,1fr) auto 40px;align-items:baseline;gap:3px 10px;width:100%;background:none;border:0;padding:6px 0 7px;text-align:left;color:inherit;font:inherit}
+.nt-r:last-child{padding-bottom:12px}
+.nt-n{font-size:14px;overflow-wrap:anywhere}
+.nt-n i{font-style:normal;color:var(--label3);margin-left:2px}
+.nt-v{font:500 13px var(--font);text-align:right}
+.nt-v small{font-size:12px;color:var(--label3)}
+.nt-p{font:700 14px var(--num);text-align:right;color:var(--label2)}
+.nt-t{grid-column:1/-1;height:4px;border-radius:2px;background:var(--fill);overflow:hidden}
+.nt-t i{display:block;height:100%;border-radius:2px;background:var(--label2)}
+.nt-r.none .nt-t{display:none}
+.nt-r.met .nt-t i{background:var(--pro)}.nt-r.met .nt-p{color:var(--pro)}
+.nt-r.low .nt-t i{background:var(--cal)}
+.nt-r.over .nt-t i{background:var(--red)}.nt-r.over .nt-p{color:var(--red)}
+.nt .nfoot{margin:10px 0 0}
+.nt-sum{margin:0 4px 12px;font:400 15px var(--font);color:var(--label2)}.nt-sum b{font:700 22px var(--num);color:var(--label)}
 </style>
 </head>
 <body>
@@ -3732,6 +3803,70 @@ function todayMotion(M,t,day){
   playMotion(root,base);
   root.querySelectorAll('.stamp.slam').forEach((st,i)=>{const d=base+(M.first?700:450)+i*200; st.style.animationDelay=d+'ms'; sfx.thump((d+170)/1000)});
 }
+/* ---------- Detailed look (Cronometer-style): Energy Summary, diary with subtotals, Nutrient Targets ---------- */
+const lookDense=()=>(S.profile&&S.profile.look)!=='tank';
+const applyLook=()=>{document.body.dataset.look=lookDense()?'dense':'tank'};
+function burnedFor(date){
+  const w=whoopDay(date); if(w&&+w.kc>0) return {v:+w.kc,src:'WHOOP'};
+  const t=calcTargets(S.profile||{}); if(t) return {v:t.tdee,src:'estimate'};
+  return null;
+}
+function energySummary(t,P,date){
+  const goal=+P.kcal||2200, eaten=Math.round(t.kcal), left=goal-eaten, over=left<0, b=burnedFor(date);
+  const ring=(pct,col,val,lab,sub)=>`<div class="es-c"><div class="es-r">${ringSVG(84,8,pct,col)}<b class="num">${val}</b></div><span class="es-l">${lab}</span>${sub?`<span class="es-s">${sub}</span>`:''}</div>`;
+  const bar=(name,v,g,u,col)=>{const pc=g?v/g*100:0, ov=pc>105&&name==='Energy';
+    return `<div class="tg-r${ov?' over':''}"><span class="tg-n">${name}</span><span class="tg-v num">${fmt(Math.round(v))} / ${fmt(Math.round(g))} ${u}</span><span class="tg-p num">${Math.round(pc)}%</span><span class="tg-t"><i style="width:${Math.min(100,pc).toFixed(1)}%;background:${ov?'var(--red)':col}"></i></span></div>`};
+  return `<section class="card es hero" aria-label="Energy summary">
+    <div class="es-top">${ring(eaten/goal,'var(--cal)',fmt(eaten),'Consumed')}
+      ${b?ring(Math.min(1,b.v/Math.max(goal,b.v)),'var(--trn)',fmt(b.v),'Burned',b.src==='WHOOP'?'WHOOP':'est. from your stats'):ring(0,'var(--trn)','–','Burned','add age in Settings')}
+      ${ring(over?1:left/goal,over?'var(--red)':'var(--label2)',fmt(Math.abs(left)),over?'Over':'Remaining')}</div>
+    <div class="tg">${bar('Energy',t.kcal,goal,'kcal','var(--cal)')}${bar('Protein',t.p,P.p,'g','var(--pro)')}${bar('Carbs',t.c,P.c,'g','var(--c-c)')}${bar('Fat',t.f,P.f,'g','var(--c-f)')}</div>
+    ${b?`<p class="es-f">${b.src==='WHOOP'?'Burned is WHOOP’s total for the day.':'Burned is your maintenance from age, height, weight and activity (Mifflin-St Jeor), not a measurement.'}${b.v-goal>0?` Plan deficit: ${fmt(b.v-goal)} kcal.`:''}</p>`:''}
+  </section>`;
+}
+function diaryHTML(day,ghosts,selOn,seenIds){
+  const rows=mealList().map(([k,l])=>{const es=day.entries.filter(e=>e.meal===k), gh=ghosts.filter(r=>r.meal===k); if(!es.length&&!gh.length) return '';
+    const s=a=>es.reduce((x,e)=>x+e[a]*e.qty,0), th=es.some(e=>e.img);
+    return `<li class="dy-h"><div><b>${esc(l)}</b><span class="num">${fmt(s('kcal'))} kcal</span></div><p class="num">P ${r0(s('p'))} · C ${r0(s('c'))} · F ${r0(s('f'))} g</p></li>
+      ${es.map(e=>{const on=selOn&&selIds.has(e.id), nw=seenIds&&!seenIds.has(e.id);
+        return `<li class="${on?'picked':''}${nw?' slap':''}"><button class="row dy-r${th?' th':''}${selOn?' selmode':''}" data-act="entry" data-v="${e.id}"${selOn?` aria-pressed="${on}"`:''}>${selOn?`<span class="pick" aria-hidden="true">${on?TICK_S:''}</span>`:''}${th?(thumb(e)||'<span class="thumb blank"></span>'):''}<span class="t">${esc(e.name)}</span><span class="d">${esc(qtyLabel(e))} ${srcTag(e)}</span><span class="k num">${fmt(e.kcal*e.qty)}<small>${r0(e.p*e.qty)} g P</small></span></button></li>`}).join('')}${gh.map(ghostRow).join('')}`}).filter(Boolean);
+  if(!rows.length) return '';
+  const t=totals(day);
+  return `<div class="gap"></div><h2 class="sec">Diary</h2><ul class="list dy">${rows.join('')}<li class="dy-tot"><div><b>Total</b><span class="num">${fmt(t.kcal)} kcal</span></div><p class="num">P ${r0(t.p)} · C ${r0(t.c)} · F ${r0(t.f)} g</p></li></ul>`;
+}
+/* Every nutrient Fuel knows, grouped like a lab report. Targets: US DRIs for men 19–30; macros from your plan. */
+function ntGroups(P){
+  const satMax=Math.round((+P.kcal||2200)*0.1/9), d=k=>[k,DRI[k][2],DRI[k][1],DRI[k][0]];
+  return [
+    ['Carbohydrates',[['c','Carbs','g',+P.c],['fb','Fiber','g',+P.fbg||DRI.fb[0]],['sg','Sugars','g',0]]],
+    ['Lipids',[['f','Fat','g',+P.f],['sat','Saturated','g',satMax,1],['mono','Monounsaturated','g',0],['poly','Polyunsaturated','g',0],['chol','Cholesterol','mg',0]]],
+    ['Protein',[['p','Protein','g',+P.p]]],
+    ['Vitamins',['b1','b2','b3','b6','b12','fol','va','vc','vd','ve','vk','cho'].map(d)],
+    ['Minerals',[...['ca','cu','fe','mg','mn','ph','k','se','zn'].map(d),['na','Sodium','mg',2300,1]]],
+  ];
+}
+const NT_MAC=new Set(['p','c','f','fb','sg','na']);
+const ntVal=(e,k)=>{const v=NT_MAC.has(k)?e[k]:(e.mi||{})[k]; return v==null?null:(+v)*(+e.qty||0)};
+function nutrientTargets(day,P){
+  if(!day.entries.length) return '';
+  const G=ntGroups(P), n=day.entries.length;
+  const sec=([title,rows])=>{let met=0,tg=0;
+    const html=rows.map(([k,name,u,goal,limit])=>{let v=0,have=0; day.entries.forEach(e=>{const x=ntVal(e,k); if(x!=null){v+=x; have++}});
+      const pc=goal?v/goal*100:0; if(goal&&!limit){tg++; if(pc>=100) met++}
+      const cls=!goal?'none':limit?(pc>100?'over':''):(pc>=100?'met':pc<50?'low':'');
+      return `<button class="nt-r ${cls}" data-act="ntSrc" data-v="${k}"><span class="nt-n">${name}${have<n?`<i aria-label="${n-have} foods without data">*</i>`:''}</span><span class="nt-v num">${fmtMi(v,u)}${goal?`<small> / ${fmtMi(goal,u)}${limit?' max':''}</small>`:''}</span><span class="nt-p num">${goal?Math.round(pc)+'%':''}</span><span class="nt-t">${goal?`<i style="width:${Math.min(100,pc).toFixed(1)}%"></i>`:''}</span></button>`}).join('');
+    return `<details class="nt-g"${title==='Vitamins'||title==='Minerals'?' open':''}><summary><b>${title}</b>${tg?`<span class="num">${met} of ${tg} met</span>`:''}</summary>${html}</details>`};
+  const m=microTotals(day.entries), miss=m.n-m.full;
+  return `<div class="gap"></div><h2 class="sec">Nutrient Targets</h2><section class="card nt">${G.map(sec).join('')}
+    <p class="nfoot">Tap a nutrient to see which foods gave it.${miss?` * ${miss===1?'One food':miss+' foods'} (You, Label or AI guess) have no data for some nutrients, so real totals can be higher.`:''} Targets: your plan for macros, US Dietary Reference Intakes (men 19–30) for the rest.</p></section>`;
+}
+async function showNtSources(k){
+  const day=await getDay(S.date), G=ntGroups(S.profile).flatMap(g=>g[1]), r=G.find(x=>x[0]===k); if(!r) return;
+  const [,name,u,goal]=r, list=day.entries.map(e=>({e,v:ntVal(e,k)})).filter(x=>x.v!=null&&x.v>0).sort((a,b)=>b.v-a.v), tot=list.reduce((a,x)=>a+x.v,0);
+  const none=day.entries.filter(e=>ntVal(e,k)==null);
+  gSheet(name,`${list.length?`<p class="nt-sum num"><b>${fmtMi(tot,u)}</b>${goal?` of ${fmtMi(goal,u)} · ${Math.round(tot/goal*100)}%`:''}</p><ul class="list">${list.map(({e,v})=>`<li><div class="row"><span class="t">${esc(e.name)}</span><span class="d">${esc(qtyLabel(e))} · ${Math.round(v/tot*100)}% of today</span><span class="k num">${fmtMi(v,u)}</span></div></li>`).join('')}</ul>`:`<div class="card empty-state"><h3>None today</h3><p>Nothing logged ${S.date===TODAY()?'today':'this day'} has ${esc(name.toLowerCase())}.</p></div>`}
+    ${none.length?`<p class="foot">No ${esc(name.toLowerCase())} data for: ${none.map(e=>esc(e.name)).join(', ')}.</p>`:''}`,`<button class="txtbtn r" data-g="closeG">Done</button>`);
+}
 async function renderToday(){
   const st=streak(), wkWeek=weekDates().filter(d=>Object.values(S.wk).some(w=>w&&!w.deleted&&w.end&&w.date===d)).length;
   const day=await getDay(S.date), P=S.profile, t=totals(day), goal=P.kcal, left=goal-t.kcal, over=left<0, isToday=S.date===TODAY();
@@ -3742,7 +3877,8 @@ async function renderToday(){
   const from=first?z:seen&&(seen.kcal!==t.kcal||seen.p!==t.p||seen.c!==t.c||seen.f!==t.f)?seen:null;
   const seenIds=seen?new Set(seen.ids||[]):null, M={from,first,slamP:isToday&&t.p>=P.p&&(first||(seen&&seen.p<P.p)),slamD:isToday&&!!seen&&day.st&&day.st.s==='done'&&seen.st!=='done'};
   if(motionLv()<2){M.slamP=false; M.slamD=false}
-  const groups=mealList().map(([k,l])=>{const es=day.entries.filter(e=>e.meal===k), gh=ghosts.filter(r=>r.meal===k); if(!es.length&&!gh.length) return '';
+  const dense=lookDense();
+  const groups=dense?diaryHTML(day,ghosts,selOn,seenIds):mealList().map(([k,l])=>{const es=day.entries.filter(e=>e.meal===k), gh=ghosts.filter(r=>r.meal===k); if(!es.length&&!gh.length) return '';
     const mk=es.reduce((a,e)=>a+e.kcal*e.qty,0), mp=es.reduce((a,e)=>a+e.p*e.qty,0), th=es.some(e=>e.img);
     return `<div class="gap"></div><h2 class="sec"><span class="mh">${mealIcon(k)}${l}</span><b class="num">${fmt(mk)} kcal · ${r0(mp)} g protein</b></h2><ul class="list${th?' th':''}">${es.map(e=>{const on=selOn&&selIds.has(e.id), tm=clock(e.t,day.date);
       const nw=seenIds&&!seenIds.has(e.id); return `<li class="${on?'picked':''}${nw?' slap':''}"><button class="row${th?' th':''}${selOn?' selmode':''}" data-act="entry" data-v="${e.id}"${selOn?` aria-pressed="${on}"`:''}>${selOn?`<span class="pick" aria-hidden="true">${on?TICK_S:''}</span>`:''}${th?(thumb(e)||'<span class="thumb blank"></span>'):''}<span class="t">${esc(e.name)}</span><span class="d">${srcTag(e)}${esc(qtyLabel(e))} · ${r0(e.p*e.qty)} g protein${tm?` · ${tm}`:''}</span><span class="k">${fmt(e.kcal*e.qty)}</span>${selOn?'':CHEV}</button></li>`}).join('')}${gh.map(ghostRow).join('')}</ul>`}).join('');
@@ -3755,18 +3891,19 @@ async function renderToday(){
     <p class="subtitle dl-sub"><span>${dateLong(S.date)}${isToday?'':` · <button class="txtbtn" style="font-size:15px;padding:0" data-act="today">Go to Today</button>`}</span>${st>1&&isToday?`<span class="streak-t">${st} days in a row</span>`:''}</p>
     ${todayChips(day)}
     <div class="badge" data-sync hidden><i></i><span></span></div>
-    ${tankHero(t,P,M)}
+    ${dense?energySummary(t,P,S.date)+(groups||''):tankHero(t,P,M)}
     ${isToday&&P.tDay!==0?yesterdayPrompt():''}${isToday&&P.tFits!==0?fitsLine(left,pLeft):''}${isToday&&P.tFits!==0&&checkinDue()?checkinCard():''}
     ${weighRow(isToday)}
     ${whoopCard(isToday)}
     ${isToday&&P.tWeek!==0?'<div id="weekRow"></div>':''}
     ${P.tWeek!==0?`<div class="gap" style="height:10px"></div>
     <div class="dl-pair">${waterCard(day)}<a class="dl-tile train" href="#train"><span class="k">Training</span><b>${gymTarget()?`${wkWeek} of ${gymTarget()}`:`${wkWeek} this week`}</b><span class="plates" aria-hidden="true">${[...Array(Math.max(1,gymTarget()))].map((_,i)=>i).map(i=>`<i${i<wkWeek?' class="on"':''}></i>`).join('')}</span><span class="s">${S.active?'Workout running':nextR?esc(nextR.name)+' next':'this week'}</span></a></div>`:''}
-    ${groups||`<div class="gap"></div><div class="card empty-state"><h3>Nothing logged ${isToday?'yet':'this day'}</h3><p>Tap Add Food to snap a photo, type what you ate or search.</p></div>`}
-    ${P.tVit!==0&&t.n&&t.nx?`<div class="gap"></div><h2 class="sec">Fiber</h2><section class="card dl-macros">
+    ${dense&&groups?'':groups||`<div class="gap"></div><div class="card empty-state"><h3>Nothing logged ${isToday?'yet':'this day'}</h3><p>Tap Add Food to snap a photo, type what you ate or search.</p></div>`}
+    ${dense?nutrientTargets(day,P):''}
+    ${!dense&&P.tVit!==0&&t.n&&t.nx?`<div class="gap"></div><h2 class="sec">Fiber</h2><section class="card dl-macros">
       ${t.nx?`<div class="mbars">${mbar('Fiber',t.fb,P.fbg||30,'var(--pro)',true)}<p class="nut-more">Sugar ${r0(t.sg)} g · Sodium ${fmt(t.na)} mg${t.nx<t.n?` · known for ${t.nx} of ${t.n} foods`:''}</p></div>`:''}
       ${macroInsight(t,P)}</section>`:''}
-    ${P.tVit!==0?nutrientsCard(day,P):''}
+    ${!dense&&P.tVit!==0?nutrientsCard(day,P):''}
     ${day.entries.length&&P.tDay!==0?dayStatus(day,isToday,M.slamD):''}`;
   /* A redraw with the same numbers keeps the hero node, so a pour or drop in progress isn't cut short. */
   const nh=$('#v-today .tk'); if(oldHero&&nh&&!M.from&&oldHero.dataset.k===nh.dataset.k) nh.replaceWith(oldHero);
@@ -4187,6 +4324,20 @@ const barPath=(x,y,w,h)=>{const r=Math.min(4,w/2,h); return `M${x.toFixed(1)} ${
 let progAnim=false;
 /* Progress headline numbers roll up from zero on the first look of each visit (React Bits' CountUp, done as rolling digits). */
 const statRoll=(v,unit,label)=>progAnim&&motionOK()?`<b class="sroll">${odo(v,0,label).replace('class="odo num"','class="odo num sm"')}${unit?`<span class="su">${unit.trim()}</span>`:''}</b>`:`<b>${fmt(v)}${unit}</b>`;
+/* Detailed look: one bar per day, split into protein / carbs / fat calories. */
+function stackChart(rows,target){
+  const W=340,H=150,L=42,R=4,T=8,B=20,n=rows.length,iw=W-L-R,ih=H-T-B;
+  const max=Math.max(target*1.2,...rows.map(r=>r.logged?r.kcal*1.05:0)), y=v=>T+(1-v/max)*ih, bw=iw/n, w=Math.min(26,bw*.56);
+  let s=`<svg class="chart" viewBox="0 0 ${W} ${H}" role="img" aria-label="Calories per day for the last 7 days split by macro, goal ${fmt(target)}"><text x="${L-6}" y="${y(0)+4}" text-anchor="end">0</text>`;
+  rows.forEach((r,i)=>{const x=L+i*bw+(bw-w)/2, g=goalOn(r.d).kcal||target;
+    if(r.logged){const parts=[['p',r.p*4,'var(--pro)'],['c',r.c*4,'var(--c-c)'],['f',r.f*9,'var(--c-f)']], sum=parts.reduce((a,q)=>a+q[1],0)||1, scale=r.kcal/sum; let acc=0;
+      parts.forEach(([k,v,c])=>{const h=v*scale/max*ih; if(h<=0) return; s+=`<rect x="${x.toFixed(1)}" y="${(y(acc+v*scale)).toFixed(1)}" width="${w.toFixed(1)}" height="${h.toFixed(1)}" fill="${c}"${r.d===TODAY()?' fill-opacity=".45"':''}/>`; acc+=v*scale});
+      if(r.kcal>g*1.1) s+=`<rect x="${x.toFixed(1)}" y="${(y(r.kcal)-3).toFixed(1)}" width="${w.toFixed(1)}" height="2" fill="var(--red)"/>`}
+    s+=`<rect x="${(L+i*bw).toFixed(1)}" y="${T}" width="${bw.toFixed(1)}" height="${ih}" fill="transparent" data-tip="${shortDate(r.d)} · ${r.logged?`${fmt(r.kcal)} kcal · P ${r0(r.p)} C ${r0(r.c)} F ${r0(r.f)} g`:'not logged'}"/>`;
+    s+=`<text x="${(L+i*bw+bw/2).toFixed(1)}" y="${H-5}" text-anchor="middle"${r.d===TODAY()?' style="fill:var(--label);font-weight:700"':''}>${parseYmd(r.d).toLocaleDateString('en-GB',{weekday:'narrow'})}</text>`});
+  return s+`<line class="tg" x1="${L}" x2="${W-R}" y1="${y(target).toFixed(1)}" y2="${y(target).toFixed(1)}"/><text x="${L-6}" y="${(y(target)+4).toFixed(1)}" text-anchor="end">${fmt(target)}</text></svg>
+    <div class="legend"><span><i style="background:var(--pro)"></i>Protein</span><span><i style="background:var(--c-c)"></i>Carbs</span><span><i style="background:var(--c-f)"></i>Fat</span></div>`;
+}
 function barChart(rows,target){
   const W=340,H=140,L=42,R=4,T=8,B=20,n=rows.length,iw=W-L-R,ih=H-T-B, NR=12, step=ih/NR, max=target*1.2;
   const y=v=>T+(1-v/max)*ih, bw=iw/n, anim=progAnim&&motionOK(), rad=(step*0.36).toFixed(2);
@@ -4238,8 +4389,8 @@ async function renderProgress(){
       <div class="stat"><span>Avg calories</span>${lg.length?statRoll(avg('kcal'),'',`${fmt(avg('kcal'))} kcal average`):'<b>–</b>'}<small>goal ${fmt(P.kcal)}</small></div>
       <div class="stat"><span>Avg protein</span>${lg.length?statRoll(avg('p'),' g',`${r0(avg('p'))} g protein average`):'<b>–</b>'}<small>goal ${P.p} g</small></div>
       <div class="stat"><span>Days logged</span><b>${lg.length}</b><small>of the last 6</small></div></div>
-      ${barChart(rows,P.kcal)}</section>
-    <p class="foot">One dot is a tenth of your goal. Red means more than 10% over it. Today is hollow and isn’t in the averages.</p>
+      ${lookDense()?stackChart(rows,P.kcal):barChart(rows,P.kcal)}</section>
+    <p class="foot">${lookDense()?'Each bar is a day’s calories split by protein, carbs and fat. A red line means more than 10% over. Today is faded and isn’t in the averages.':'One dot is a tenth of your goal. Red means more than 10% over it. Today is hollow and isn’t in the averages.'}</p>
     ${weekCard()}
     ${whoopSection()}
     ${lg.length?(()=>{const pk=avg('p')*4,fk=avg('f')*9,ck=avg('c')*4,gk=P.p*4+P.f*9+P.c*4||1;
@@ -4759,7 +4910,7 @@ function renderSettings(){
     <p class="foot">Sports you pick show on the Train tab with quick time buttons.</p>
     ${whoopSettings()}
     <div class="gap" style="height:14px"></div><h2 class="sec">Today Screen</h2>
-    <ul class="list">${sw('tWeek','Week, water and training')}${sw('tFits','Food ideas and check-in card')}${sw('tVit','Vitamins and fiber')}${sw('tDay','“Logged everything?” questions')}${whoopHas()||P.whoopLive?sw('tWhoop','WHOOP recovery, sleep and strain'):''}</ul>
+    <ul class="list"><li><label class="row single" for="s-look"><span class="t">Layout</span><select id="s-look" data-p="look" class="ssel">${[['dense','Detailed'],['tank','Tank']].map(([v,t])=>`<option value="${v}"${(lookDense()?'dense':'tank')===v?' selected':''}>${t}</option>`).join('')}</select></label></li>${sw('tWeek','Week, water and training')}${sw('tFits','Food ideas and check-in card')}${sw('tVit','Vitamins and fiber')}${sw('tDay','“Logged everything?” questions')}${whoopHas()||P.whoopLive?sw('tWhoop','WHOOP recovery, sleep and strain'):''}</ul>
     <p class="foot">Turn cards off to keep Today short. The weekly check-in is always on Progress.</p>
     <div class="gap" style="height:14px"></div><h2 class="sec">Meal Names</h2>
     <ul class="list">${MEALS.map(([k,l])=>`<li><label class="row single" for="s-meal-${k}"><span class="t">${l}</span><input type="text" id="s-meal-${k}" data-p="meal-${k}" class="stxt" maxlength="24" placeholder="${l}" value="${esc(((P.mealNames||{})[k])||'')}"></label></li>`).join('')}</ul>
@@ -4804,6 +4955,7 @@ function onSetting(e){const el=e.target.closest('[data-p]'); if(!el) return; con
   if(k==='name'){S.profile.name=el.value.trim().slice(0,40); save('profile',S.profile); return}
   if(k.startsWith('meal-')){S.profile.mealNames={...(S.profile.mealNames||{}),[k.slice(5)]:el.value.trim().slice(0,24)}; save('profile',S.profile); renderSeg&&$('#mealSeg')&&renderSeg(); return}
   if(k==='goal'||k==='act'){S.profile[k]=el.value; save('profile',S.profile); renderSettings(); return}
+  if(k==='look'){S.profile.look=el.value; save('profile',S.profile); applyLook(); haptic(); return}
   if(k==='motion'){S.profile.motion=el.value; save('profile',S.profile); applyMotionPref(); haptic(); return}
   if(k==='gymDays'){S.profile.gymDays=Math.max(0,Math.min(7,Math.round(+el.value||0))); save('profile',S.profile); return}
   if(k==='uBody'||k==='uHeight'||k==='uGym'){S.profile[k]=el.value; save('profile',S.profile); haptic(); renderSettings(); return}
@@ -5090,7 +5242,7 @@ document.addEventListener('focusin',e=>{const el=e.target; if(!el.matches||!el.m
 let sw=null, swallow=false;
 document.addEventListener('pointerdown',e=>{
   if(e.pointerType==='mouse'&&e.button!==0) return; if(sheetOpen()||selIds) return;
-  const row=e.target.closest('#v-today button.row[data-act="entry"]'), hero=row?null:e.target.closest('#v-today .dl-top');
+  const row=e.target.closest('#v-today button.row[data-act="entry"]'), hero=row?null:e.target.closest('#v-today .dl-top, #v-today .es');
   if(!row&&!hero) return; sw={row,hero,x:e.clientX,y:e.clientY,dx:0,on:false,id:e.pointerId};
 },{passive:true});
 document.addEventListener('pointermove',e=>{
@@ -5155,7 +5307,7 @@ function route(keepScroll){
   const done=(v==='today'?renderToday():v==='train'?renderTrain():v==='progress'?renderProgress():renderSettings());
   if(keepScroll!==true) window.scrollTo(0,0);
   /* Tab switch only (never on app open or redraws): content slides in from the side you moved toward, softly in focus. */
-  applyMotionPref(); if(moved&&motionLv()>=2) Promise.resolve(done).then(()=>{const el=$('#v-'+v); el.style.setProperty('--dx',(dir*14)+'px'); el.classList.remove('enter'); void el.offsetWidth; el.classList.add('enter'); clearTimeout(route.t); route.t=setTimeout(()=>el.classList.remove('enter'),700)});
+  applyMotionPref(); applyLook(); if(moved&&motionLv()>=2) Promise.resolve(done).then(()=>{const el=$('#v-'+v); el.style.setProperty('--dx',(dir*14)+'px'); el.classList.remove('enter'); void el.offsetWidth; el.classList.add('enter'); clearTimeout(route.t); route.t=setTimeout(()=>el.classList.remove('enter'),700)});
   titleScroll();
 }
 /* Large title shrinks and fades as you scroll; the small title in the bar comes into focus (Apple's large-title collapse). */
@@ -5219,6 +5371,7 @@ document.addEventListener('click',async ev=>{
     case 'tmatch': {const i=tray[+v]; if(i){i.picking=!i.picking; if(i.picking&&!USDA) loadUSDA().then(()=>renderTray()).catch(()=>{}); renderTray()}} break;
     case 'tpick': pickMatch(+v,b.dataset.k); break;
     case 'commit': commitTray(); break;
+    case 'ntSrc': showNtSources(v); break;
     case 'entry': if(selIds){selIds.has(v)?selIds.delete(v):selIds.add(v); if(!selIds.size) selIds=null; haptic(); renderToday(); break} openEdit(v); break;
     case 'dayst': setDayStatus(b.dataset.d||S.date,v); break;
     case 'repOk': repConfirm(v); break;
