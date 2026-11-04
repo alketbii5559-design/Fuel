@@ -3934,7 +3934,7 @@ function pickMatch(n,k){const i=tray[n]; if(!i||!i.aiq) return; const q=i.aiq; l
   if(!it) return; if(i.img) it.img=i.img; tray[n]=it; renderTray()}
 function trayMeta(i){return `${inG(i)?'':esc((+i.qty===1?'':r1(i.qty)+' × ')+i.serving)+' · '}${fmt(i.kcal*i.qty)} kcal · ${r0(i.p*i.qty)} g protein`}
 function trayStep(i,d){const z=sizeOf(i); if(inG(i)){const a=Math.max(z.un==='ml'||z.sz>=20?10:1,r0(i.qty*z.sz)+d*(z.sz>=20?10:1)); i.qty=a/z.sz} else i.qty=Math.max(0.5,r1(+i.qty+d*0.5))}
-function trayUnit(i){if(inG(i)){i.mode=undefined; i.qty=Math.max(0.5,r1(i.qty))} else if(sizeOf(i)) i.mode='g'; else {i.askSz=!i.askSz}}
+function trayUnit(i){const z=sizeOf(i); if(inG(i)){if(i.flip){i.flip=0; i.sz=z.sz; i.un=z.un==='ml'?'g':'ml'; i.mode=undefined; i.qty=Math.max(0.5,r1(i.qty))} else {i.flip=1; i.sz=z.sz; i.un=z.un==='ml'?'g':'ml'}} else if(z){i.mode='g'; i.flip=0} else {i.askSz=!i.askSz}}
 function focusQin(n){setTimeout(()=>{const q=$(`.qin[data-v="${n}"]`); if(q){q.focus(); q.select()}},60)}
 document.addEventListener('input',ev=>{
   const q=ev.target.closest&&ev.target.closest('.qin'); if(q){const i=tray[+q.dataset.v]; if(!i) return; const v=+q.value; if(!(v>=0)) return; const z=sizeOf(i); i.qty=inG(i)?v/z.sz:v;
@@ -4001,7 +4001,7 @@ function renderEdit(e){
   $('#editBody').innerHTML=`
     <div class="edit-head">${e.img?thumb(e,120):''}<h3>${esc(e.name)}</h3><p>${esc(e.serving)} · ${fmt(e.kcal)} kcal each</p></div>
     <div class="card" style="display:grid;gap:14px">
-      <div class="seg" role="group" aria-label="Amount in"><button data-act="eunit" data-v="srv" aria-pressed="${editing.mode!=='g'}">Servings</button><button data-act="eunit" data-v="g" aria-pressed="${editing.mode==='g'}">${editing.sz?(editing.un==='ml'?'Millilitres':'Grams'):'Grams / ml'}</button></div>
+      <div class="seg" role="group" aria-label="Amount in"><button data-act="eunit" data-v="srv" aria-pressed="${editing.mode!=='g'}">Servings</button><button data-act="eunit" data-v="g" aria-pressed="${editing.mode==='g'&&editing.un!=='ml'}">Grams</button><button data-act="eunit" data-v="ml" aria-pressed="${editing.mode==='g'&&editing.un==='ml'}">Millilitres</button></div>
       ${editing.askSz?`<div class="szrow"><span>1 serving${/^1 serving$/i.test(e.serving)?'':' ('+esc(e.serving)+')'} =</span><input class="szin" id="eSzIn" type="number" inputmode="decimal" min="0" aria-label="Serving size"><button class="btn tint" data-act="esz" data-u="g">g</button><button class="btn tint" data-act="esz" data-u="ml">ml</button></div>`:''}
       <div class="bigstep"><button data-act="eq" data-d="-1" aria-label="Less">−</button><div class="v"><input id="eQtyIn" type="number" inputmode="decimal" min="0" step="any" value="${editing.mode==='g'?r0(q*editing.sz):r1(q)}" aria-label="Amount"><span>${editing.mode==='g'?editing.un:'servings'}</span></div><button data-act="eq" data-d="1" aria-label="More">+</button></div>
       <p style="text-align:center;margin:0;color:var(--label2);font-size:15px" id="eTot"></p>
@@ -5082,7 +5082,7 @@ document.addEventListener('click',async ev=>{
     case 'mper': setPer(v); break;
     case 'tunit': {const i=tray[+v]; if(i){trayUnit(i); renderTray(); if(i.askSz) setTimeout(()=>{const z=$('#sz'+v); z&&z.focus()},40); else focusQin(+v)}} break;
     case 'tsz': {const i=tray[+v], z=+($('#sz'+v)||{}).value; if(i&&z>0){i.sz=r1(z); i.un=b.dataset.u; i.mode='g'; i.askSz=false; renderTray(); focusQin(+v)} else {const x=$('#sz'+v); x&&x.focus()}} break;
-    case 'eunit': if(v==='g'&&!editing.sz){editing.askSz=true; await eRerender(); setTimeout(()=>{const z=$('#eSzIn'); z&&z.focus()},40)} else {editing.mode=v; editing.askSz=false; if(v==='srv') editing.qty=Math.max(0.5,r1(editing.qty)); await eRerender()} break;
+    case 'eunit': if(v!=='srv'&&!editing.sz){editing.askSz=true; await eRerender(); setTimeout(()=>{const z=$('#eSzIn'); z&&z.focus()},40)} else {if(v==='srv') editing.mode='srv'; else {editing.mode='g'; editing.un=v} editing.askSz=false; if(v==='srv') editing.qty=Math.max(0.5,r1(editing.qty)); await eRerender()} break;
     case 'esz': {const z=+($('#eSzIn')||{}).value; if(z>0){editing.sz=r1(z); editing.un=b.dataset.u; editing.mode='g'; editing.askSz=false; await eRerender(); const q=$('#eQtyIn'); q&&(q.focus(),q.select())} else {const x=$('#eSzIn'); x&&x.focus()}} break;
     case 'pick': {const f=lastResults[+v]; if(!f) break; if(Array.isArray(f.items)){f.items.forEach(i=>tray.push({...i,qty:+i.qty||1,src:i.src||'db'})); renderTray(); flyToTray(b,f,tray.length-1); break} const ex=tray.find(i=>foodKey(i)===foodKey(f)&&i.src!=='ai'); if(ex) ex.qty=+ex.qty+1; else tray.push({...f,qty:1,src:'db',...(per100(f)&&!f.mode?{mode:'g'}:{})}); renderTray(); flyToTray(b,f,ex?tray.indexOf(ex):tray.length-1);} break;
     case 'tq': {const i=tray[+v]; if(i){trayStep(i,+b.dataset.d); renderTray();}} break;
