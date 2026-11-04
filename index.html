@@ -7,9 +7,19 @@
 <title>Fuel Tracker</title>
 <meta name="color-scheme" content="dark">
 <meta name="theme-color" content="#0b0b0e">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible+Mono:wght@400..500&family=Atkinson+Hyperlegible+Next:wght@400..800&family=Barlow+Semi+Condensed:wght@500;600;700&display=swap" rel="stylesheet">
+<!-- fonts are self-hosted: no Google round-trip, and they still load on networks that block Google -->
+<link rel="preload" href="fonts/atk-600.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="fonts/bsc-600.woff2" as="font" type="font/woff2" crossorigin>
+<style>@font-face{font-family:"Atkinson Hyperlegible Next";font-weight:400;font-display:swap;src:url(fonts/atk-400.woff2) format("woff2")}
+@font-face{font-family:"Atkinson Hyperlegible Next";font-weight:500;font-display:swap;src:url(fonts/atk-500.woff2) format("woff2")}
+@font-face{font-family:"Atkinson Hyperlegible Next";font-weight:600;font-display:swap;src:url(fonts/atk-600.woff2) format("woff2")}
+@font-face{font-family:"Atkinson Hyperlegible Next";font-weight:700;font-display:swap;src:url(fonts/atk-700.woff2) format("woff2")}
+@font-face{font-family:"Atkinson Hyperlegible Next";font-weight:800;font-display:swap;src:url(fonts/atk-800.woff2) format("woff2")}
+@font-face{font-family:"Atkinson Hyperlegible Mono";font-weight:400;font-display:swap;src:url(fonts/atkm-400.woff2) format("woff2")}
+@font-face{font-family:"Atkinson Hyperlegible Mono";font-weight:500;font-display:swap;src:url(fonts/atkm-500.woff2) format("woff2")}
+@font-face{font-family:"Barlow Semi Condensed";font-weight:500;font-display:swap;src:url(fonts/bsc-500.woff2) format("woff2")}
+@font-face{font-family:"Barlow Semi Condensed";font-weight:600;font-display:swap;src:url(fonts/bsc-600.woff2) format("woff2")}
+@font-face{font-family:"Barlow Semi Condensed";font-weight:700;font-display:swap;src:url(fonts/bsc-700.woff2) format("woff2")}</style>
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -749,9 +759,10 @@ input[switch]{accent-color:var(--pro)}
 /* data sources + nutrients */
 .ds{display:inline-block;font:600 12px/1.5 var(--font);padding:0 6px;border-radius:6px;background:var(--fill);color:var(--label2);margin-right:6px;vertical-align:1px;white-space:nowrap}
 .tn .ds,summary .ds{margin:0 0 0 8px}
-.ds-usda,.ds-recipe,.ds-table{color:#8fd8ff}
+.ds-usda,.ds-fdc,.ds-recipe,.ds-table{color:#8fd8ff}
 .ds-label,.ds-off{color:#c9f58f}
 .ds-ai{color:#14140a;background:var(--yel)}
+.ds-uae{color:var(--label)}
 .tsrc{font-size:13px;color:var(--label2);margin-top:2px;line-height:1.35}
 .tsrc .txtbtn{font-size:13px;padding:0;color:var(--link)}
 .mpick{grid-column:1/-1;display:grid;gap:6px;margin-top:8px}
@@ -848,6 +859,12 @@ section.ci:not(.card){padding:0}
 .etime{display:flex;align-items:center;justify-content:space-between;gap:10px;font-weight:600}
 .etime input{border:0;background:var(--fill);border-radius:10px;min-height:40px;padding:0 10px;font:600 16px var(--num);color:var(--label)}
 .foot.warn{color:var(--cal);font-weight:600}
+/* skeleton rows while the online databases answer */
+.row.skel{pointer-events:none;grid-template-columns:1fr auto}
+.row.skel i{display:block;height:11px;border-radius:4px;background:linear-gradient(90deg,var(--fill) 25%,rgba(255,255,255,.13) 50%,var(--fill) 75%);background-size:300% 100%;animation:skel 1.3s linear infinite}
+.row.skel .t i{width:62%;height:13px;margin-bottom:6px}.row.skel .d i{width:38%}.row.skel .k i{width:34px;height:15px}
+@keyframes skel{from{background-position:100% 0}to{background-position:-50% 0}}
+@media (prefers-reduced-motion:reduce){.row.skel i{animation:none}}
 
 /* ---------- Fuel · Tank (current look) ----------
    One world: a dark toy-like fuel tank on a piece of hardware. Liquid for today (Toybox), dots for history and timers
@@ -1011,7 +1028,7 @@ body{font-family:var(--font);font-weight:450;letter-spacing:-.005em;-webkit-font
 .exact .grid4 input{font:600 20px var(--font);letter-spacing:-.02em;background:var(--cell);box-shadow:inset 0 0 0 1px var(--hair)}
 .field label{font-size:13px}
 .ds{font:500 11px/1.6 var(--mono);letter-spacing:0;background:transparent;box-shadow:inset 0 0 0 1px var(--hair);color:var(--label2)}
-.ds-usda,.ds-recipe,.ds-table,.ds-label,.ds-off{color:var(--label2)}
+.ds-usda,.ds-fdc,.ds-recipe,.ds-table,.ds-label,.ds-off{color:var(--label2)}
 .ds-ai{color:#16130a;background:var(--yel);box-shadow:none}
 /* Today */
 .dl-sub .streak-t{font:500 13px var(--font);background:none;color:var(--label2);box-shadow:inset 0 0 0 1px var(--hair);border-radius:99px;padding:4px 10px;transform:none}
@@ -1802,7 +1819,7 @@ const apiKey=()=>{try{return localStorage.getItem('fuel-apikey')||''}catch(e){re
 const isGoogleKey=k=>{k=String(k||'').trim(); return !!k&&!/^sk-ant-/i.test(k)};   // Anthropic keys start sk-ant-; anything else is a Google AI Studio key (AIza… or the newer AQ.…)
 const GEMINI_MODELS=['gemini-3.5-flash-lite','gemini-2.5-flash-lite','gemini-3.8-flash','gemini-flash-latest'];   // fastest first: naming foods doesn't need a thinking model   // first that this key can use; the working one is remembered
 /* a request that never answers must end: 25 s, then a clear message instead of "Testing…" forever */
-const fetchT=async(url,opts)=>{const c=new AbortController(), t=setTimeout(()=>c.abort(),window.__aiTimeout||25000); try{return await fetch(url,{...opts,signal:c.signal})}catch(e){throw {code:c.signal.aborted?'timeout':'offline'}}finally{clearTimeout(t)}};
+const fetchT=async(url,opts,ms)=>{const c=new AbortController(), t=setTimeout(()=>c.abort(),ms||window.__aiTimeout||25000); try{return await fetch(url,{...opts,signal:c.signal})}catch(e){throw {code:c.signal.aborted?'timeout':'offline'}}finally{clearTimeout(t)}};
 const blobB64=b=>new Promise((res,rej)=>{const r=new FileReader(); r.onload=()=>res(String(r.result).split(',')[1]); r.onerror=rej; r.readAsDataURL(b)});
 function apiSample(){
   const call=async(prompt,opts)=>{
@@ -3150,7 +3167,7 @@ function catOf(name){const n=String(name||'').toLowerCase(); for(const [c,re] of
 function thumb(f,size){
   if(!(f&&typeof f.img==='string'&&f.img.startsWith('data:image/'))&&!size) return '';
   const s=size?` style="width:${size}px;height:${size}px;border-radius:${Math.round(size/4)}px"`:'';
-  if(f&&typeof f.img==='string'&&f.img.startsWith('data:image/')) return `<span class="thumb"${s}><img src="${f.img}" alt=""></span>`;
+  if(f&&typeof f.img==='string'&&f.img.startsWith('data:image/')) return `<span class="thumb"${s}><img src="${f.img}" alt="" decoding="async"></span>`;
   const c=catOf(f&&f.name);
   return `<span class="thumb"${s} style="--tc:${GC[c]};${size?`width:${size}px;height:${size}px;border-radius:${Math.round(size/4)}px`:''}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${G[c]}</svg></span>`;
 }
@@ -3191,7 +3208,9 @@ document.addEventListener('pointerout',e=>{const el=e.target.closest('[data-tip]
 document.addEventListener('click',e=>{const el=e.target.closest('[data-tip]'); if(el) showTip(el); else $$('.tip').forEach(t=>t.hidden=true)});
 async function thumbURL(cv){
   const S2=96, o=document.createElement('canvas'); o.width=o.height=S2; const s=Math.min(cv.width,cv.height);
-  o.getContext('2d').drawImage(cv,(cv.width-s)/2,(cv.height-s)/2,s,s,0,0,S2,S2); return o.toDataURL('image/jpeg',0.62);
+  o.getContext('2d').drawImage(cv,(cv.width-s)/2,(cv.height-s)/2,s,s,0,0,S2,S2);
+  /* WebP where the browser can encode it (Safari silently returns PNG instead, so check), else JPEG */
+  const j=o.toDataURL('image/jpeg',0.62), w=o.toDataURL('image/webp',0.6); return w.startsWith('data:image/webp')&&w.length<j.length?w:j;
 }
 
 /* ---------- rings ---------- */
@@ -3330,24 +3349,96 @@ function usdaItem(f,g,label){
   return {name:f[1],serving:label||`${rnd(g)} g`,sz:rnd(g),un:'g',kcal:r0(v.kcal),p:r1(v.p||0),c:r1(v.c||0),f:r1(v.f||0),
     ...nutOf({fb:v.fb!=null?r1(v.fb):null,sg:v.sg!=null?r1(v.sg):null,na:v.na!=null?r0(v.na):null}),...(Object.keys(mi).length?{mi}:{}),ds:{t:'usda',id:f[0],n:f[1]}};
 }
-/* Open Food Facts: what the package label says, by barcode. Only from the home-screen app (Claude's page blocks outside sites). */
+/* ---------- online databases (home-screen app only; Claude's page blocks outside sites) ----------
+   Open Food Facts: package labels for millions of products, UAE and Gulf products ranked first.
+   USDA FoodData Central: FNDDS survey dishes (mixed and restaurant-style foods), Foundation foods and US brand labels.
+   Every online item must pass a label check: its calories have to agree with its protein, carbs and fat. */
+const num=x=>x!=null&&x!==''&&isFinite(+x)?+x:null;
+function sane(v){const {kcal,p,c,f}=v; if(kcal==null||kcal<0||kcal>902) return false; const m=(p||0)+(c||0)+(f||0); if(m>102||(kcal>40&&m===0)) return false;
+  const est=4*(p||0)+4*(c||0)+9*(f||0); return Math.abs(est-kcal)<=Math.max(30,kcal*0.3)}
+function per100Item(name,v,sz,un,label,ds){const k=sz/100, mi={}; Object.entries(v.mi||{}).forEach(([key,x])=>{if(x!=null) mi[key]=rnd(x*k)});
+  return {name:String(name).slice(0,70),serving:label,sz:rnd(sz),un,kcal:r0(v.kcal*k),p:r1((v.p||0)*k),c:r1((v.c||0)*k),f:r1((v.f||0)*k),
+    ...nutOf({fb:v.fb!=null?r1(v.fb*k):null,sg:v.sg!=null?r1(v.sg*k):null,na:v.na!=null?r0(v.na*k):null}),...(Object.keys(mi).length?{mi}:{}),ds}}
+const titleCase=t=>/[a-z]/.test(t)?t:String(t).toLowerCase().replace(/(^|[\s(\-/&])([a-z])/g,(m,a,b)=>a+b.toUpperCase());
+const OFF_MI={ca:['calcium',1e3],fe:['iron',1e3],mg:['magnesium',1e3],k:['potassium',1e3],zn:['zinc',1e3],ph:['phosphorus',1e3],vc:['vitamin-c',1e3],vd:['vitamin-d',1e6],va:['vitamin-a',1e6],b12:['vitamin-b12',1e6],sat:['saturated-fat',1],chol:['cholesterol',1e3]};
+/* one Open Food Facts product as a loggable item; check=false for a barcode you scanned yourself */
+function offItem(p,code,check=true){
+  const n=p&&p.nutriments; if(!n) return null; const g=k=>num(n[k+'_100g']);
+  let kcal=g('energy-kcal'); if(kcal==null&&g('energy-kj')!=null) kcal=g('energy-kj')/4.184; if(kcal==null) return null;
+  const v={kcal,p:g('proteins'),c:g('carbohydrates'),f:g('fat'),fb:g('fiber'),sg:g('sugars'),na:g('sodium')!=null?g('sodium')*1000:null,mi:{}};
+  Object.entries(OFF_MI).forEach(([k,[o,m]])=>{const x=g(o); if(x!=null) v.mi[k]=x*m});
+  if(check&&!sane(v)) return null;
+  const unitTxt=[p.serving_quantity_unit,p.product_quantity_unit,p.serving_size,p.quantity].filter(Boolean).join(' ');
+  const un=/(^|[\d\s])(ml|cl|l)\b/i.test(unitTxt)&&!/\d\s*g\b/i.test(String(p.serving_size||''))?'ml':'g', sq=num(p.serving_quantity);
+  const brand=String(Array.isArray(p.brands)?p.brands[0]||'':String(p.brands||'').split(',')[0]).trim(), pn=String(p.product_name_en||p.product_name||'').trim();
+  const name=[brand&&!pn.toLowerCase().includes(brand.toLowerCase())?brand:'',pn].filter(Boolean).join(' ')||'Product';
+  return per100Item(name,v,sq>0?sq:100,un,sq>0?String(p.serving_size||`${sq} ${un}`).slice(0,40):`100 ${un}`,{t:'off',code:String(code||p.code||''),...(brand?{b:brand}:{})});
+}
+/* Open Food Facts: what the package label says, by barcode */
 async function offLookup(code){
   if(!STANDALONE||!code) return null;
-  try{
-    const r=await fetch(`https://world.openfoodfacts.org/api/v2/product/${encodeURIComponent(code)}.json?fields=product_name,brands,serving_size,serving_quantity,nutriments`);
-    if(!r.ok) return null; const j=await r.json(), p=j&&j.product, n=p&&p.nutriments; if(!n||n['energy-kcal_100g']==null) return null;
-    const per=+p.serving_quantity>0?+p.serving_quantity:100, f=per/100, gv=k=>{const x=n[k+'_100g']; return x!=null&&x!==''&&isFinite(+x)?+x*f:null};
-    const mi={}; Object.entries({ca:['calcium',1e3],fe:['iron',1e3],mg:['magnesium',1e3],k:['potassium',1e3],zn:['zinc',1e3],ph:['phosphorus',1e3],vc:['vitamin-c',1e3],vd:['vitamin-d',1e6],va:['vitamin-a',1e6],b12:['vitamin-b12',1e6],sat:['saturated-fat',1],chol:['cholesterol',1e3]})
-      .forEach(([k,[o,m]])=>{const v=gv(o); if(v!=null) mi[k]=rnd(v*m)});
-    const nm=[(p.brands||'').split(',')[0].trim(),p.product_name].filter(Boolean).join(' ')||'Product';
-    return {name:nm.slice(0,60),serving:+p.serving_quantity>0?String(p.serving_size||`${per} g`).slice(0,40):'100 g',sz:per,un:'g',kcal:r0(gv('energy-kcal')),p:r1(gv('proteins')||0),c:r1(gv('carbohydrates')||0),f:r1(gv('fat')||0),
-      ...nutOf({fb:gv('fiber')!=null?r1(gv('fiber')):null,sg:gv('sugars')!=null?r1(gv('sugars')):null,na:gv('sodium')!=null?r0(gv('sodium')*1000):null}),...(Object.keys(mi).length?{mi}:{}),ds:{t:'off',code}};
-  }catch(e){return null}
+  try{const r=await fetchT(`https://world.openfoodfacts.org/api/v2/product/${encodeURIComponent(code)}.json?fields=manufacturing_places,product_name,product_name_en,brands,serving_size,serving_quantity,serving_quantity_unit,product_quantity_unit,quantity,nutriments`,{},10000);
+    if(!r.ok) return null; const j=await r.json(); const it=j&&j.product?offItem(j.product,code,false):null; if(it&&madeUAE({...j.product,code})) it.ds.uae=1; return it}catch(e){return null}
+}
+const fdcKey=()=>{try{return localStorage.getItem('fuel-fdckey')||'DEMO_KEY'}catch(e){return 'DEMO_KEY'}};
+const FDC_MI={ca:'301',fe:'303',mg:'304',ph:'305',k:'306',zn:'309',cu:'312',mn:'315',se:'317',va:'320',ve:'323',vd:'328',b1:'404',b2:'405',b3:'406',b6:'415',fol:'435',b12:'418',cho:'421',vk:'430',vc:'401',sat:'606',mono:'645',poly:'646',chol:'601'};
+/* one FoodData Central search hit (nutrients per 100 g or ml) as a loggable item */
+function fdcItem(x){
+  const v={}; (x&&x.foodNutrients||[]).forEach(n=>{const k=String(n.nutrientNumber||n.number||''), a=num(n.value!=null?n.value:n.amount); if(k&&a!=null&&v[k]==null) v[k]=a});
+  const kcal=v['208']??v['958']??v['957']??(v['268']!=null?v['268']/4.184:null); if(kcal==null) return null;
+  const val={kcal,p:v['203'],c:v['205'],f:v['204'],fb:v['291'],sg:v['269'],na:v['307'],mi:{}}; Object.entries(FDC_MI).forEach(([k,id])=>{if(v[id]!=null) val.mi[k]=v[id]});
+  if(!sane(val)) return null;
+  const dt=String(x.dataType||''), br=/branded/i.test(dt); let sz=100, un='g', label='100 g';
+  if(br){const u=String(x.servingSizeUnit||'').toLowerCase(); un=/^(ml|mlt)$/.test(u)?'ml':'g'; label=`100 ${un}`;
+    if(num(x.servingSize)>0&&/^(g|grm|ml|mlt)$/.test(u)){sz=+x.servingSize; label=(x.householdServingFullText?titleCase(x.householdServingFullText)+' ':'')+`(${rnd(sz)} ${un})`}}
+  else {const m=(x.foodMeasures||[]).filter(m=>num(m.gramWeight)>0&&m.disseminationText&&!/quantity not specified/i.test(m.disseminationText)).sort((a,b)=>(a.rank||99)-(b.rank||99))[0]; if(m){sz=+m.gramWeight; label=`${m.disseminationText} (${rnd(sz)} g)`.slice(0,48)}}
+  const brand=br?titleCase(String(x.brandName||x.brandOwner||'').trim()):'', d=titleCase(String(x.description||'Food'));
+  return per100Item((brand&&!d.toLowerCase().includes(brand.toLowerCase())?brand+' ':'')+d,val,sz,un,label,{t:'fdc',id:x.fdcId,dt:br?'b':/survey/i.test(dt)?'s':'f',...(brand?{b:brand}:{})});
+}
+const GCC=/united-arab-emirates|saudi-arabia|oman|kuwait|qatar|bahrain/;
+/* made in the UAE: GS1 UAE barcodes start 629, or the label names a UAE place */
+const madeUAE=p=>/^629/.test(String(p.code||''))||/emirates|dubai|abu dhabi|sharjah|ajman|ras al|fujairah|umm al|al ain/i.test(String(p.manufacturing_places||'')+' '+String(p.manufacturing_places_tags||''));
+async function offSearch(q){
+  const fl='code,product_name,product_name_en,brands,serving_size,serving_quantity,serving_quantity_unit,product_quantity_unit,quantity,nutriments,countries_tags,manufacturing_places,unique_scans_n';
+  /* two asks at once: everything, and UAE products only, so local brands aren't crowded out by global ones */
+  const one=async(uae)=>{let hits=null;
+    try{const r=await fetchT(`https://search.openfoodfacts.org/search?q=${encodeURIComponent(q+(uae?' countries_tags:"en:united-arab-emirates"':''))}&page_size=${uae?25:40}&fields=${fl}`,{},8000); if(r.ok){const j=await r.json(); if(Array.isArray(j.hits)) hits=j.hits}}catch(e){}
+    if(!hits){const r=await fetchT(`https://world.openfoodfacts.org/cgi/search.pl?search_terms=${encodeURIComponent(q)}&search_simple=1&action=process&json=1&page_size=${uae?25:40}${uae?'&tagtype_0=countries&tag_contains_0=contains&tag_0=united-arab-emirates':''}&fields=${fl}`,{},10000); if(!r.ok) throw {code:'api_error'}; hits=(await r.json()).products||[]}
+    return hits};
+  const [g,u]=await Promise.allSettled([one(false),one(true)]); if(g.status==='rejected'&&u.status==='rejected') throw g.reason;
+  const seen=new Set(), terms=qTerms(q);
+  return [...(u.value||[]),...(g.value||[])].filter(p=>p&&!seen.has(p.code)&&seen.add(p.code)).map(p=>{const uae=madeUAE(p), it=offItem(p); if(!it) return null; const nm=it.name.toLowerCase(); if(!terms.every(t=>nm.includes(t))) return null;
+    if(uae) it.ds.uae=1; return [(uae?30:0)+(GCC.test(String(p.countries_tags||''))?20:0)+Math.log1p(+p.unique_scans_n||0)*2-nm.length*0.05,it]}).filter(Boolean).sort((a,b)=>b[0]-a[0]).map(x=>x[1]);
+}
+async function fdcSearch(q,all=true){
+  const r=await fetchT(`https://api.nal.usda.gov/fdc/v1/foods/search?api_key=${encodeURIComponent(fdcKey())}&query=${encodeURIComponent(q)}&pageSize=40${all?'&requireAllWords=true':''}&dataType=${encodeURIComponent('Survey (FNDDS),Foundation,Branded')}`,{},9000);
+  if(r.status===429) throw {code:'rate_limited'}; if(r.status===403||r.status===401) throw {code:'bad_key'}; if(!r.ok) throw {code:'api_error'};
+  return ((await r.json()).foods||[]).map(fdcItem).filter(Boolean);
+}
+/* both databases at once, each query asked once: cached for a week (saves the free USDA quota) and shared while in flight */
+const LIVE=new Map(), LIVE_RUN=new Map(), LIVE_DAY=7*864e5;
+try{Object.entries(JSON.parse(localStorage.getItem('fuel-live')||'{}')).forEach(([k,v])=>{if(v&&Date.now()-v.t<LIVE_DAY) LIVE.set(k,v)})}catch(e){}
+function liveSave(){try{localStorage.setItem('fuel-live',JSON.stringify(Object.fromEntries([...LIVE].filter(([,v])=>!v.err).slice(-60))))}catch(e){}}
+function liveSearch(q){
+  q=String(q).trim().toLowerCase(); const hit=LIVE.get(q); if(hit&&!hit.err) return Promise.resolve(hit); if(LIVE_RUN.has(q)) return LIVE_RUN.get(q);
+  const run=Promise.allSettled([offSearch(q),fdcSearch(q)]).then(([o,f])=>{
+    const fd=f.status==='fulfilled'?f.value:[], res={t:Date.now(),off:o.status==='fulfilled'?o.value.slice(0,15):[],dish:fd.filter(x=>x.ds.dt!=='b').slice(0,12),brand:fd.filter(x=>x.ds.dt==='b').slice(0,12)};
+    if(o.status==='rejected'&&f.status==='rejected') res.err=(f.reason&&f.reason.code)||'offline'; else if(f.status==='rejected') res.fdcErr=f.reason&&f.reason.code;
+    LIVE.set(q,res); if(!res.err) liveSave(); return res}).finally(()=>LIVE_RUN.delete(q));
+  LIVE_RUN.set(q,run); return run;
+}
+/* AI-named food with no offline match: try a USDA dish, then a package label, by best word overlap */
+async function liveMatch(name){
+  if(!STANDALONE) return null; const terms=qTerms(name); if(!terms.length) return null;
+  let list=[]; try{list=await fdcSearch(name,false)}catch(e){}
+  if(!list.length) try{list=await offSearch(name)}catch(e){}
+  const sc=it=>{const nm=it.name.toLowerCase(); return terms.filter(t=>nm.includes(t)).length/terms.length-(it.ds.dt==='b'?0.15:0)-nm.length*0.002};
+  const best=list.map(it=>[sc(it),it]).sort((a,b)=>b[0]-a[0])[0]; return best&&best[0]>=0.6?best[1]:null;
 }
 /* where a number came from */
 function dsOf(e){ if(e&&e.ds&&e.ds.t) return e.ds; const s=e&&e.src;
   return s==='ai'?{t:'ai'}:s==='label'?{t:'label'}:s==='manual'||s==='quick'?{t:'you'}:Array.isArray(e&&e.items)?{t:'meal'}:e&&e.recipe?{t:'recipe'}:null}
-const DS_NAME={usda:'USDA',recipe:'Recipe',label:'Label',table:'Lab table',off:'Barcode',you:'You',ai:'AI guess',meal:'Meal'};
+const DS_NAME={usda:'USDA',recipe:'Recipe',label:'Label',table:'Lab table',off:'Package',fdc:'USDA',you:'You',ai:'AI guess',meal:'Meal'};
 const srcTag=e=>{const d=dsOf(e); return d&&DS_NAME[d.t]?`<span class="ds ds-${d.t}">${DS_NAME[d.t]}</span>`:''};
 const ndb=id=>'#'+String(id).padStart(5,'0');
 function dsText(e){const d=dsOf(e); if(!d) return 'Logged before sources were tracked.';
@@ -3355,7 +3446,8 @@ function dsText(e){const d=dsOf(e); if(!d) return 'Logged before sources were tr
   if(d.t==='recipe') return d.ids?`Built from USDA SR28 ingredients: ${d.ids.map(([i,g])=>`${ndb(i)} × ${g} g`).join(', ')}`:'Your recipe, from its ingredients.';
   if(d.t==='label') return d.by?`Printed label: ${d.by}`:'Read from the printed nutrition label.';
   if(d.t==='table') return d.by||'National food composition table.';
-  if(d.t==='off') return `Open Food Facts${d.code?`, barcode ${d.code}`:''} (the package label).`;
+  if(d.t==='off') return `Open Food Facts${d.b?` · ${d.b}`:''}${d.uae?' · made in the UAE':''}${d.code?`, barcode ${d.code}`:''} (the package label).`;
+  if(d.t==='fdc') return `USDA FoodData Central #${d.id} · ${d.dt==='b'?'brand label'+(d.b?`: ${d.b}`:''):d.dt==='s'?'FNDDS survey dish':'Foundation food'}${e.aiq?' · matched from the AI’s description':''}`;
   if(d.t==='you') return 'Entered by you.';
   if(d.t==='meal') return 'Your saved meal: each part keeps its own source.';
   return 'AI guess: not from a database. Tap Change match to pick a USDA food.'}
@@ -3378,7 +3470,12 @@ function matchItem(x){
   const m=USDA&&usdaRank(aiq.usda||aiq.name,1,false)[0]; if(m){aiq.g=g0||(m[4][0]?m[4][0][1]:100); return fromUsda(m,aiq.g,aiq)}
   return aiGuessItem({...x,grams:g0||100});
 }
-async function idItems(v){const arr=Array.isArray(v&&v.items)?v.items:[]; try{await loadUSDA()}catch(e){} return arr.filter(x=>x&&(+x.grams>0||+x.kcal>0)).map(matchItem)}
+async function idItems(v){const arr=Array.isArray(v&&v.items)?v.items:[]; try{await loadUSDA()}catch(e){}
+  const out=arr.filter(x=>x&&(+x.grams>0||+x.kcal>0)).map(matchItem);
+  /* still an AI guess: ask the online databases before falling back to the AI's numbers */
+  await Promise.all(out.map(async(it,i)=>{if(dsOf(it).t!=='ai') return; const m=await liveMatch(it.aiq.usda&&it.aiq.name.split(' ').length<2?it.aiq.usda:it.aiq.name).catch(()=>null);
+    if(m){const g=it.aiq.g||m.sz; out[i]={...m,name:it.aiq.name||m.name,qty:Math.max(0.01,g/m.sz),mode:'g',src:'ai',aiq:it.aiq}}}));
+  return out}
 function matchChoices(i){const q=i.aiq||{name:i.name}, words=qTerms(q.name);
   const fuel=FOODS.filter(f=>{const n=f.name.toLowerCase(); return words.some(w=>w.length>2&&n.includes(w))}).slice(0,4);
   const us=USDA?usdaRank(q.usda||q.name,6,false):[]; return {fuel,us}}
@@ -3831,6 +3928,8 @@ async function runDescribe(){
 let selMeal='breakfast', tray=[], lastResults=[];
 function autoMeal(){const h=new Date().getHours(); return h<11?'breakfast':h<16?'lunch':h<18?'snacks':h<23?'dinner':'snacks'}
 function openAdd(){
+  /* start fetching the USDA list now (after the sheet has slid in) so search is ready when you type */
+  if(!USDA) setTimeout(()=>loadUSDA().catch(()=>{}),450);
   selMeal=autoMeal(); tray=[]; pendingCode=''; renderSeg(); $('#q').value=''; renderResults(); renderTray(); status('');
   $('#descBox').hidden=true; $('#manualBox').hidden=true; savingMeal=false; savingRecipe=false; rcDraft={name:'',n:4,w:'',edit:null}; renderAI(); openSheet('#addSheet');
 }
@@ -3857,10 +3956,11 @@ async function logUsual(){
   toastUndo(`Added your usual ${mealName(selMeal).toLowerCase()}`,async()=>{const d=await getDay(S.date); d.entries=d.entries.filter(e=>!ids.has(e.id)); d.del=uniqDel(d.del,[...ids]); saveDay(d); renderToday()});
 }
 const isFav=f=>S.foods.favs.some(x=>foodKey(x)===foodKey(f));
+let liveT=0;
 function renderResults(){
   const q=$('#q').value.trim().toLowerCase(); lastResults=[]; let html='';
   const sec=(title,list)=>{if(!list.length) return; html+=`<h2 class="sec" style="margin-top:6px">${title}</h2><ul class="list">${list.map(f=>{lastResults.push(f); const i=lastResults.length-1;
-    return `<li><button class="row" data-act="pick" data-v="${i}"><span class="t">${esc(f.name)}</span><span class="d">${srcTag(f)}${esc(f.serving)} · ${r0(f.p)} g protein</span><span class="k">${fmt(f.kcal)}</span><svg class="chev" viewBox="0 0 16 16" fill="none" stroke="var(--blue)" stroke-width="2.4" stroke-linecap="round" style="width:16px;height:16px"><path d="M8 3v10M3 8h10"/></svg></button></li>`}).join('')}</ul>`};
+    return `<li><button class="row" data-act="pick" data-v="${i}"><span class="t">${esc(f.name)}</span><span class="d">${srcTag(f)}${f.ds&&f.ds.uae?'<span class="ds ds-uae">UAE</span>':''}${esc(f.serving)} · ${r0(f.p)} g protein</span><span class="k">${fmt(f.kcal)}</span><svg class="chev" viewBox="0 0 16 16" fill="none" stroke="var(--blue)" stroke-width="2.4" stroke-linecap="round" style="width:16px;height:16px"><path d="M8 3v10M3 8h10"/></svg></button></li>`}).join('')}</ul>`};
   if(!q){
     const fk=new Set(S.foods.favs.map(foodKey));
     sec('Favourites',S.foods.favs); sec('Recent',S.foods.recents.filter(f=>!fk.has(foodKey(f))).slice(0,10));
@@ -3873,7 +3973,14 @@ function renderResults(){
     sec('My Foods',mine); sec('Foods',db.slice(0,30));
     if(USDA){const us=usdaRank(q,25,true).map(f=>usdaItem(f)); sec('USDA Database',us)}
     else{html+=`<p class="foot usda-wait" style="text-align:center">Searching 8,000+ USDA foods…</p>`; loadUSDA().then(()=>{const qq=$('#q'); if(qq&&qq.value.trim().toLowerCase()===q) renderResults()}).catch(()=>{const n=$('#results .usda-wait'); if(n) n.textContent='The USDA list didn’t load. Check your connection.'})}
-    if(!html) html=`<p class="foot" style="text-align:center">No results for “${esc(q)}”. Try Describe It, or enter it manually.</p>`;
+    if(STANDALONE&&q.length>=3){const L=LIVE.get(q), had=new Set(lastResults.map(f=>f.name.toLowerCase())), nd=l=>l.filter(f=>{const k=f.name.toLowerCase(); if(had.has(k)) return false; had.add(k); return true});
+      if(L){sec('USDA Dishes',nd(L.dish)); sec('Package Labels',nd([...L.off,...L.brand]).slice(0,20));
+        if(L.err) html+=`<p class="foot" style="text-align:center">${L.err==='offline'||L.err==='timeout'?'Online food databases didn’t answer, so these are offline results only.':'Online food databases are busy. Offline results only.'}</p>`;
+        else if(L.fdcErr) html+=`<p class="foot" style="text-align:center">${L.fdcErr==='rate_limited'?'USDA’s free search limit is used up for now. Add your own free USDA key in Settings.':L.fdcErr==='bad_key'?'Your USDA key was turned down. Check it in Settings.':'USDA online didn’t answer; package labels still searched.'}</p>`}
+      else {const sk=`<li><div class="row skel" aria-hidden="true"><span><span class="t"><i></i></span><span class="d"><i></i></span></span><span class="k"><i></i></span></div></li>`;
+        html+=`<h2 class="sec" style="margin-top:6px">Online Databases</h2><ul class="list live-wait" aria-label="Searching online food databases">${sk.repeat(3)}</ul>`;
+        clearTimeout(liveT); liveT=setTimeout(()=>liveSearch(q).then(()=>{const qq=$('#q'); if(qq&&qq.value.trim().toLowerCase()===q) renderResults()}),420)}}
+    if(!lastResults.length&&!/live-wait|usda-wait/.test(html)) html+=`<p class="foot" style="text-align:center">No results for “${esc(q)}”. Try Describe It, or enter it manually.</p>`;
   }
   $('#results').innerHTML=html;
 }
@@ -4650,6 +4757,9 @@ function renderSettings(){
       <li><button class="row single action" style="grid-template-columns:1fr" data-act="testKey"><span class="t">Test Key</span></button></li>
       <li><label class="row single" for="s-aiCap"><span class="t">Monthly limit</span><span style="display:flex;align-items:center;gap:4px"><input type="number" id="s-aiCap" data-p="aiCap" inputmode="numeric" placeholder="none" value="${+P.aiCap>0?esc(P.aiCap):''}"><span style="color:var(--label2)">uses</span></span></label></li></ul>
     <p class="foot">Photo and Describe It use your own key: a free one from aistudio.google.com/apikey, or a paid one from console.anthropic.com. It stays on this iPhone and isn’t saved in backups. The AI only names foods and guesses grams; the numbers come from USDA and labels. This month: ${aiUse().n} use${aiUse().n===1?'':'s'}${isGoogleKey(apiKey())?', free. With a free Google key, Google may use what you send to improve its products.':`, about $${(aiUse().n*0.015).toFixed(2)}.`}</p>`:''}
+    ${STANDALONE?`<div class="gap"></div><h2 class="sec">Food Databases</h2>
+    <ul class="list"><li><label class="row single" for="s-fdckey"><span class="t">USDA key</span><input type="password" id="s-fdckey" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="optional" value="${esc(fdcKey()==='DEMO_KEY'?'':fdcKey())}" style="width:170px;text-align:right;border:0;background:none;color:var(--label2);font:inherit;outline:none"></label></li></ul>
+    <p class="foot">Search also checks USDA FoodData Central (dishes and US brands) and Open Food Facts (package labels, UAE products first). Items whose calories don’t add up from their protein, carbs and fat are left out. USDA’s shared free access allows about 30 searches an hour; a free key from api.data.gov/signup raises that to 1,000.</p>`:''}
     <div class="gap"></div><h2 class="sec">Food Notes for AI</h2>
     <textarea id="s-notes" data-p="notes" aria-label="Food notes for AI">${esc(P.notes)}</textarea>
     <p class="foot">Used when the AI estimates your food.</p>
@@ -5133,7 +5243,8 @@ $('#snapIn').addEventListener('change',e=>{const f=e.target.files[0]; e.target.v
 document.addEventListener('change',e=>{if(e.target.id==='restoreIn'){const f=e.target.files[0]; e.target.value=''; if(f) restoreJSON(f)}});
 $('#labelIn').addEventListener('change',e=>{const f=e.target.files[0]; e.target.value=''; if(f) onLabel(f)});
 $('#v-settings').addEventListener('change',onSetting);
-$('#v-settings').addEventListener('change',e=>{if(e.target.id!=='s-apikey') return; const k=e.target.value.trim(); try{k?localStorage.setItem('fuel-apikey',k):localStorage.removeItem('fuel-apikey')}catch(x){} sample=k?apiSample():null; imgOK=!!sample; renderAI(); toast(k?'Key saved on this iPhone':'Key removed')});
+$('#v-settings').addEventListener('change',e=>{if(e.target.id==='s-fdckey'){const k=e.target.value.trim(); try{k?localStorage.setItem('fuel-fdckey',k):localStorage.removeItem('fuel-fdckey')}catch(x){} [...LIVE].forEach(([q,v])=>{if(v.fdcErr) LIVE.delete(q)}); toast(k?'USDA key saved on this iPhone':'Using USDA’s shared access'); return}
+  if(e.target.id!=='s-apikey') return; const k=e.target.value.trim(); try{k?localStorage.setItem('fuel-apikey',k):localStorage.removeItem('fuel-apikey')}catch(x){} sample=k?apiSample():null; imgOK=!!sample; renderAI(); toast(k?'Key saved on this iPhone':'Key removed')});
 $('#v-settings').addEventListener('input',e=>{if(e.target.id==='s-notes') onSetting(e)});
 document.addEventListener('keydown',e=>{if(e.key==='Escape'){if(!$('#editSheet').hidden) closeSheet('#editSheet'); else closeSheet('#addSheet')}});
 
