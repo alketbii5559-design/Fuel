@@ -1591,6 +1591,33 @@ body[data-look="dense"] .start-card h2{font-size:28px}
 .nt-r.over .nt-t i{background:var(--red)}.nt-r.over .nt-p{color:var(--red)}
 .nt .nfoot{margin:10px 0 0}
 .nt-sum{margin:0 4px 12px;font:400 15px var(--font);color:var(--label2)}.nt-sum b{font:700 22px var(--num);color:var(--label)}
+/* ---------- Amount pad (5 Nov) ---------- */
+.amt{position:fixed;inset:0;z-index:70;display:flex;align-items:flex-end;justify-content:center}
+.amt-bg{position:absolute;inset:0;background:rgba(0,0,0,.5);opacity:0;transition:opacity 240ms var(--e-out)}
+.amt-p{position:relative;width:100%;max-width:520px;background:var(--cell);border-radius:20px 20px 0 0;box-shadow:inset 0 1px 0 var(--hair);padding:10px 16px calc(12px + env(safe-area-inset-bottom));display:grid;gap:12px;transform:translateY(100%);transition:transform 280ms var(--e-out)}
+.amt.on .amt-bg{opacity:1}.amt.on .amt-p{transform:none}
+@media (prefers-reduced-motion:reduce){.amt-p{transition:opacity 200ms;transform:none;opacity:0}.amt.on .amt-p{opacity:1}}
+.amt-top{display:grid;grid-template-columns:auto minmax(0,1fr) auto;align-items:center;gap:10px;min-height:44px}
+.amt-top b{text-align:center;font:600 16px var(--font);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.amt-top .txtbtn{font-size:16px;color:var(--label2)}
+.amt-done{background:var(--btn);color:var(--btn-ink);border:0;border-radius:99px;padding:0 18px;min-height:38px;font:700 16px var(--font)}
+.amt-done:active{transform:scale(.97)}
+.amt-note{margin:0;text-align:center;font-size:13px;color:var(--label2)}
+.amt-big{display:grid;grid-template-columns:52px 1fr 52px;align-items:center;gap:8px}
+.amt-big>button{height:52px;border-radius:14px;border:0;background:var(--fill);color:var(--label);font:500 26px var(--font)}
+.amt-v{display:flex;align-items:baseline;justify-content:center;gap:8px;min-width:0}
+.amt-v b{font:700 54px/1 var(--num);letter-spacing:-.02em}
+.amt-v.fresh b{color:var(--label);text-decoration:underline 2px var(--label3);text-underline-offset:8px}
+.amt-v span{font:500 17px var(--font);color:var(--label2)}
+.amt-k{margin:-4px 0 0;text-align:center;font:500 14px var(--font);color:var(--label2)}
+.amt-q{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;padding:2px 0}
+.amt-q::-webkit-scrollbar{display:none}
+.amt-q .chip2{flex:0 0 auto;white-space:nowrap}
+.amt-q .chip2.on{box-shadow:inset 0 0 0 1.5px var(--label)}
+.amt-keys{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
+.amt-keys button{height:52px;border:0;border-radius:12px;background:var(--fill);color:var(--label);font:600 24px var(--num);display:grid;place-items:center}
+.amt-keys button:active,.amt-big>button:active{transform:scale(.97);background:color-mix(in srgb,var(--fill) 60%,var(--label3))}
+.qin,#eQtyIn{cursor:pointer;caret-color:transparent}
 </style>
 </head>
 <body>
@@ -4145,7 +4172,7 @@ function renderTray(){
   const t=tray.reduce((a,i)=>{const q=+i.qty||0;a.k+=i.kcal*q;a.p+=i.p*q;return a},{k:0,p:0});
   el.hidden=false;
   el.innerHTML=`<ul>${tray.map((i,n)=>{const z=sizeOf(i),g=inG(i);return `<li>${thumb(i)||'<span></span>'}<div><div class="tn">${esc(i.name)}${srcTag(i)}</div><div class="tm" id="tm${n}">${trayMeta(i)}</div>${i.aiq?`<div class="tsrc">${dsOf(i).t==='ai'?'No database match':esc(dsOf(i).n||((dsOf(i).t==='recipe'?'Fuel recipe: ':'Fuel food: ')+i.name))} · <button class="txtbtn" data-act="tmatch" data-v="${n}">${i.picking?'Close':'Change match'}</button></div>`:''}</div>
-    <div style="display:flex;align-items:center"><div class="stepper"><button data-act="tq" data-v="${n}" data-d="-1" aria-label="Less">−</button><i></i><input class="qin" data-v="${n}" type="number" inputmode="decimal" min="0" step="any" value="${g?r0(i.qty*z.sz):r1(i.qty)}" aria-label="${g?'Amount in '+z.un:'Servings'}"><button class="unit" data-act="tunit" data-v="${n}" aria-label="Switch unit">${g?z.un:'srv'}</button><i></i><button data-act="tq" data-v="${n}" data-d="1" aria-label="More">+</button></div><button class="x" data-act="tdel" data-v="${n}" aria-label="Remove ${esc(i.name)}"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg></button></div>${i.picking?matchPicker(i,n):''}${i.askSz?`<div class="szrow"><span>1 serving${/^1 serving$/i.test(i.serving)?'':' ('+esc(i.serving)+')'} =</span><input class="szin" id="sz${n}" type="number" inputmode="decimal" min="0" aria-label="Serving size"><button class="btn tint" data-act="tsz" data-v="${n}" data-u="g">g</button><button class="btn tint" data-act="tsz" data-v="${n}" data-u="ml">ml</button></div>`:''}</li>`}).join('')}</ul>
+    <div style="display:flex;align-items:center"><div class="stepper"><button data-act="tq" data-v="${n}" data-d="-1" aria-label="Less">−</button><i></i><input class="qin" data-v="${n}" type="text" inputmode="none" readonly value="${g?r0(i.qty*z.sz):r1(i.qty)}" aria-label="${g?'Amount in '+z.un:'Servings'}"><button class="unit" data-act="${z?'tamt':'tunit'}" data-v="${n}" aria-label="${z?'Change amount or unit':'Set grams per serving'}">${g?z.un:'srv'}</button><i></i><button data-act="tq" data-v="${n}" data-d="1" aria-label="More">+</button></div><button class="x" data-act="tdel" data-v="${n}" aria-label="Remove ${esc(i.name)}"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg></button></div>${i.picking?matchPicker(i,n):''}${i.askSz?`<div class="szrow"><span>1 serving${/^1 serving$/i.test(i.serving)?'':' ('+esc(i.serving)+')'} =</span><input class="szin" id="sz${n}" type="number" inputmode="decimal" min="0" aria-label="Serving size"><button class="btn tint" data-act="tsz" data-v="${n}" data-u="g">g</button><button class="btn tint" data-act="tsz" data-v="${n}" data-u="ml">ml</button></div>`:''}</li>`}).join('')}</ul>
     ${savingRecipe&&tray.length?recipeForm(t):tray.length>1||tray.some(i=>i.aiq)?(savingMeal?`<div style="display:grid;grid-template-columns:1fr auto;gap:8px"><input type="text" id="mealName" value="${esc(tray.length===1?(tray[0].aiq&&tray[0].aiq.name)||tray[0].name:lastDesc||'')}" placeholder="Name, e.g. My eggs breakfast" style="border:0;background:var(--fill);border-radius:10px;padding:0 12px;min-height:42px;outline:none" aria-label="Meal name"><button class="btn tint" style="width:auto;min-height:42px" data-act="saveMeal">Save</button></div>`:(tray.length===1?`<div class="savebtns"><button class="txtbtn" data-act="saveMealAsk">Remember This Dish</button></div>`:`<div class="savebtns"><button class="txtbtn" data-act="saveMealAsk">${tray.some(i=>i.aiq)?'Remember as a Meal':'Save as Meal'}</button><button class="txtbtn" data-act="saveRecipeAsk">Save as Recipe</button></div>`)):''}
     ${savingRecipe&&tray.length?'':`<button class="btn" data-act="commit" id="trayGo">Add ${fmt(t.k)} kcal to ${mealName(selMeal)}</button>`}`;
   if(savingMeal) setTimeout(()=>{const m=$('#mealName'); m&&m.focus()},30);
@@ -4198,12 +4225,66 @@ function pickMatch(n,k){const i=tray[n]; if(!i||!i.aiq) return; const q=i.aiq; l
 function trayMeta(i){return `${inG(i)?'':esc((+i.qty===1?'':r1(i.qty)+' × ')+i.serving)+' · '}${fmt(i.kcal*i.qty)} kcal · ${r0(i.p*i.qty)} g protein`}
 function trayStep(i,d){const z=sizeOf(i); if(inG(i)){const a=Math.max(z.un==='ml'||z.sz>=20?10:1,r0(i.qty*z.sz)+d*(z.sz>=20?10:1)); i.qty=a/z.sz} else i.qty=Math.max(0.5,r1(+i.qty+d*0.5))}
 function trayUnit(i){const z=sizeOf(i); if(inG(i)){if(i.flip){i.flip=0; i.sz=z.sz; i.un=z.un==='ml'?'g':'ml'; i.mode=undefined; i.qty=Math.max(0.5,r1(i.qty))} else {i.flip=1; i.sz=z.sz; i.un=z.un==='ml'?'g':'ml'}} else if(z){i.mode='g'; i.flip=0} else {i.askSz=!i.askSz}}
-function focusQin(n){setTimeout(()=>{const q=$(`.qin[data-v="${n}"]`); if(q){q.focus(); q.select()}},60)}
+function focusQin(n){setTimeout(()=>{if(tray[n]&&!sheetBusy()) trayAmt(n)},80)}
+const sheetBusy=()=>!!AMT;
 document.addEventListener('input',ev=>{
   const q=ev.target.closest&&ev.target.closest('.qin'); if(q){const i=tray[+q.dataset.v]; if(!i) return; const v=+q.value; if(!(v>=0)) return; const z=sizeOf(i); i.qty=inG(i)?v/z.sz:v;
     const m=$('#tm'+q.dataset.v); if(m) m.innerHTML=trayMeta(i); const t=tray.reduce((a,x)=>a+x.kcal*(+x.qty||0),0), go=$('#trayGo'); if(go) go.textContent=`Add ${fmt(t)} kcal to ${mealName(selMeal)}`; return}
   if(ev.target.id==='eQtyIn'&&editing){const v=+ev.target.value; if(!(v>=0)) return; editing.qty=editing.mode==='g'&&editing.sz?v/editing.sz:v; eTotUpd()}
 });
+/* ---------- Amount pad: one place to set how much you ate. Own keypad (no iPhone keyboard, so there's always a Done),
+   unit switch, quick amounts, live calories. Used by the Add tray and the Edit sheet. ---------- */
+let AMT=null;
+function amtOpen(o){
+  /* o: {name, serving, sz, un0 (the food's own unit), mode:'g'|'srv', un, amount, kcal, p (per serving), done(mode,un,amount)} */
+  AMT={...o,str:String(o.amount),fresh:true};
+  let el=$('#amt'); if(!el){el=document.createElement('div'); el.id='amt'; el.className='amt'; el.hidden=true; document.body.appendChild(el)}
+  amtRender(); el.hidden=false; requestAnimationFrame(()=>el.classList.add('on')); haptic();
+}
+function amtClose(){const el=$('#amt'); if(!el) return; el.classList.remove('on'); AMT=null; setTimeout(()=>{if(!AMT) el.hidden=true},motionOK()?240:0)}
+const amtVal=()=>{const v=parseFloat(String(AMT.str).replace(',','.')); return v>=0?v:0};
+const amtServ=()=>AMT.mode==='g'&&AMT.sz?amtVal()/AMT.sz:amtVal();
+function amtQuick(){
+  if(AMT.mode==='g'){const z=AMT.sz, base=AMT.un==='ml'?[100,200,250,330,500]:[50,100,150,200,250,300], s=new Set(base);
+    const out=base.map(v=>[v,`${v} ${AMT.un}`]); if(z&&!s.has(r0(z))) out.unshift([r0(z),`1 serving · ${r0(z)} ${AMT.un}`]); return out.slice(0,6)}
+  return [[0.5,'½'],[1,'1'],[1.5,'1½'],[2,'2'],[3,'3']];
+}
+function amtRender(){
+  const el=$('#amt'); if(!el||!AMT) return; const q=amtServ(), units=[['srv','Servings']].concat(AMT.sz?[['g','Grams']].concat(AMT.liq?[['ml','Millilitres']]:[]):[]), cur=AMT.mode==='g'?AMT.un:'srv', v=amtVal();
+  el.innerHTML=`<div class="amt-bg" data-amt="cancel"></div><div class="amt-p" role="dialog" aria-label="Amount for ${esc(AMT.name)}">
+    <div class="amt-top"><button class="txtbtn" data-amt="cancel">Cancel</button><b>${esc(AMT.name)}</b><button class="amt-done" data-amt="done">Done</button></div>
+    ${units.length>1?`<div class="seg" role="group" aria-label="Amount in">${units.map(([k,l])=>`<button data-amt="unit" data-v="${k}" aria-pressed="${cur===k}">${l}</button>`).join('')}</div>`:`<p class="amt-note">No gram weight for this food, so it's in servings (${esc(AMT.serving)}).</p>`}
+    <div class="amt-big"><button data-amt="step" data-d="-1" aria-label="Less">−</button><div class="amt-v${AMT.fresh?' fresh':''}" aria-live="polite"><b class="num">${esc(AMT.str||'0')}</b><span>${AMT.mode==='g'?AMT.un:v===1?'serving':'servings'}</span></div><button data-amt="step" data-d="1" aria-label="More">+</button></div>
+    <p class="amt-k num">${fmt(AMT.kcal*q)} kcal · ${r0(AMT.p*q)} g protein${AMT.mode==='g'?` · ${r1(q)} × ${esc(AMT.serving)}`:AMT.sz?` · ${r0(q*AMT.sz)} ${AMT.un}`:''}</p>
+    <div class="amt-q">${amtQuick().map(([n,l])=>`<button class="chip2${Math.abs(v-n)<1e-9?' on':''}" data-amt="set" data-v="${n}">${l}</button>`).join('')}</div>
+    <div class="amt-keys">${['1','2','3','4','5','6','7','8','9','.','0','del'].map(k=>`<button data-amt="key" data-v="${k}"${k==='del'?' aria-label="Delete"':''}>${k==='del'?'<svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 5h11v14H9l-6-7z"/><path d="M12.5 9.5l5 5M17.5 9.5l-5 5"/></svg>':k}</button>`).join('')}</div></div>`;
+}
+function amtAct(b){
+  const a=b.dataset.amt, v=b.dataset.v; if(!AMT) return;
+  if(a==='cancel'){amtClose(); return}
+  if(a==='done'){const n=amtVal(); if(!(n>0)){toast('Enter an amount above 0'); haptic('error'); return} const d=AMT.done, m=AMT.mode, u=AMT.un; amtClose(); haptic('confirm'); d(m,u,n); return}
+  if(a==='key'){let s=AMT.fresh?'':AMT.str; if(v==='del') s=s.slice(0,-1); else if(v==='.'){if(!s.includes('.')) s=(s||'0')+'.'} else {if(s==='0') s=''; if(s.replace('.','').length<6&&!(s.includes('.')&&s.split('.')[1].length>=(AMT.mode==='g'?1:2))) s+=v}
+    AMT.str=s; AMT.fresh=false; buzz(); amtRender(); return}
+  if(a==='set'){AMT.str=String(+v); AMT.fresh=true; haptic(); amtRender(); return}
+  if(a==='step'){const d=+b.dataset.d, cur=amtVal(); let n;
+    if(AMT.mode==='g'){const st=AMT.un==='ml'||AMT.sz>=20?10:1; n=Math.max(st,(d>0?Math.floor(cur/st):Math.ceil(cur/st))*st+d*st)} else n=Math.max(0.5,Math.round((cur+d*0.5)*2)/2);
+    AMT.str=String(r1(n)); AMT.fresh=true; haptic(); amtRender(); return}
+  if(a==='unit'){const q=amtServ(); if(v==='srv'){AMT.mode='srv'; AMT.str=String(Math.max(0.5,r1(q)))} else {AMT.mode='g'; AMT.un=v; AMT.str=String(r0(q*AMT.sz))} AMT.fresh=true; haptic(); amtRender(); return}
+}
+document.addEventListener('click',e=>{const b=e.target.closest&&e.target.closest('#amt [data-amt]'); if(b){e.preventDefault(); e.stopPropagation(); amtAct(b)}},true);
+document.addEventListener('keydown',e=>{if(!AMT) return; const k=e.key, m={Backspace:'del',Enter:'done',Escape:'cancel'};
+  if(/^[0-9.]$/.test(k)||k===','){amtAct({dataset:{amt:'key',v:k===','?'.':k}}); e.preventDefault(); e.stopImmediatePropagation()} else if(m[k]){amtAct({dataset:m[k]==='del'?{amt:'key',v:'del'}:{amt:m[k]}}); e.preventDefault(); e.stopImmediatePropagation()}},true);
+/* openers */
+function trayAmt(n){const i=tray[n]; if(!i) return; const z=sizeOf(i), g=inG(i);
+  if(z&&z.un==='ml') i.liq=1; amtOpen({name:i.name,serving:i.serving,sz:z&&z.sz,liq:!!i.liq,mode:g?'g':'srv',un:z?z.un:'g',amount:g?r0(i.qty*z.sz):r1(i.qty),kcal:i.kcal,p:i.p,
+    done:(m,u,a)=>{const t=tray[n]; if(t!==i) return; if(m==='g'){i.sz=z.sz; i.un=u; i.mode='g'; i.flip=0; i.qty=a/z.sz} else {i.mode=undefined; i.flip=0; i.qty=a} renderTray()}})}
+function editAmt(){if(!editing) return; const g=editing.mode==='g'&&editing.sz;
+  getDay(S.date).then(day=>{const e=day.entries.find(x=>x.id===editing.id); if(!e) return;
+    amtOpen({name:e.name,serving:e.serving,sz:editing.sz,liq:editing.un==='ml'||(sizeOf(e)||{}).un==='ml'||/\bml\b/i.test(e.serving),mode:g?'g':'srv',un:editing.un||'g',amount:g?r0(editing.qty*editing.sz):r1(editing.qty),kcal:$('#eK')?+$('#eK').value:editing.kcal,p:$('#eP')?+$('#eP').value:editing.p,
+      done:(m,u,a)=>{if(!editing) return; if(m==='g'){editing.mode='g'; editing.un=u; editing.qty=a/editing.sz} else {editing.mode='srv'; editing.qty=a} editing.askSz=false; eRerender()}})})}
+document.addEventListener('click',e=>{const t=e.target; if(!t.closest) return;
+  const q=t.closest('.qin'); if(q){e.preventDefault(); trayAmt(+q.dataset.v); return}
+  if(t.closest('#eQtyIn')){e.preventDefault(); editAmt()}});
 function saveMeal(){
   if(!$('#mealName')) return;
   const name=($('#mealName').value||'').trim(); if(!name){$('#mealName').focus();return}
@@ -4264,9 +4345,9 @@ function renderEdit(e){
   $('#editBody').innerHTML=`
     <div class="edit-head">${e.img?thumb(e,120):''}<h3>${esc(e.name)}</h3><p>${esc(e.serving)} · ${fmt(e.kcal)} kcal each</p></div>
     <div class="card" style="display:grid;gap:14px">
-      <div class="seg" role="group" aria-label="Amount in"><button data-act="eunit" data-v="srv" aria-pressed="${editing.mode!=='g'}">Servings</button><button data-act="eunit" data-v="g" aria-pressed="${editing.mode==='g'&&editing.un!=='ml'}">Grams</button><button data-act="eunit" data-v="ml" aria-pressed="${editing.mode==='g'&&editing.un==='ml'}">Millilitres</button></div>
+      <div class="seg" role="group" aria-label="Amount in"><button data-act="eunit" data-v="srv" aria-pressed="${editing.mode!=='g'}">Servings</button><button data-act="eunit" data-v="g" aria-pressed="${editing.mode==='g'&&editing.un!=='ml'}">Grams</button>${!editing.sz||editing.un==='ml'||(sizeOf(e)||{}).un==='ml'||/\bml\b/i.test(e.serving)?`<button data-act="eunit" data-v="ml" aria-pressed="${editing.mode==='g'&&editing.un==='ml'}">Millilitres</button>`:''}</div>
       ${editing.askSz?`<div class="szrow"><span>1 serving${/^1 serving$/i.test(e.serving)?'':' ('+esc(e.serving)+')'} =</span><input class="szin" id="eSzIn" type="number" inputmode="decimal" min="0" aria-label="Serving size"><button class="btn tint" data-act="esz" data-u="g">g</button><button class="btn tint" data-act="esz" data-u="ml">ml</button></div>`:''}
-      <div class="bigstep"><button data-act="eq" data-d="-1" aria-label="Less">−</button><div class="v"><input id="eQtyIn" type="number" inputmode="decimal" min="0" step="any" value="${editing.mode==='g'?r0(q*editing.sz):r1(q)}" aria-label="Amount"><span>${editing.mode==='g'?editing.un:'servings'}</span></div><button data-act="eq" data-d="1" aria-label="More">+</button></div>
+      <div class="bigstep"><button data-act="eq" data-d="-1" aria-label="Less">−</button><div class="v"><input id="eQtyIn" type="text" inputmode="none" readonly value="${editing.mode==='g'?r0(q*editing.sz):r1(q)}" aria-label="Amount"><span>${editing.mode==='g'?editing.un:'servings'}</span></div><button data-act="eq" data-d="1" aria-label="More">+</button></div>
       <p style="text-align:center;margin:0;color:var(--label2);font-size:15px" id="eTot"></p>
     </div>
     <div class="seg" role="group" aria-label="Meal">${mealList().map(([k,l])=>`<button data-act="emeal" data-v="${k}" aria-pressed="${k===editing.meal}">${l}</button>`).join('')}</div>
@@ -5361,10 +5442,11 @@ document.addEventListener('click',async ev=>{
     case 'logWaist': logWaist(); break;
     case 'delWaist': delWaist(v); break;
     case 'mper': setPer(v); break;
+    case 'tamt': trayAmt(+v); break;
     case 'tunit': {const i=tray[+v]; if(i){trayUnit(i); renderTray(); if(i.askSz) setTimeout(()=>{const z=$('#sz'+v); z&&z.focus()},40); else focusQin(+v)}} break;
     case 'tsz': {const i=tray[+v], z=+($('#sz'+v)||{}).value; if(i&&z>0){i.sz=r1(z); i.un=b.dataset.u; i.mode='g'; i.askSz=false; renderTray(); focusQin(+v)} else {const x=$('#sz'+v); x&&x.focus()}} break;
     case 'eunit': if(v!=='srv'&&!editing.sz){editing.askSz=true; await eRerender(); setTimeout(()=>{const z=$('#eSzIn'); z&&z.focus()},40)} else {if(v==='srv') editing.mode='srv'; else {editing.mode='g'; editing.un=v} editing.askSz=false; if(v==='srv') editing.qty=Math.max(0.5,r1(editing.qty)); await eRerender()} break;
-    case 'esz': {const z=+($('#eSzIn')||{}).value; if(z>0){editing.sz=r1(z); editing.un=b.dataset.u; editing.mode='g'; editing.askSz=false; await eRerender(); const q=$('#eQtyIn'); q&&(q.focus(),q.select())} else {const x=$('#eSzIn'); x&&x.focus()}} break;
+    case 'esz': {const z=+($('#eSzIn')||{}).value; if(z>0){editing.sz=r1(z); editing.un=b.dataset.u; editing.mode='g'; editing.askSz=false; await eRerender(); editAmt()} else {const x=$('#eSzIn'); x&&x.focus()}} break;
     case 'pick': {const f=lastResults[+v]; if(!f) break; if(Array.isArray(f.items)){f.items.forEach(i=>tray.push({...i,qty:+i.qty||1,src:i.src||'db'})); renderTray(); flyToTray(b,f,tray.length-1); break} const ex=tray.find(i=>foodKey(i)===foodKey(f)&&i.src!=='ai'); if(ex) ex.qty=+ex.qty+1; else tray.push({...f,qty:1,src:'db',...(per100(f)&&!f.mode?{mode:'g'}:{})}); renderTray(); flyToTray(b,f,ex?tray.indexOf(ex):tray.length-1);} break;
     case 'tq': {const i=tray[+v]; if(i){trayStep(i,+b.dataset.d); renderTray();}} break;
     case 'tdel': tray.splice(+v,1); renderTray(); break;
