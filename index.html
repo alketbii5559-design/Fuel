@@ -3466,11 +3466,11 @@ function loadUSDA(){
   return usdaP;
 }
 /* ---------- Restaurant chains: each chain's own published nutrition (rest.json), never estimates ---------- */
-let REST=null, restP=null;
+let REST=null, restP=null; const REST_V='3';   /* bump when rest.json changes so no cache can serve an old list */
 const normT=t=>String(t||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[’'`]/g,'').replace(/[^a-z0-9 ]+/g,' ').replace(/\s+/g,' ').trim();
 function loadRest(){
   if(REST) return Promise.resolve(REST);
-  if(!restP) restP=fetch('rest.json').then(r=>{if(!r.ok) throw new Error('rest '+r.status); return r.json()}).then(d=>{
+  if(!restP) restP=fetch('rest.json?v='+REST_V,{cache:'no-cache'}).then(r=>{if(!r.ok) throw new Error('rest '+r.status); return r.json()}).then(d=>{
     const all=[]; d.chains.forEach(c=>{c.key=new Set([normT(c.name),...c.alias.map(normT)]); c.items.forEach(row=>{const o={}; c.cols.forEach((k,j)=>o[k]=row[j]);
       all.push({...o,chain:c, txt:normT(c.name+' '+c.alias.join(' ')+' '+o.name+' '+o.cat)})})}); d.all=all; REST=d; return d})
     .catch(e=>{restP=null; throw e});
