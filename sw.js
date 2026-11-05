@@ -1,7 +1,7 @@
 /* Fuel offline cache. The app page is fetched fresh when online (so updates arrive on the next open)
    and served from cache when offline. Fonts are self-hosted and cached on install; libraries are cached the first time they load. */
-const V='fuel-v30';
-const CORE=['./','./index.html','./manifest.webmanifest','./icons/apple-touch-icon.png','./icons/icon-192.png','./usda.json',
+const V='fuel-v31';
+const CORE=['./','./index.html','./manifest.webmanifest','./icons/apple-touch-icon.png','./icons/icon-192.png','./usda.json','./rest.json',
   ...['atk-400','atk-500','atk-600','atk-700','atk-800','atkm-400','atkm-500','bsc-500','bsc-600','bsc-700'].map(f=>`./fonts/${f}.woff2`)];
 self.addEventListener('install',e=>{e.waitUntil(caches.open(V).then(c=>c.addAll(CORE)).then(()=>self.skipWaiting()))});
 self.addEventListener('activate',e=>{e.waitUntil(caches.keys().then(ks=>Promise.all(ks.filter(k=>k!==V).map(k=>caches.delete(k)))).then(()=>self.clients.claim()))});

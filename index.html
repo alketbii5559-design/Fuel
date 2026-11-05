@@ -1634,6 +1634,12 @@ body[data-look="dense"] .start-card h2{font-size:28px}
 .sc-name{all:unset;cursor:pointer;-webkit-tap-highlight-color:transparent}
 .sc-name:focus-visible{outline:2px solid var(--label);outline-offset:2px;border-radius:4px}
 .start-card .sc-sub{margin:2px 0 8px}
+
+/* ---------- Restaurants (5 Nov) ---------- */
+.rest-chips{display:flex;flex-wrap:wrap;gap:6px;margin:0 0 8px}
+.rest-chips .chip2 small{margin-left:6px;font:500 11px var(--mono);color:var(--label3)}
+.ds-chain{color:var(--label2)}
+.rest-src{margin:2px 4px 8px;text-align:left}
 </style>
 </head>
 <body>
@@ -3459,6 +3465,30 @@ function loadUSDA(){
     .catch(e=>{usdaP=null; throw e});
   return usdaP;
 }
+/* ---------- Restaurant chains: each chain's own published nutrition (rest.json), never estimates ---------- */
+let REST=null, restP=null;
+const normT=t=>String(t||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[’'`]/g,'').replace(/[^a-z0-9 ]+/g,' ').replace(/\s+/g,' ').trim();
+function loadRest(){
+  if(REST) return Promise.resolve(REST);
+  if(!restP) restP=fetch('rest.json').then(r=>{if(!r.ok) throw new Error('rest '+r.status); return r.json()}).then(d=>{
+    const all=[]; d.chains.forEach(c=>{c.key=new Set([normT(c.name),...c.alias.map(normT)]); c.items.forEach(row=>{const o={}; c.cols.forEach((k,j)=>o[k]=row[j]);
+      all.push({...o,chain:c, txt:normT(c.name+' '+c.alias.join(' ')+' '+o.name+' '+o.cat)})})}); d.all=all; REST=d; return d})
+    .catch(e=>{restP=null; throw e});
+  return restP;
+}
+function restItem(r){
+  const c=r.chain, tag=`${c.name}${c.country?' '+c.country:''}`;
+  return {name:`${r.name} · ${c.name}`,serving:r.serving,kcal:r0(r.kcal),p:r1(r.p),c:r1(r.c),f:r1(r.f),...nutOf({fb:r.fb,sg:r.sg,na:r.na}),
+    ds:{t:'chain',c:tag,cid:c.id,src:c.src,url:c.url,d:c.checked}};
+}
+/* the whole menu when the search is just a chain's name ("mcdonalds", "mcd"), else items matching every word */
+function restSearch(q){
+  if(!REST) return null; const nq=normT(q); if(!nq) return null;
+  const chain=REST.chains.find(c=>c.key.has(nq)); if(chain) return {chain,items:REST.all.filter(r=>r.chain===chain)};
+  const terms=nq.split(' ').map(stemW), hit=r=>terms.every(t=>r.txt.split(' ').some(w=>w.startsWith(t)||stemW(w)===t));
+  const own=r=>{const w=normT(r.name).split(' '); return terms.filter(t=>w.some(x=>x.startsWith(t)||stemW(x)===t)).length};
+  return {items:REST.all.filter(hit).map(r=>[own(r),r]).sort((a,b)=>b[0]-a[0]||a[1].name.length-b[1].name.length).slice(0,40).map(x=>x[1])};
+}
 /* everyday staples: the USDA foods Fuel's own catalog is built from rank first */
 let STAPLES=null; const STAPLE=()=>STAPLES||(STAPLES=new Set(FOODS.flatMap(f=>f.ds&&Array.isArray(f.ds.ids)?f.ds.ids.map(x=>x[0]):[])));
 const STOPW=new Set(['and','with','of','the','a','an','in','or','for','to','style','plain','fresh','homemade','piece','pieces','serving']);
@@ -3582,8 +3612,8 @@ async function liveMatch(name){
 /* where a number came from */
 function dsOf(e){ if(e&&e.ds&&e.ds.t) return e.ds; const s=e&&e.src;
   return s==='ai'?{t:'ai'}:s==='label'?{t:'label'}:s==='manual'||s==='quick'?{t:'you'}:Array.isArray(e&&e.items)?{t:'meal'}:e&&e.recipe?{t:'recipe'}:null}
-const DS_NAME={usda:'USDA',recipe:'Recipe',label:'Label',table:'Lab table',off:'Package',fdc:'USDA',you:'You',ai:'AI guess',meal:'Meal'};
-const srcTag=e=>{const d=dsOf(e); return d&&DS_NAME[d.t]?`<span class="ds ds-${d.t}">${DS_NAME[d.t]}</span>`:''};
+const DS_NAME={chain:'Restaurant',usda:'USDA',recipe:'Recipe',label:'Label',table:'Lab table',off:'Package',fdc:'USDA',you:'You',ai:'AI guess',meal:'Meal'};
+const srcTag=e=>{const d=dsOf(e); return d&&DS_NAME[d.t]?`<span class="ds ds-${d.t}">${esc(d.t==='chain'&&d.c?d.c:DS_NAME[d.t])}</span>`:''};
 const ndb=id=>'#'+String(id).padStart(5,'0');
 function dsText(e){const d=dsOf(e); if(!d) return 'Logged before sources were tracked.';
   if(d.t==='usda') return d.id?`USDA SR28 ${ndb(d.id)}${d.n?` · ${d.n}`:''}${e.aiq?' · matched from the AI’s description':''}`:d.ids?`USDA SR28 ${d.ids.map(([i,g])=>`${ndb(i)} × ${g} g`).join(', ')}`:'USDA SR28';
@@ -3592,6 +3622,7 @@ function dsText(e){const d=dsOf(e); if(!d) return 'Logged before sources were tr
   if(d.t==='table') return d.by||'National food composition table.';
   if(d.t==='off') return `Open Food Facts${d.b?` · ${d.b}`:''}${d.uae?' · made in the UAE':''}${d.code?`, barcode ${d.code}`:''} (the package label).`;
   if(d.t==='fdc') return `USDA FoodData Central #${d.id} · ${d.dt==='b'?'brand label'+(d.b?`: ${d.b}`:''):d.dt==='s'?'FNDDS survey dish':'Foundation food'}${e.aiq?' · matched from the AI’s description':''}`;
+  if(d.t==='chain') return `${d.src||d.c}${d.d?` · checked ${d.d}`:''}. The restaurant’s own published numbers; your portion can differ a little.`;
   if(d.t==='you') return 'Entered by you.';
   if(d.t==='meal') return 'Your saved meal: each part keeps its own source.';
   return 'AI guess: not from a database. Tap Change match to pick a USDA food.'}
@@ -4174,13 +4205,26 @@ function renderResults(){
   if(!q){
     const fk=new Set(S.foods.favs.map(foodKey));
     sec('Favourites',S.foods.favs); sec('Recent',S.foods.recents.filter(f=>!fk.has(foodKey(f))).slice(0,10));
-    if(!html) sec('Popular',FOODS.filter(f=>/egg, whole|chicken breast|white rice.*cup|shawarma sandwich|karak|banana|greek yogurt 0|beef burger/i.test(f.name)));
+    if(REST) html+=`<h2 class="sec" style="margin-top:6px">Restaurants</h2><div class="rest-chips">${REST.chains.map(c=>`<button class="chip2" data-act="restOpen" data-v="${esc(c.name)}">${esc(c.name)}<small>${c.items.length}</small></button>`).join('')}</div>`;
+    else loadRest().then(()=>{const qq=$('#q'); if(qq&&!qq.value.trim()) resultsLater()}).catch(()=>{});
+    if(!html.replace(/<h2[^>]*>Restaurants[\s\S]*$/,'')) sec('Popular',FOODS.filter(f=>/egg, whole|chicken breast|white rice.*cup|shawarma sandwich|karak|banana|greek yogurt 0|beef burger/i.test(f.name)));
   } else {
     const terms=q.split(/\s+/), hit=f=>{const n=f.name.toLowerCase();return terms.every(t=>n.includes(t))};
     const seen=new Set(), uniq=l=>l.filter(f=>{const k=foodKey(f);if(seen.has(k))return false;seen.add(k);return true});
     const mine=uniq([...S.foods.favs,...S.foods.custom,...Object.values(S.foods.barcodes),...S.foods.recents].filter(hit));
-    const db=uniq(FOODS.filter(hit)).sort((a,b)=>a.name.toLowerCase().indexOf(terms[0])-b.name.toLowerCase().indexOf(terms[0]));
-    sec('My Foods',mine); sec('Foods',db.slice(0,30));
+    /* US fast-food copies (USDA group 21) step aside when the chain's own UAE numbers exist */
+    const restNames=REST?REST.nameSet||(REST.nameSet=new Set(REST.all.map(r=>normT(r.name)))):null;
+    const usFast=f=>restNames&&f.ds&&String(f.ds.id||(f.ds.ids&&f.ds.ids.length===1&&f.ds.ids[0][0])||'').startsWith('21')&&restNames.has(normT(f.name));
+    const db=uniq(FOODS.filter(f=>hit(f)&&!usFast(f))).sort((a,b)=>a.name.toLowerCase().indexOf(terms[0])-b.name.toLowerCase().indexOf(terms[0]));
+    sec('My Foods',mine);
+    const RS=restSearch(q);
+    if(RS&&RS.chain){const by={}; RS.items.forEach(r=>(by[r.cat]=by[r.cat]||[]).push(restItem(r))); html+=`<p class="foot rest-src">${esc(RS.chain.name)} ${esc(RS.chain.country||'')} · ${esc(RS.chain.src)}</p>`; Object.entries(by).forEach(([k,l])=>sec(`${RS.chain.name} · ${k}`,l))}
+    else if(!REST) loadRest().then(()=>{const qq=$('#q'); if(qq&&qq.value.trim().toLowerCase()===q) resultsLater()}).catch(()=>{});
+    /* restaurant items come first only when you name the chain ("mcd fries"); "banana" stays a plain banana first */
+    const named=RS&&!RS.chain&&(!db.length||REST.chains.some(c=>normT(q).split(' ').some(t=>[...c.key].some(k=>k.split(' ').includes(t)))));
+    if(RS&&!RS.chain&&named) sec('Restaurants',RS.items.map(restItem));
+    sec('Foods',db.slice(0,30));
+    if(RS&&!RS.chain&&!named) sec('Restaurants',RS.items.slice(0,12).map(restItem));
     if(USDA){const us=usdaRank(q,25,true).map(f=>usdaItem(f)); sec('USDA Database',us)}
     else{html+=`<p class="foot usda-wait" style="text-align:center">Searching 8,000+ USDA foods…</p>`; loadUSDA().then(()=>{const qq=$('#q'); if(qq&&qq.value.trim().toLowerCase()===q) resultsLater()}).catch(()=>{const n=$('#results .usda-wait'); if(n) n.textContent='The USDA list didn’t load. Check your connection.'})}
     if(STANDALONE&&q.length>=3){const L=LIVE.get(q), had=new Set(lastResults.map(f=>f.name.toLowerCase())), nd=l=>l.filter(f=>{const k=f.name.toLowerCase(); if(had.has(k)) return false; had.add(k); return true});
@@ -5497,6 +5541,7 @@ document.addEventListener('click',async ev=>{
     case 'tpick': pickMatch(+v,b.dataset.k); break;
     case 'commit': commitTray(); break;
     case 'ntSrc': showNtSources(v); break;
+    case 'restOpen': {const qq=$('#q'); qq.value=v; renderResults(); haptic(); break}
     case 'entry': if(selIds){selIds.has(v)?selIds.delete(v):selIds.add(v); if(!selIds.size) selIds=null; haptic(); renderToday(); break} openEdit(v); break;
     case 'dayst': setDayStatus(b.dataset.d||S.date,v); break;
     case 'repOk': repConfirm(v); break;
