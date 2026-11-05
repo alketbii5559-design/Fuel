@@ -1617,7 +1617,9 @@ body[data-look="dense"] .start-card h2{font-size:28px}
 .amt-keys{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
 .amt-keys button{height:52px;border:0;border-radius:12px;background:var(--fill);color:var(--label);font:600 24px var(--num);display:grid;place-items:center}
 .amt-keys button:active,.amt-big>button:active{transform:scale(.97);background:color-mix(in srgb,var(--fill) 60%,var(--label3))}
-.qin,#eQtyIn{cursor:pointer;caret-color:transparent}
+.qin,#eQtyIn{cursor:pointer;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none;touch-action:manipulation;display:inline-block;color:var(--label)}
+.stepper .qin{min-height:32px;line-height:32px}
+#eQtyIn{line-height:1}
 </style>
 </head>
 <body>
@@ -1722,7 +1724,8 @@ body[data-look="dense"] .start-card h2{font-size:28px}
 const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const r0=n=>Math.round(+n||0), r1=n=>Math.round((+n||0)*10)/10;
-const fmt=n=>r0(n).toLocaleString('en-US');
+const NF0=new Intl.NumberFormat('en-US',{maximumFractionDigits:20}), fmt=n=>NF0.format(r0(n));
+const DF=(()=>{const c=new Map(); return (d,o)=>{const k=JSON.stringify(o); let f=c.get(k); if(!f){f=new Intl.DateTimeFormat('en-GB',o); c.set(k,f)} return f.format(d)}})();
 const clone=o=>JSON.parse(JSON.stringify(o));
 const pad=n=>String(n).padStart(2,'0');
 const ymd=d=>`${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;
@@ -2435,7 +2438,7 @@ async function renderTrain(){
     <p class="subtitle">${gymTarget()?`${weekGym} of ${gymTarget()} gym sessions this week`:`${weekGym} gym session${weekGym===1?'':'s'} this week`}</p>
     <label class="search trsearch"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6"/><path d="M15 15l5 5"/></svg><input type="search" id="trQ" placeholder="Search exercises" autocomplete="off" enterkeyhint="search" aria-label="Search exercises" value="${esc(trQ)}"></label>
     <div id="trRes"></div><div id="trMain">
-    <div class="weekstrip">${wd.map(d=>`<div class="wd${d===TODAY()?' today':''}"><span>${parseYmd(d).toLocaleDateString('en-GB',{weekday:'narrow'})}</span><i class="${gymDays.has(d)?'gym':actDays.has(d)?'act':''}"></i></div>`).join('')}</div>
+    <div class="weekstrip">${wd.map(d=>`<div class="wd${d===TODAY()?' today':''}"><span>${DF(parseYmd(d),{weekday:'narrow'})}</span><i class="${gymDays.has(d)?'gym':actDays.has(d)?'act':''}"></i></div>`).join('')}</div>
     ${trainRecovery()}${S.active?`<section class="card start-card live"><p class="sc-k">Workout in progress</p><h2>${esc(S.active.name)}</h2><p class="sc-sub">${dur(Date.now()-S.active.start)} · ${S.active.ex.reduce((a,x)=>a+x.sets.filter(s=>s.done).length,0)} sets logged</p><button class="btn big" data-g="resume">Resume Workout</button></section>`
     :r?`<section class="card start-card"><div class="sc-top"><p class="sc-k">Up next</p><button class="txtbtn sc-ren" data-g="rRen" data-v="${r.id}" aria-label="Rename ${esc(r.name)}">Rename</button></div><h2>${esc(r.name)}</h2>
       <div class="sc-ex">${r.ex.map(x=>`<span>${esc(exById(x.eid).n.replace(/ \(.*\)$/,''))}</span>`).join('')}</div>
@@ -3734,7 +3737,7 @@ function calendarCard(){
     if(ds>T){cells+=`<span class="cd fut">${d}</span>`; continue}
     const cls=!logged?'none':st==='done'?'done':st==='partial'?'part':'logged';
     cells+=`<button class="cd ${cls}${ds===T?' now':''}" data-act="calDay" data-v="${ds}" aria-label="${shortDate(ds)}: ${!logged?'nothing logged':cls==='done'?'all logged':cls==='part'?'missed some':'logged, not marked'}">${d}</button>`}
-  return `<div class="gap"></div><h2 class="sec">Log Calendar</h2><section class="card calc"><div class="cal-h"><button class="circ" data-act="calPrev" aria-label="Previous month">${ICON_L}</button><b>${first.toLocaleDateString('en-GB',{month:'long',year:'numeric'})}</b><button class="circ" data-act="calNext" aria-label="Next month"${base>=T.slice(0,7)?' disabled':''}>${ICON_R}</button></div>
+  return `<div class="gap"></div><h2 class="sec">Log Calendar</h2><section class="card calc"><div class="cal-h"><button class="circ" data-act="calPrev" aria-label="Previous month">${ICON_L}</button><b>${DF(first,{month:'long',year:'numeric'})}</b><button class="circ" data-act="calNext" aria-label="Next month"${base>=T.slice(0,7)?' disabled':''}>${ICON_R}</button></div>
     <div class="cal-w">${['M','T','W','T','F','S','S'].map(x=>`<span>${x}</span>`).join('')}</div><div class="cal-g">${cells}</div>
     <div class="legend"><span><i class="lg done"></i>All logged</span><span><i class="lg part"></i>Missed some</span><span><i class="lg logged"></i>Not marked</span></div></section>
     <p class="foot">Tap a day to open it. Mark days from the bottom of Today.</p>`;
@@ -3763,9 +3766,9 @@ function ringSVG(size,stroke,pct,color,track){
   const r=(size-stroke)/2, C=2*Math.PI*r, off=C*(1-Math.min(1,Math.max(0,pct)));
   return `<svg viewBox="0 0 ${size} ${size}" aria-hidden="true"><circle class="r-track" cx="${size/2}" cy="${size/2}" r="${r}" stroke-width="${stroke}" style="stroke:color-mix(in srgb,${color} 18%,transparent)"/>${pct>0.003?`<circle class="r-fill" cx="${size/2}" cy="${size/2}" r="${r}" stroke-width="${stroke}" stroke="${color}" stroke-dasharray="${C.toFixed(2)}" stroke-dashoffset="${off.toFixed(2)}"/>`:''}</svg>`;
 }
-function dayTitle(s){const t=TODAY(); if(s===t) return 'Today'; if(s===addDays(t,-1)) return 'Yesterday'; return parseYmd(s).toLocaleDateString('en-GB',{weekday:'long'})}
-const dateLong=s=>parseYmd(s).toLocaleDateString('en-GB',{weekday:'long',day:'numeric',month:'long'});
-const shortDate=s=>parseYmd(s).toLocaleDateString('en-GB',{day:'numeric',month:'short'});
+function dayTitle(s){const t=TODAY(); if(s===t) return 'Today'; if(s===addDays(t,-1)) return 'Yesterday'; return DF(parseYmd(s),{weekday:'long'})}
+const dateLong=s=>DF(parseYmd(s),{weekday:'long',day:'numeric',month:'long'});
+const shortDate=s=>DF(parseYmd(s),{day:'numeric',month:'short'});
 const ICON_L='<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M10 3L5 8l5 5"/></svg>';
 const ICON_R='<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3l5 5-5 5"/></svg>';
 const DB_ICON='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M6.5 6.5v11M17.5 6.5v11M3.5 9v6M20.5 9v6M6.5 12h11"/></svg>';
@@ -3832,7 +3835,7 @@ function todayMotion(M,t,day){
 }
 /* ---------- Detailed look (Cronometer-style): Energy Summary, diary with subtotals, Nutrient Targets ---------- */
 const lookDense=()=>(S.profile&&S.profile.look)!=='tank';
-const applyLook=()=>{document.body.dataset.look=lookDense()?'dense':'tank'};
+const applyLook=()=>{const v=lookDense()?'dense':'tank'; if(document.body.dataset.look!==v) document.body.dataset.look=v};
 function burnedFor(date){
   const w=whoopDay(date); if(w&&+w.kc>0) return {v:+w.kc,src:'WHOOP'};
   const t=calcTargets(S.profile||{}); if(t) return {v:t.tdee,src:'estimate'};
@@ -4155,24 +4158,32 @@ function renderResults(){
     const db=uniq(FOODS.filter(hit)).sort((a,b)=>a.name.toLowerCase().indexOf(terms[0])-b.name.toLowerCase().indexOf(terms[0]));
     sec('My Foods',mine); sec('Foods',db.slice(0,30));
     if(USDA){const us=usdaRank(q,25,true).map(f=>usdaItem(f)); sec('USDA Database',us)}
-    else{html+=`<p class="foot usda-wait" style="text-align:center">Searching 8,000+ USDA foods…</p>`; loadUSDA().then(()=>{const qq=$('#q'); if(qq&&qq.value.trim().toLowerCase()===q) renderResults()}).catch(()=>{const n=$('#results .usda-wait'); if(n) n.textContent='The USDA list didn’t load. Check your connection.'})}
+    else{html+=`<p class="foot usda-wait" style="text-align:center">Searching 8,000+ USDA foods…</p>`; loadUSDA().then(()=>{const qq=$('#q'); if(qq&&qq.value.trim().toLowerCase()===q) resultsLater()}).catch(()=>{const n=$('#results .usda-wait'); if(n) n.textContent='The USDA list didn’t load. Check your connection.'})}
     if(STANDALONE&&q.length>=3){const L=LIVE.get(q), had=new Set(lastResults.map(f=>f.name.toLowerCase())), nd=l=>l.filter(f=>{const k=f.name.toLowerCase(); if(had.has(k)) return false; had.add(k); return true});
       if(L){sec('USDA Dishes',nd(L.dish)); sec('Package Labels',nd([...L.off,...L.brand]).slice(0,20));
         if(L.err) html+=`<p class="foot" style="text-align:center">${L.err==='offline'||L.err==='timeout'?'Online food databases didn’t answer, so these are offline results only.':'Online food databases are busy. Offline results only.'}</p>`;
         else if(L.fdcErr) html+=`<p class="foot" style="text-align:center">${L.fdcErr==='rate_limited'?'USDA’s free search limit is used up for now. Add your own free USDA key in Settings.':L.fdcErr==='bad_key'?'Your USDA key was turned down. Check it in Settings.':'USDA online didn’t answer; package labels still searched.'}</p>`}
       else {const sk=`<li><div class="row skel" aria-hidden="true"><span><span class="t"><i></i></span><span class="d"><i></i></span></span><span class="k"><i></i></span></div></li>`;
         html+=`<h2 class="sec" style="margin-top:6px">Online Databases</h2><ul class="list live-wait" aria-label="Searching online food databases">${sk.repeat(3)}</ul>`;
-        clearTimeout(liveT); liveT=setTimeout(()=>liveSearch(q).then(()=>{const qq=$('#q'); if(qq&&qq.value.trim().toLowerCase()===q) renderResults()}),420)}}
+        clearTimeout(liveT); liveT=setTimeout(()=>liveSearch(q).then(()=>{const qq=$('#q'); if(qq&&qq.value.trim().toLowerCase()===q) resultsLater()}),420)}}
     if(!lastResults.length&&!/live-wait|usda-wait/.test(html)) html+=`<p class="foot" style="text-align:center">No results for “${esc(q)}”. Try Describe It, or enter it manually.</p>`;
   }
-  $('#results').innerHTML=html;
+  const R=$('#results'); if(R._h!==html){R.innerHTML=html; R._h=html}
 }
+/* Results that arrive late (USDA list, online databases) never redraw the list under a finger:
+   a tap that started on the old list finishes first, then the list updates. */
+let resDown=false, resPend=false;
+function resultsLater(){if(resDown){resPend=true; return} renderResults()}
+(()=>{const up=()=>{if(!resDown) return; resDown=false; if(resPend){resPend=false; setTimeout(()=>{if(!resDown) renderResults()},120)}};
+  document.addEventListener('pointerdown',e=>{if(e.target.closest&&e.target.closest('#results')) resDown=true},true);
+  ['pointerup','pointercancel'].forEach(t=>document.addEventListener(t,up,true));
+})();
 function renderTray(){
   const el=$('#tray'); if(!tray.length){el.hidden=true;el.innerHTML='';return}
   const t=tray.reduce((a,i)=>{const q=+i.qty||0;a.k+=i.kcal*q;a.p+=i.p*q;return a},{k:0,p:0});
   el.hidden=false;
   el.innerHTML=`<ul>${tray.map((i,n)=>{const z=sizeOf(i),g=inG(i);return `<li>${thumb(i)||'<span></span>'}<div><div class="tn">${esc(i.name)}${srcTag(i)}</div><div class="tm" id="tm${n}">${trayMeta(i)}</div>${i.aiq?`<div class="tsrc">${dsOf(i).t==='ai'?'No database match':esc(dsOf(i).n||((dsOf(i).t==='recipe'?'Fuel recipe: ':'Fuel food: ')+i.name))} · <button class="txtbtn" data-act="tmatch" data-v="${n}">${i.picking?'Close':'Change match'}</button></div>`:''}</div>
-    <div style="display:flex;align-items:center"><div class="stepper"><button data-act="tq" data-v="${n}" data-d="-1" aria-label="Less">−</button><i></i><input class="qin" data-v="${n}" type="text" inputmode="none" readonly value="${g?r0(i.qty*z.sz):r1(i.qty)}" aria-label="${g?'Amount in '+z.un:'Servings'}"><button class="unit" data-act="${z?'tamt':'tunit'}" data-v="${n}" aria-label="${z?'Change amount or unit':'Set grams per serving'}">${g?z.un:'srv'}</button><i></i><button data-act="tq" data-v="${n}" data-d="1" aria-label="More">+</button></div><button class="x" data-act="tdel" data-v="${n}" aria-label="Remove ${esc(i.name)}"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg></button></div>${i.picking?matchPicker(i,n):''}${i.askSz?`<div class="szrow"><span>1 serving${/^1 serving$/i.test(i.serving)?'':' ('+esc(i.serving)+')'} =</span><input class="szin" id="sz${n}" type="number" inputmode="decimal" min="0" aria-label="Serving size"><button class="btn tint" data-act="tsz" data-v="${n}" data-u="g">g</button><button class="btn tint" data-act="tsz" data-v="${n}" data-u="ml">ml</button></div>`:''}</li>`}).join('')}</ul>
+    <div style="display:flex;align-items:center"><div class="stepper"><button data-act="tq" data-v="${n}" data-d="-1" aria-label="Less">−</button><i></i><button type="button" class="qin" data-v="${n}" aria-label="${g?'Amount in '+z.un:'Servings'}, tap to change">${g?r0(i.qty*z.sz):r1(i.qty)}</button><button class="unit" data-act="${z?'tamt':'tunit'}" data-v="${n}" aria-label="${z?'Change amount or unit':'Set grams per serving'}">${g?z.un:'srv'}</button><i></i><button data-act="tq" data-v="${n}" data-d="1" aria-label="More">+</button></div><button class="x" data-act="tdel" data-v="${n}" aria-label="Remove ${esc(i.name)}"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg></button></div>${i.picking?matchPicker(i,n):''}${i.askSz?`<div class="szrow"><span>1 serving${/^1 serving$/i.test(i.serving)?'':' ('+esc(i.serving)+')'} =</span><input class="szin" id="sz${n}" type="number" inputmode="decimal" min="0" aria-label="Serving size"><button class="btn tint" data-act="tsz" data-v="${n}" data-u="g">g</button><button class="btn tint" data-act="tsz" data-v="${n}" data-u="ml">ml</button></div>`:''}</li>`}).join('')}</ul>
     ${savingRecipe&&tray.length?recipeForm(t):tray.length>1||tray.some(i=>i.aiq)?(savingMeal?`<div style="display:grid;grid-template-columns:1fr auto;gap:8px"><input type="text" id="mealName" value="${esc(tray.length===1?(tray[0].aiq&&tray[0].aiq.name)||tray[0].name:lastDesc||'')}" placeholder="Name, e.g. My eggs breakfast" style="border:0;background:var(--fill);border-radius:10px;padding:0 12px;min-height:42px;outline:none" aria-label="Meal name"><button class="btn tint" style="width:auto;min-height:42px" data-act="saveMeal">Save</button></div>`:(tray.length===1?`<div class="savebtns"><button class="txtbtn" data-act="saveMealAsk">Remember This Dish</button></div>`:`<div class="savebtns"><button class="txtbtn" data-act="saveMealAsk">${tray.some(i=>i.aiq)?'Remember as a Meal':'Save as Meal'}</button><button class="txtbtn" data-act="saveRecipeAsk">Save as Recipe</button></div>`)):''}
     ${savingRecipe&&tray.length?'':`<button class="btn" data-act="commit" id="trayGo">Add ${fmt(t.k)} kcal to ${mealName(selMeal)}</button>`}`;
   if(savingMeal) setTimeout(()=>{const m=$('#mealName'); m&&m.focus()},30);
@@ -4298,8 +4309,13 @@ function saveMeal(){
   savingMeal=false; renderTray(); toast(`Saved “${name}”. Search for it next time.`);
 }
 function pushRecent(f){const k=foodKey(f); S.foods.recents=[{name:f.name,serving:f.serving,kcal:f.kcal,p:f.p,c:f.c,f:f.f,...keepX(f)},...S.foods.recents.filter(x=>foodKey(x)!==k)].slice(0,40)}
+let committing=false;
 async function commitTray(){
-  const items=tray.filter(i=>+i.qty>0); if(!items.length) return;
+  if(committing) return; const items=tray.filter(i=>+i.qty>0); if(!items.length) return;
+  committing=true; tray=[]; const go=$('#trayGo'); if(go) go.disabled=true;
+  try{ await commitItems(items) } finally { committing=false; if(go) go.disabled=false }
+}
+async function commitItems(items){
   const day=await getDay(S.date);
   for(const i of items){
     day.entries.push({id:uid(),name:i.name,serving:i.serving,qty:+i.qty,kcal:+i.kcal,p:+i.p,c:+i.c,f:+i.f,...keepX(i),meal:selMeal,src:i.src||'db',t:Date.now(),u:Date.now(),...(i.img?{img:i.img}:{})});
@@ -4347,7 +4363,7 @@ function renderEdit(e){
     <div class="card" style="display:grid;gap:14px">
       <div class="seg" role="group" aria-label="Amount in"><button data-act="eunit" data-v="srv" aria-pressed="${editing.mode!=='g'}">Servings</button><button data-act="eunit" data-v="g" aria-pressed="${editing.mode==='g'&&editing.un!=='ml'}">Grams</button>${!editing.sz||editing.un==='ml'||(sizeOf(e)||{}).un==='ml'||/\bml\b/i.test(e.serving)?`<button data-act="eunit" data-v="ml" aria-pressed="${editing.mode==='g'&&editing.un==='ml'}">Millilitres</button>`:''}</div>
       ${editing.askSz?`<div class="szrow"><span>1 serving${/^1 serving$/i.test(e.serving)?'':' ('+esc(e.serving)+')'} =</span><input class="szin" id="eSzIn" type="number" inputmode="decimal" min="0" aria-label="Serving size"><button class="btn tint" data-act="esz" data-u="g">g</button><button class="btn tint" data-act="esz" data-u="ml">ml</button></div>`:''}
-      <div class="bigstep"><button data-act="eq" data-d="-1" aria-label="Less">−</button><div class="v"><input id="eQtyIn" type="text" inputmode="none" readonly value="${editing.mode==='g'?r0(q*editing.sz):r1(q)}" aria-label="Amount"><span>${editing.mode==='g'?editing.un:'servings'}</span></div><button data-act="eq" data-d="1" aria-label="More">+</button></div>
+      <div class="bigstep"><button data-act="eq" data-d="-1" aria-label="Less">−</button><div class="v"><button type="button" id="eQtyIn" aria-label="Amount, tap to change">${editing.mode==='g'?r0(q*editing.sz):r1(q)}</button><span>${editing.mode==='g'?editing.un:'servings'}</span></div><button data-act="eq" data-d="1" aria-label="More">+</button></div>
       <p style="text-align:center;margin:0;color:var(--label2);font-size:15px" id="eTot"></p>
     </div>
     <div class="seg" role="group" aria-label="Meal">${mealList().map(([k,l])=>`<button data-act="emeal" data-v="${k}" aria-pressed="${k===editing.meal}">${l}</button>`).join('')}</div>
@@ -4365,6 +4381,9 @@ function renderEdit(e){
       <li><button class="row single" data-act="erep"><span class="t">Suggest every day in ${esc(mealName(e.meal))}</span><span class="tick${repeatOf(e)?' on':''}" aria-label="${repeatOf(e)?'On':'Off'}"></span></button></li>
       <li><button class="row single danger" data-act="edel"><span class="t">Delete Food</span></button></li></ul>`;
 }
+/* A second tap while one of these is still saving does nothing (stops double logs). */
+const onceAsync=fn=>{let busy=false; return async function(...a){if(busy) return; busy=true; try{return await fn.apply(this,a)}finally{busy=false}}};
+logUsual=onceAsync(logUsual); fitAdd=onceAsync(fitAdd); saveEdit=onceAsync(saveEdit);
 async function saveEdit(){
   const day=await getDay(S.date), e=day.entries.find(x=>x.id===editing.id); if(!e) return;
   e.qty=editing.qty; e.meal=editing.meal; e.u=Date.now();
@@ -4415,7 +4434,7 @@ function stackChart(rows,target){
       parts.forEach(([k,v,c])=>{const h=v*scale/max*ih; if(h<=0) return; s+=`<rect x="${x.toFixed(1)}" y="${(y(acc+v*scale)).toFixed(1)}" width="${w.toFixed(1)}" height="${h.toFixed(1)}" fill="${c}"${r.d===TODAY()?' fill-opacity=".45"':''}/>`; acc+=v*scale});
       if(r.kcal>g*1.1) s+=`<rect x="${x.toFixed(1)}" y="${(y(r.kcal)-3).toFixed(1)}" width="${w.toFixed(1)}" height="2" fill="var(--red)"/>`}
     s+=`<rect x="${(L+i*bw).toFixed(1)}" y="${T}" width="${bw.toFixed(1)}" height="${ih}" fill="transparent" data-tip="${shortDate(r.d)} · ${r.logged?`${fmt(r.kcal)} kcal · P ${r0(r.p)} C ${r0(r.c)} F ${r0(r.f)} g`:'not logged'}"/>`;
-    s+=`<text x="${(L+i*bw+bw/2).toFixed(1)}" y="${H-5}" text-anchor="middle"${r.d===TODAY()?' style="fill:var(--label);font-weight:700"':''}>${parseYmd(r.d).toLocaleDateString('en-GB',{weekday:'narrow'})}</text>`});
+    s+=`<text x="${(L+i*bw+bw/2).toFixed(1)}" y="${H-5}" text-anchor="middle"${r.d===TODAY()?' style="fill:var(--label);font-weight:700"':''}>${DF(parseYmd(r.d),{weekday:'narrow'})}</text>`});
   return s+`<line class="tg" x1="${L}" x2="${W-R}" y1="${y(target).toFixed(1)}" y2="${y(target).toFixed(1)}"/><text x="${L-6}" y="${(y(target)+4).toFixed(1)}" text-anchor="end">${fmt(target)}</text></svg>
     <div class="legend"><span><i style="background:var(--pro)"></i>Protein</span><span><i style="background:var(--c-c)"></i>Carbs</span><span><i style="background:var(--c-f)"></i>Fat</span></div>`;
 }
@@ -4429,7 +4448,7 @@ function barChart(rows,target){
     for(let j=0;j<NR;j++){const cy=(T+ih-step*(j+.5)).toFixed(1);
       s+=j<k?`<circle cx="${cx}" cy="${cy}" r="${rad}" fill="${col}"${now?' stroke="var(--cal)" stroke-width="1.2"':''}${anim?` class="lt" style="animation-delay:${Math.round(li++*gap)}ms"`:''}/>`:`<circle cx="${cx}" cy="${cy}" r="${rad}" fill="var(--fill)"/>`}
     s+=`<rect x="${(L+i*bw).toFixed(1)}" y="${T}" width="${bw.toFixed(1)}" height="${ih}" fill="transparent" data-tip="${shortDate(r.d)} · ${r.logged?fmt(r.kcal)+' kcal':'not logged'}"/>`;
-    s+=`<text x="${cx}" y="${H-5}" text-anchor="middle"${r.d===TODAY()?' style="fill:var(--label);font-weight:700"':''}>${parseYmd(r.d).toLocaleDateString('en-GB',{weekday:'narrow'})}</text>`});
+    s+=`<text x="${cx}" y="${H-5}" text-anchor="middle"${r.d===TODAY()?' style="fill:var(--label);font-weight:700"':''}>${DF(parseYmd(r.d),{weekday:'narrow'})}</text>`});
   return s+`<line class="tg" x1="${L}" x2="${W-R}" y1="${y(target).toFixed(1)}" y2="${y(target).toFixed(1)}"/><text x="${L-6}" y="${(y(target)+4).toFixed(1)}" text-anchor="end">${fmt(target)}</text></svg>`;
 }
 function weightChart(list,unit='kg'){
@@ -4515,8 +4534,8 @@ function logWeight(){const v=+$('#wIn').value; if(!bOK(v)){toast(`Enter your wei
 
 /* ---------- Week in review, personal records, share image ---------- */
 const monOf=d=>{const x=parseYmd(d); return addDays(d,-((x.getDay()+6)%7))};
-const rangeTxt=(a,b)=>{const A=parseYmd(a), B=parseYmd(b), m=d=>d.toLocaleDateString('en-GB',{month:'short'}); return A.getMonth()===B.getMonth()?`${A.getDate()} – ${B.getDate()} ${m(B)}`:`${A.getDate()} ${m(A)} – ${B.getDate()} ${m(B)}`};
-const dayShort=d=>parseYmd(d).toLocaleDateString('en-GB',{weekday:'short'});
+const rangeTxt=(a,b)=>{const A=parseYmd(a), B=parseYmd(b), m=d=>DF(d,{month:'short'}); return A.getMonth()===B.getMonth()?`${A.getDate()} – ${B.getDate()} ${m(B)}`:`${A.getDate()} ${m(A)} – ${B.getDate()} ${m(B)}`};
+const dayShort=d=>DF(parseYmd(d),{weekday:'short'});
 function weekStats(start){
   const T=TODAY(), days=[...Array(7)].map((_,i)=>addDays(start,i)), H=S.hist||{};
   const rows=days.map(d=>{const day=S.days[d]||H[d], g=goalOn(d), t=day&&day.entries&&day.entries.length?totals(day):null; return {d,g,t,future:d>T,today:d===T}});
@@ -5473,7 +5492,7 @@ document.addEventListener('click',async ev=>{
     case 'calPrev': calShift(-1); break;
     case 'calNext': calShift(1); break;
     case 'closeEdit': closeSheet('#editSheet'); break;
-    case 'eq': {const d=+b.dataset.d; if(editing.mode==='g'&&editing.sz){const st=editing.sz>=20||editing.un==='ml'?10:1; editing.qty=Math.max(st,r0(editing.qty*editing.sz)+d*st)/editing.sz; $('#eQtyIn').value=r0(editing.qty*editing.sz)} else {editing.qty=Math.max(0.5,r1(editing.qty+d*0.5)); $('#eQtyIn').value=r1(editing.qty)} eTotUpd()} break;
+    case 'eq': {const d=+b.dataset.d; if(editing.mode==='g'&&editing.sz){const st=editing.sz>=20||editing.un==='ml'?10:1; editing.qty=Math.max(st,r0(editing.qty*editing.sz)+d*st)/editing.sz; $('#eQtyIn').textContent=r0(editing.qty*editing.sz)} else {editing.qty=Math.max(0.5,r1(editing.qty+d*0.5)); $('#eQtyIn').textContent=r1(editing.qty)} eTotUpd()} break;
     case 'emeal': editing.meal=v; $$('[data-act="emeal"]').forEach(x=>x.setAttribute('aria-pressed',x.dataset.v===v)); break;
     case 'efav': {const day=await getDay(S.date), e=day.entries.find(x=>x.id===editing.id); if(!e) break; const k=foodKey(e);
       if(isFav(e)){S.foods.favs=S.foods.favs.filter(x=>foodKey(x)!==k); addDel(S.foods,'fav:'+k)} else {undel(S.foods,'fav:'+k); S.foods.favs.unshift({name:e.name,serving:e.serving,kcal:e.kcal,p:e.p,c:e.c,f:e.f,...keepX(e)})}
