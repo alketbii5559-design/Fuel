@@ -3466,7 +3466,7 @@ function loadUSDA(){
   return usdaP;
 }
 /* ---------- Restaurant chains: each chain's own published nutrition (rest.json), never estimates ---------- */
-let REST=null, restP=null; const REST_V='3';   /* bump when rest.json changes so no cache can serve an old list */
+let REST=null, restP=null; const REST_V='4';   /* bump when rest.json changes so no cache can serve an old list */
 const normT=t=>String(t||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[’'`]/g,'').replace(/[^a-z0-9 ]+/g,' ').replace(/\s+/g,' ').trim();
 function loadRest(){
   if(REST) return Promise.resolve(REST);
@@ -3478,7 +3478,8 @@ function loadRest(){
 }
 function restItem(r){
   const c=r.chain, tag=`${c.name}${c.country?' '+c.country:''}`;
-  return {name:`${r.name} · ${c.name}`,serving:r.serving,kcal:r0(r.kcal),p:r1(r.p),c:r1(r.c),f:r1(r.f),...nutOf({fb:r.fb,sg:r.sg,na:r.na}),
+  const gm=/^(\d+(?:\.\d+)?) ?(g|ml)\b/.exec(r.serving||'');
+  return {name:`${r.name} · ${c.name}`,serving:r.serving,...(gm?{sz:+gm[1],un:gm[2]}:{}),kcal:r0(r.kcal),p:r1(r.p),c:r1(r.c),f:r1(r.f),...nutOf({fb:r.fb,sg:r.sg,na:r.na}),
     ds:{t:'chain',c:tag,cid:c.id,src:c.src,url:c.url,d:c.checked}};
 }
 /* the whole menu when the search is just a chain's name ("mcdonalds", "mcd"), else items matching every word */
