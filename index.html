@@ -1620,6 +1620,20 @@ body[data-look="dense"] .start-card h2{font-size:28px}
 .qin,#eQtyIn{cursor:pointer;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none;touch-action:manipulation;display:inline-block;color:var(--label)}
 .stepper .qin{min-height:32px;line-height:32px}
 #eQtyIn{line-height:1}
+
+/* ---------- Routine switcher (5 Nov) ---------- */
+.rt-pills{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;margin:-2px -14px 12px;padding:2px 14px;scroll-snap-type:x proximity}
+.rt-pills::-webkit-scrollbar{display:none}
+.rt-pill{flex:0 0 auto;scroll-snap-align:start;display:inline-flex;align-items:center;gap:6px;min-height:36px;padding:0 14px;border-radius:99px;border:0;background:var(--fill);color:var(--label2);font:600 15px var(--font);white-space:nowrap}
+.rt-pill small{font:500 11px var(--mono);color:var(--label3)}
+.rt-pill[aria-selected="true"]{background:var(--btn);color:var(--btn-ink)}
+.rt-pill[aria-selected="true"] small{color:color-mix(in srgb,var(--btn-ink) 60%,transparent)}
+.rt-pill.add{padding:0 13px;font-size:19px;font-weight:500}
+.rt-pill:active{transform:scale(.97)}
+.sc-acts{display:flex;gap:14px}
+.sc-name{all:unset;cursor:pointer;-webkit-tap-highlight-color:transparent}
+.sc-name:focus-visible{outline:2px solid var(--label);outline-offset:2px;border-radius:4px}
+.start-card .sc-sub{margin:2px 0 8px}
 </style>
 </head>
 <body>
@@ -2249,7 +2263,7 @@ function prescribeBase(rx){
 
 /* ---------- starting, logging, finishing ---------- */
 const nextRoutine=()=>{const L=S.routines.list; return L.length?L[((S.routines.next||0)%L.length+L.length)%L.length]:null};
-function startWorkout(rid){
+function startWorkout(rid){S.ui.rSel=null; 
   const r=S.routines.list.find(x=>x.id===rid), now=Date.now(), id=uid();
   const ex=(r?r.ex:[]).map(rx=>{const m=hasMach(exById(rx.eid))?machOf(rx.eid):null, p=prescribe({...rx,m}); return {eid:rx.eid,...(m?{m:{...m}}:{}),rest:rx.rest,rx:{...rx},why:p.why,sets:p.sets.map(s=>({id:uid(),kg:s.kg,reps:s.reps,t:'n',done:false,ph:1,u:now}))}});
   const base0={}; ex.forEach(x=>{const L=S.lifts.ex[kx(x)]; base0[kx(x)]=L&&L.best?{...L.best}:null});
@@ -2423,6 +2437,17 @@ function setDone0(xi,si){
 /* ---------- Train tab ---------- */
 const MUSCLE_COLOR={Chest:'#eceae4',Back:'#eceae4',Shoulders:'#eceae4',Arms:'#eceae4',Legs:'#eceae4',Glutes:'#eceae4',Core:'#eceae4',Other:'#8a8a96'};   // training is chalk; food owns the colours
 function weekDates(){const d=parseYmd(TODAY()), dow=(d.getDay()+6)%7; return [...Array(7)].map((_,i)=>addDays(TODAY(),i-dow))}
+/* Start card with a routine switcher: tap a routine to see it, tap its name (or Rename) to rename, Start to go. */
+function routineCard(next){
+  const L=S.routines.list, sel=L.find(x=>x.id===S.ui.rSel)||next, sets=sel.ex.reduce((a,x)=>a+(+x.sets||0),0);
+  return `<section class="card start-card"><div class="rt-pills" role="tablist" aria-label="Your routines">${L.map(x=>`<button class="rt-pill" role="tab" data-g="rSel" data-v="${x.id}" aria-selected="${x.id===sel.id}">${esc(x.name)}${x.id===next.id?'<small>Next</small>':''}</button>`).join('')}<button class="rt-pill add" data-g="rNewT" aria-label="New routine">+</button></div>
+    <div class="sc-top"><p class="sc-k">${sel.id===next.id?'Up next':'Routine'}</p><span class="sc-acts"><button class="txtbtn sc-ren" data-g="rRen" data-v="${sel.id}" aria-label="Rename ${esc(sel.name)}">Rename</button><button class="txtbtn sc-ren" data-g="rEditOne" data-v="${sel.id}" aria-label="Edit ${esc(sel.name)}">Edit</button></span></div>
+    <h2><button class="sc-name" data-g="rRen" data-v="${sel.id}" aria-label="${esc(sel.name)}, tap to rename">${esc(sel.name)}</button></h2>
+    <p class="sc-sub">${sel.ex.length?`${sel.ex.length} exercise${sel.ex.length===1?'':'s'} · ${sets} sets`:'No exercises yet. Tap Edit to add some.'}</p>
+    ${sel.ex.length?`<div class="sc-ex">${sel.ex.map(x=>`<span>${esc(exById(x.eid).n.replace(/ \(.*\)$/,''))}</span>`).join('')}</div>`:''}
+    <button class="btn big" data-g="start" data-v="${sel.id}">Start ${esc(sel.name)}</button>
+    <div class="sc-alt"><button class="chip2" data-g="start" data-v="">Blank workout</button></div></section>`;
+}
 async function renderTrain(){
   if(!S.wkLoaded) await loadWorkouts();
   if(!S.hist) await loadHist();
@@ -2440,10 +2465,7 @@ async function renderTrain(){
     <div id="trRes"></div><div id="trMain">
     <div class="weekstrip">${wd.map(d=>`<div class="wd${d===TODAY()?' today':''}"><span>${DF(parseYmd(d),{weekday:'narrow'})}</span><i class="${gymDays.has(d)?'gym':actDays.has(d)?'act':''}"></i></div>`).join('')}</div>
     ${trainRecovery()}${S.active?`<section class="card start-card live"><p class="sc-k">Workout in progress</p><h2>${esc(S.active.name)}</h2><p class="sc-sub">${dur(Date.now()-S.active.start)} · ${S.active.ex.reduce((a,x)=>a+x.sets.filter(s=>s.done).length,0)} sets logged</p><button class="btn big" data-g="resume">Resume Workout</button></section>`
-    :r?`<section class="card start-card"><div class="sc-top"><p class="sc-k">Up next</p><button class="txtbtn sc-ren" data-g="rRen" data-v="${r.id}" aria-label="Rename ${esc(r.name)}">Rename</button></div><h2>${esc(r.name)}</h2>
-      <div class="sc-ex">${r.ex.map(x=>`<span>${esc(exById(x.eid).n.replace(/ \(.*\)$/,''))}</span>`).join('')}</div>
-      <button class="btn big" data-g="start" data-v="${r.id}">Start ${esc(r.name)}</button>
-      <div class="sc-alt">${S.routines.list.filter(x=>x.id!==r.id).map(x=>`<button class="chip2" data-g="start" data-v="${x.id}">${esc(x.name)} instead</button>`).join('')}<button class="chip2" data-g="start" data-v="">Blank workout</button></div></section>`
+    :r?routineCard(r)
     :`<section class="card start-card"><p class="sc-k">Quick start</p><h2>No routines yet</h2><p class="sc-sub">Start empty and add exercises as you go, or set up a plan below.</p>
       <button class="btn big" data-g="start" data-v="">Start Workout</button>
       <div class="sc-alt"><button class="chip2" data-g="defRoutines">Use Push / Pull / Legs</button><button class="chip2" data-g="rNew">New Routine</button></div></section>`}
@@ -3006,6 +3028,7 @@ function pickExercise(id){
 }
 const persistW=()=>{if(!S.ui.edit) saveSession(S.active)};
 /* ---------- routines made from workouts (Save as Routine, Update, Start from a past workout) ---------- */
+const uniqRoutineName=n=>{const taken=new Set(S.routines.list.map(r=>r.name.toLowerCase())); if(!taken.has(n.toLowerCase())) return n; let i=2; while(taken.has(`${n} ${i}`.toLowerCase())) i++; return `${n} ${i}`};
 function routineName(w){
   let n=w.name&&w.name!=='Workout'?w.name:new Set(w.ex.map(x=>exById(x.eid).m).filter(m=>m&&m!=='Other')).size>=4?'Full Body':`Workout ${shortDate(w.date)}`;
   const taken=new Set(S.routines.list.map(r=>r.name)); if(!taken.has(n)) return n; let i=2; while(taken.has(`${n} (${i})`)) i++; return `${n} (${i})`;
@@ -3067,7 +3090,7 @@ function saveRename(){
   if(back) showRoutines(); else {closeSheet('#gSheet'); route(true)}
   if(n!==old) toastUndo(`Renamed to ${n}`,()=>{const q=S.routines.list.find(x=>x.id===r.id); if(q){q.name=old; saveRoutines(); if(!$('#gSheet').hidden&&back) showRoutines(); route(true)}});
 }
-function showRoutines(){
+function showRoutines(focus){
   const L=S.routines.list;
   gSheet('Routines',`${L.map((r,ri)=>`<div class="rt"><div class="rt-h"><input class="rt-name" type="text" value="${esc(r.name)}" data-gi="rname" data-r="${ri}" aria-label="Routine name"><button class="txtbtn" style="font-size:15px" data-g="rRen" data-v="${r.id}" data-b="1">Rename</button><button class="txtbtn" style="font-size:15px" data-g="rDup" data-r="${ri}">Duplicate</button><button class="txtbtn" style="color:var(--red);font-size:15px" data-g="rDel" data-r="${ri}">Delete</button></div>
     <ul class="list">${r.ex.map((x,xi)=>`<li class="rt-li"><div class="rt-ex"><div class="rt-top"><button class="exthumb" data-g="exInfo" data-v="${esc(x.eid)}" aria-label="How to do ${esc(exById(x.eid).n)}">${exThumb(exById(x.eid),40)}</button><div class="rt-n"><b>${esc(exById(x.eid).n)}</b><span>${x.sets} × ${x.lo===x.hi?x.lo:x.lo+'–'+x.hi} · rest ${Math.floor(x.rest/60)}:${pad(x.rest%60)} · ${x.scheme==='rp'?'Reverse pyramid':'Double progression'}</span></div>${r.ex.length>1?`<button class="rt-grip" data-r="${ri}" data-x="${xi}" aria-label="Drag to reorder ${esc(exById(x.eid).n)}"><svg viewBox="0 0 12 18" aria-hidden="true"><g fill="currentColor"><circle cx="3" cy="3" r="1.6"/><circle cx="9" cy="3" r="1.6"/><circle cx="3" cy="9" r="1.6"/><circle cx="9" cy="9" r="1.6"/><circle cx="3" cy="15" r="1.6"/><circle cx="9" cy="15" r="1.6"/></g></svg></button>`:''}</div>
@@ -3079,6 +3102,7 @@ function showRoutines(){
     <button class="btn tint" data-g="rNew">New Routine</button>
     <p class="foot">DP = double progression: add weight once every set hits the top of the rep range. RP = reverse pyramid: heaviest set first, then 10% lighter per set.</p>`,
     `<button class="txtbtn r" data-g="closeG">Done</button>`);
+  if(focus){const k=L.findIndex(r=>r.id===focus); setTimeout(()=>{const el=document.querySelectorAll('#gSheet .rt')[k]; if(el) el.scrollIntoView({block:'start'})},60)}
 }
 
 /* ---------- Hevy CSV import (format per Hevy's export: title,start_time,end_time,…,exercise_title,…,set_type,weight_kg,reps,…) ---------- */
@@ -5600,6 +5624,9 @@ document.addEventListener('click',async ev=>{
     case 'rFromW': {const r=S.routines.list[+b.dataset.r], ww=S.wk[v]; if(!r||!ww) break; const nr=routineFromSession(ww); if(!nr.ex.length){toast('That workout has no logged sets'); break}
       r.ex=nr.ex; if(/^New Routine( \(\d+\))?$/.test(r.name)) r.name=routineName(ww); S.routines.src='custom'; saveRoutines(); showRoutines(); haptic('confirm'); toast(`${r.name}: ${r.ex.length} exercises from ${shortDate(ww.date)}`)} break;
     case 'rRen': showRename(b.dataset.v,!!b.dataset.b); break;
+    case 'rSel': if(S.ui.rSel!==b.dataset.v){S.ui.rSel=b.dataset.v; haptic(); const sc=$('#v-train .start-card'); if(sc){const y=$('.rt-pills',sc)?.scrollLeft||0; sc.outerHTML=routineCard(nextRoutine()); const n=$('#v-train .rt-pills'); if(n) n.scrollLeft=y}} break;
+    case 'rEditOne': showRoutines(b.dataset.v); break;
+    case 'rNewT': {const id=uid(); S.routines.list.push({id,name:uniqRoutineName('New Routine'),ex:[]}); S.routines.src='custom'; saveRoutines(); S.ui.rSel=id; renderTrain(); showRename(id); break}
     case 'rRenSave': saveRename(); break;
     case 'rNew': S.routines.list.push({id:uid(),name:'New Routine',ex:[]}); S.routines.src='custom'; saveRoutines(); showRoutines(); break;
     case 'apt': toggleApt(v); break;
