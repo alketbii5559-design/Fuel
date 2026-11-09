@@ -1640,6 +1640,42 @@ body[data-look="dense"] .start-card h2{font-size:28px}
 .rest-chips .chip2 small{margin-left:6px;font:500 11px var(--mono);color:var(--label3)}
 .ds-chain{color:var(--label2)}
 .rest-src{margin:2px 4px 8px;text-align:left}
+/* ---------- Food details + diary rows + summary at bottom (9 Nov, Detailed look) ---------- */
+.fd{position:fixed;inset:0;z-index:65;background:var(--bg);transform:translateX(100%);transition:transform 300ms var(--e-out)}
+.fd.on{transform:none}
+@media (prefers-reduced-motion:reduce){.fd{transform:none;opacity:0;transition:opacity 200ms}.fd.on{opacity:1}}
+.fd-p{height:100%;display:grid;grid-template-rows:auto 1fr auto;padding-top:env(safe-area-inset-top)}
+.fd-bar{padding:8px 16px}
+.fd-body{overflow-y:auto;padding:4px 16px 16px;display:grid;gap:12px;align-content:start}
+.fd-name{margin:0;font:700 26px/1.15 var(--display);text-wrap:balance}
+.fd-src{margin:-4px 0 0;display:flex;gap:8px;align-items:center;flex-wrap:wrap;font-size:13px;color:var(--label2)}
+.fd-amt{display:grid;gap:10px}
+.fd-num{all:unset;cursor:pointer;display:flex;align-items:baseline;gap:8px;padding:12px 16px;border-radius:14px;background:var(--cell);box-shadow:inset 0 0 0 1px var(--hair)}
+.fd-num b{font:700 40px/1 var(--num);text-decoration:underline 2px var(--label3);text-underline-offset:7px}
+.fd-num span{font:500 17px var(--font);color:var(--label2)}
+.fd-sum{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;text-align:center;padding:12px 6px;border-radius:14px;background:var(--cell)}
+.fd-sum b{display:block;font:700 22px var(--num)}.fd-sum span{font-size:12px;color:var(--label2)}
+.fd-split{display:flex;height:8px;border-radius:4px;overflow:hidden;gap:2px;background:var(--fill)}
+.fd-split i{display:block;min-width:2px}
+.fd-pct{margin:-6px 0 0;font-size:13px;color:var(--label2)}
+.fd-mi{list-style:none;margin:0;padding:0 14px;border-radius:14px;background:var(--cell)}
+.fd-mi li{display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--sep);font-size:15px}
+.fd-mi li:last-child{border-bottom:0}.fd-mi b{font-weight:600}
+.fd-foot{display:grid;gap:4px;justify-items:center;padding:10px 16px calc(10px + env(safe-area-inset-bottom));border-top:1px solid var(--sep);background:var(--bg)}
+.fd-foot .btn{width:100%}
+/* diary rows: time, name, amount, macro bar, kcal */
+.row.dy-r{display:grid;grid-template-columns:44px minmax(0,1fr) auto;grid-template-areas:"tm t k" "tm d k" "tm bar k";align-items:center;column-gap:10px}
+.row.dy-r .tm{grid-area:tm;align-self:start;padding-top:2px;font:500 12px var(--mono);color:var(--label3)}
+.row.dy-r .t{grid-area:t}.row.dy-r .d{grid-area:d}.row.dy-r .k{grid-area:k}
+.row.dy-r.th{grid-template-columns:44px auto minmax(0,1fr) auto;grid-template-areas:"tm img t k" "tm img d k" "tm img bar k"}
+.row.dy-r.th .thumb{grid-area:img}
+.row.dy-r .pick{grid-area:tm}
+.dy-bar{grid-area:bar;display:flex;height:4px;border-radius:2px;overflow:hidden;gap:1px;max-width:180px;margin-top:3px}
+.dy-bar i{display:block}
+.dy-h .dy-add{all:unset;cursor:pointer;margin-left:8px;width:26px;height:26px;border-radius:50%;display:inline-grid;place-items:center;background:var(--fill);color:var(--label);font:500 18px/1 var(--font);vertical-align:middle;position:relative}
+.dy-h .dy-add::before{content:"";position:absolute;inset:-9px}
+.dy-h>div>b{display:flex;align-items:center}
+.es-sum-h{margin-top:4px}
 </style>
 </head>
 <body>
@@ -3911,12 +3947,12 @@ function energySummary(t,P,date){
   </section>`;
 }
 function diaryHTML(day,ghosts,selOn,seenIds){
-  const rows=mealList().map(([k,l])=>{const es=day.entries.filter(e=>e.meal===k), gh=ghosts.filter(r=>r.meal===k); if(!es.length&&!gh.length) return '';
+  const rows=mealList().map(([k,l])=>{const es=day.entries.filter(e=>e.meal===k).sort((a,b)=>(a.t||0)-(b.t||0)), gh=ghosts.filter(r=>r.meal===k);
     const s=a=>es.reduce((x,e)=>x+e[a]*e.qty,0), th=es.some(e=>e.img);
-    return `<li class="dy-h"><div><b>${esc(l)}</b><span class="num">${fmt(s('kcal'))} kcal</span></div><p class="num">P ${r0(s('p'))} · C ${r0(s('c'))} · F ${r0(s('f'))} g</p></li>
+    return `<li class="dy-h"><div><b>${esc(l)}<button class="dy-add" data-act="addTo" data-v="${k}" aria-label="Add to ${esc(l)}">+</button></b><span class="num">${fmt(s('kcal'))} kcal</span></div><p class="num">P ${r0(s('p'))} · C ${r0(s('c'))} · F ${r0(s('f'))} g</p></li>
       ${es.map(e=>{const on=selOn&&selIds.has(e.id), nw=seenIds&&!seenIds.has(e.id);
-        return `<li class="${on?'picked':''}${nw?' slap':''}"><button class="row dy-r${th?' th':''}${selOn?' selmode':''}" data-act="entry" data-v="${e.id}"${selOn?` aria-pressed="${on}"`:''}>${selOn?`<span class="pick" aria-hidden="true">${on?TICK_S:''}</span>`:''}${th?(thumb(e)||'<span class="thumb blank"></span>'):''}<span class="t">${esc(e.name)}</span><span class="d">${esc(qtyLabel(e))} ${srcTag(e)}</span><span class="k num">${fmt(e.kcal*e.qty)}<small>${r0(e.p*e.qty)} g P</small></span></button></li>`}).join('')}${gh.map(ghostRow).join('')}`}).filter(Boolean);
-  if(!rows.length) return '';
+        return `<li class="${on?'picked':''}${nw?' slap':''}"><button class="row dy-r${th?' th':''}${selOn?' selmode':''}" data-act="entry" data-v="${e.id}"${selOn?` aria-pressed="${on}"`:''}>${selOn?`<span class="pick" aria-hidden="true">${on?TICK_S:''}</span>`:''}${th?(thumb(e)||'<span class="thumb blank"></span>'):''}<span class="tm num">${e.t?DF(new Date(e.t),{hour:'2-digit',minute:'2-digit',hour12:false}):''}</span><span class="t">${esc(e.name)}</span><span class="d">${esc(qtyLabel(e))} ${srcTag(e)}</span>${(()=>{const c=Math.max(1,e.p*4+e.c*4+e.f*9); return `<span class="dy-bar" aria-hidden="true"><i style="flex:${e.p*4/c};background:var(--pro)"></i><i style="flex:${e.c*4/c};background:var(--c-c)"></i><i style="flex:${e.f*9/c};background:var(--c-f)"></i></span>`})()}<span class="k num">${fmt(e.kcal*e.qty)}<small>${r0(e.p*e.qty)} g P</small></span></button></li>`}).join('')}${gh.map(ghostRow).join('')}`}).filter(Boolean);
+  if(!day.entries.length&&!ghosts.length) return `<div class="gap"></div><h2 class="sec">Diary</h2><ul class="list dy">${rows.join('')}</ul>`;
   const t=totals(day);
   return `<div class="gap"></div><h2 class="sec">Diary</h2><ul class="list dy">${rows.join('')}<li class="dy-tot"><div><b>Total</b><span class="num">${fmt(t.kcal)} kcal</span></div><p class="num">P ${r0(t.p)} · C ${r0(t.c)} · F ${r0(t.f)} g</p></li></ul>`;
 }
@@ -3977,7 +4013,7 @@ async function renderToday(){
     <p class="subtitle dl-sub"><span>${dateLong(S.date)}${isToday?'':` · <button class="txtbtn" style="font-size:15px;padding:0" data-act="today">Go to Today</button>`}</span>${st>1&&isToday?`<span class="streak-t">${st} days in a row</span>`:''}</p>
     ${todayChips(day)}
     <div class="badge" data-sync hidden><i></i><span></span></div>
-    ${dense?energySummary(t,P,S.date)+(groups||''):tankHero(t,P,M)}
+    ${dense?(groups||'')+'<div class="gap"></div><h2 class="sec es-sum-h">Energy Summary</h2>'+energySummary(t,P,S.date):tankHero(t,P,M)}
     ${isToday&&P.tDay!==0?yesterdayPrompt():''}${isToday&&P.tFits!==0?fitsLine(left,pLeft):''}${isToday&&P.tFits!==0&&checkinDue()?checkinCard():''}
     ${weighRow(isToday)}
     ${whoopCard(isToday)}
@@ -4365,6 +4401,50 @@ function editAmt(){if(!editing) return; const g=editing.mode==='g'&&editing.sz;
 document.addEventListener('click',e=>{const t=e.target; if(!t.closest) return;
   const q=t.closest('.qin'); if(q){e.preventDefault(); trayAmt(+q.dataset.v); return}
   if(t.closest('#eQtyIn')){e.preventDefault(); editAmt()}});
+/* ---------- Food details (Detailed look, Cronometer-style): tap a food → its page with amount, unit, nutrients → Add to Diary ---------- */
+let FD=null;
+/* Settings → Today Screen → Tapping a food: details page (default) or straight into the tray. Kept per device. */
+const tapDetail=()=>{try{return localStorage.getItem('fuel-tap')!=='tray'}catch(e){return true}};
+function fdOpen(f){
+  const z=sizeOf(f), g=!!z&&(f.mode==='g'||per100(f));
+  FD={f, z, mode:g?'g':'srv', un:z?z.un:'g', qty:g?1:1, meal:selMeal};
+  if(g&&per100(f)) FD.qty=1; /* 100 g by default */
+  let el=$('#fd'); if(!el){el=document.createElement('div'); el.id='fd'; el.className='fd'; el.hidden=true; document.body.appendChild(el)}
+  fdRender(); el.hidden=false; requestAnimationFrame(()=>el.classList.add('on')); haptic();
+}
+function fdClose(){const el=$('#fd'); if(!el) return; el.classList.remove('on'); FD=null; setTimeout(()=>{if(!FD) el.hidden=true},motionOK()?260:0)}
+const fdAmt=()=>FD.mode==='g'?r0(FD.qty*FD.z.sz):r1(FD.qty);
+function fdRender(){
+  const el=$('#fd'); if(!el||!FD) return; const f=FD.f, q=FD.qty, k=f.kcal*q, P=f.p*q, C=f.c*q, F=f.f*q, cal=Math.max(1,P*4+C*4+F*9);
+  const row=(n,v,u)=>v==null?'':`<li><span>${n}</span><b class="num">${fmtMi(v*q,u)}</b></li>`, mi=f.mi||{};
+  const micro=[['Fiber',f.fb,'g'],['Sugars',f.sg,'g'],['Sodium',f.na,'mg'],['Saturated fat',mi.sat,'g'],['Cholesterol',mi.chol,'mg'],['Potassium',mi.k,'mg'],['Calcium',mi.ca,'mg'],['Iron',mi.fe,'mg'],['Vitamin C',mi.vc,'mg']].filter(x=>x[1]!=null);
+  const units=[['srv','Servings']].concat(FD.z?[[FD.z.un,FD.z.un==='ml'?'Millilitres':'Grams']]:[]);
+  el.innerHTML=`<div class="fd-p" role="dialog" aria-label="${esc(f.name)}">
+    <div class="sheet-bar fd-bar"><button class="txtbtn" data-fd="back">Back</button><h2>Food</h2><span></span></div>
+    <div class="fd-body">
+      <h1 class="fd-name">${esc(f.name)}</h1><p class="fd-src">${srcTag(f)} <span>${esc(f.serving)} per serving</span></p>
+      <div class="fd-amt"><button class="fd-num" data-fd="amt" aria-label="Amount ${fdAmt()}, tap to change"><b class="num">${fdAmt()}</b><span>${FD.mode==='g'?FD.un:(q===1?'serving':'servings')}</span></button>
+        ${units.length>1?`<div class="seg" role="group" aria-label="Amount in">${units.map(([v,l])=>`<button data-fd="unit" data-v="${v}" aria-pressed="${(FD.mode==='g'?FD.un:'srv')===v}">${l}</button>`).join('')}</div>`:''}</div>
+      <div class="fd-sum"><div><b class="num">${fmt(k)}</b><span>kcal</span></div><div><b class="num">${r1(P)}</b><span>Protein g</span></div><div><b class="num">${r1(C)}</b><span>Carbs g</span></div><div><b class="num">${r1(F)}</b><span>Fat g</span></div></div>
+      <div class="fd-split" aria-hidden="true"><i style="flex:${P*4/cal};background:var(--pro)"></i><i style="flex:${C*4/cal};background:var(--c-c)"></i><i style="flex:${F*9/cal};background:var(--c-f)"></i></div>
+      <p class="fd-pct num">${Math.round(P*4/cal*100)}% protein · ${Math.round(C*4/cal*100)}% carbs · ${Math.round(F*9/cal*100)}% fat${S.profile&&S.profile.kcal?` · ${Math.round(k/S.profile.kcal*100)}% of your day`:''}</p>
+      ${micro.length?`<h2 class="sec">Nutrients</h2><ul class="fd-mi">${micro.map(x=>row(...x)).join('')}</ul>`:''}
+      <h2 class="sec">Meal</h2><div class="seg" role="group" aria-label="Meal">${mealList().map(([m,l])=>`<button data-fd="meal" data-v="${m}" aria-pressed="${m===FD.meal}">${esc(l)}</button>`).join('')}</div>
+    </div>
+    <div class="fd-foot"><button class="btn big" data-fd="add">Add to Diary</button><button class="txtbtn" data-fd="tray">Add more foods first</button></div></div>`;
+}
+function fdItem(){const f=FD.f; return {...f,qty:FD.qty,src:f.src||'db',...(FD.mode==='g'?{mode:'g',sz:FD.z.sz,un:FD.un}:{mode:undefined})}}
+async function fdAct(b){
+  const a=b.dataset.fd, v=b.dataset.v; if(!FD) return;
+  if(a==='back'){fdClose(); return}
+  if(a==='meal'){FD.meal=v; haptic(); fdRender(); return}
+  if(a==='unit'){if(v==='srv'){FD.mode='srv'; FD.qty=Math.max(0.5,r1(FD.qty))} else {FD.mode='g'; FD.un=v} haptic(); fdRender(); return}
+  if(a==='amt'){const f=FD.f; amtOpen({name:f.name,serving:f.serving,sz:FD.z&&FD.z.sz,liq:FD.z&&FD.z.un==='ml',mode:FD.mode,un:FD.un,amount:+fdAmt(),kcal:f.kcal,p:f.p,
+     done:(m,u,n)=>{if(!FD) return; if(m==='g'){FD.mode='g'; FD.un=u; FD.qty=n/FD.z.sz} else {FD.mode='srv'; FD.qty=n} fdRender()}}); return}
+  if(a==='tray'){const it=fdItem(); selMeal=FD.meal; renderSeg(); tray.push(it); renderTray(); fdClose(); toast('In the tray. Add the rest, then tap Add.'); return}
+  if(a==='add'){if(b.disabled) return; b.disabled=true; const it=fdItem(); selMeal=FD.meal; fdClose(); await commitItems([...tray.filter(i=>+i.qty>0),it]); tray=[]}
+}
+document.addEventListener('click',e=>{const b=e.target.closest&&e.target.closest('#fd [data-fd]'); if(b){e.preventDefault(); e.stopPropagation(); fdAct(b)}},true);
 function saveMeal(){
   if(!$('#mealName')) return;
   const name=($('#mealName').value||'').trim(); if(!name){$('#mealName').focus();return}
@@ -5079,7 +5159,7 @@ function renderSettings(){
     <p class="foot">Sports you pick show on the Train tab with quick time buttons.</p>
     ${whoopSettings()}
     <div class="gap" style="height:14px"></div><h2 class="sec">Today Screen</h2>
-    <ul class="list"><li><label class="row single" for="s-look"><span class="t">Layout</span><select id="s-look" data-p="look" class="ssel">${[['dense','Detailed'],['tank','Tank']].map(([v,t])=>`<option value="${v}"${(lookDense()?'dense':'tank')===v?' selected':''}>${t}</option>`).join('')}</select></label></li>${sw('tWeek','Week, water and training')}${sw('tFits','Food ideas and check-in card')}${sw('tVit','Vitamins and fiber')}${sw('tDay','“Logged everything?” questions')}${whoopHas()||P.whoopLive?sw('tWhoop','WHOOP recovery, sleep and strain'):''}</ul>
+    <ul class="list"><li><label class="row single" for="s-tap"><span class="t">Tapping a food</span><select id="s-tap" data-p="tapFood" class="ssel">${[['detail','Opens its details'],['tray','Adds it to the tray']].map(([v,t])=>`<option value="${v}"${(tapDetail()?'detail':'tray')===v?' selected':''}>${t}</option>`).join('')}</select></label></li><li><label class="row single" for="s-look"><span class="t">Layout</span><select id="s-look" data-p="look" class="ssel">${[['dense','Detailed'],['tank','Tank']].map(([v,t])=>`<option value="${v}"${(lookDense()?'dense':'tank')===v?' selected':''}>${t}</option>`).join('')}</select></label></li>${sw('tWeek','Week, water and training')}${sw('tFits','Food ideas and check-in card')}${sw('tVit','Vitamins and fiber')}${sw('tDay','“Logged everything?” questions')}${whoopHas()||P.whoopLive?sw('tWhoop','WHOOP recovery, sleep and strain'):''}</ul>
     <p class="foot">Turn cards off to keep Today short. The weekly check-in is always on Progress.</p>
     <div class="gap" style="height:14px"></div><h2 class="sec">Meal Names</h2>
     <ul class="list">${MEALS.map(([k,l])=>`<li><label class="row single" for="s-meal-${k}"><span class="t">${l}</span><input type="text" id="s-meal-${k}" data-p="meal-${k}" class="stxt" maxlength="24" placeholder="${l}" value="${esc(((P.mealNames||{})[k])||'')}"></label></li>`).join('')}</ul>
@@ -5124,6 +5204,7 @@ function onSetting(e){const el=e.target.closest('[data-p]'); if(!el) return; con
   if(k==='name'){S.profile.name=el.value.trim().slice(0,40); save('profile',S.profile); return}
   if(k.startsWith('meal-')){S.profile.mealNames={...(S.profile.mealNames||{}),[k.slice(5)]:el.value.trim().slice(0,24)}; save('profile',S.profile); renderSeg&&$('#mealSeg')&&renderSeg(); return}
   if(k==='goal'||k==='act'){S.profile[k]=el.value; save('profile',S.profile); renderSettings(); return}
+  if(k==='tapFood'){try{localStorage.setItem('fuel-tap',el.value)}catch(e){} haptic(); return}
   if(k==='look'){S.profile.look=el.value; save('profile',S.profile); applyLook(); haptic(); return}
   if(k==='motion'){S.profile.motion=el.value; save('profile',S.profile); applyMotionPref(); haptic(); return}
   if(k==='gymDays'){S.profile.gymDays=Math.max(0,Math.min(7,Math.round(+el.value||0))); save('profile',S.profile); return}
@@ -5535,7 +5616,7 @@ document.addEventListener('click',async ev=>{
     case 'tsz': {const i=tray[+v], z=+($('#sz'+v)||{}).value; if(i&&z>0){i.sz=r1(z); i.un=b.dataset.u; i.mode='g'; i.askSz=false; renderTray(); focusQin(+v)} else {const x=$('#sz'+v); x&&x.focus()}} break;
     case 'eunit': if(v!=='srv'&&!editing.sz){editing.askSz=true; await eRerender(); setTimeout(()=>{const z=$('#eSzIn'); z&&z.focus()},40)} else {if(v==='srv') editing.mode='srv'; else {editing.mode='g'; editing.un=v} editing.askSz=false; if(v==='srv') editing.qty=Math.max(0.5,r1(editing.qty)); await eRerender()} break;
     case 'esz': {const z=+($('#eSzIn')||{}).value; if(z>0){editing.sz=r1(z); editing.un=b.dataset.u; editing.mode='g'; editing.askSz=false; await eRerender(); editAmt()} else {const x=$('#eSzIn'); x&&x.focus()}} break;
-    case 'pick': {const f=lastResults[+v]; if(!f) break; if(Array.isArray(f.items)){f.items.forEach(i=>tray.push({...i,qty:+i.qty||1,src:i.src||'db'})); renderTray(); flyToTray(b,f,tray.length-1); break} const ex=tray.find(i=>foodKey(i)===foodKey(f)&&i.src!=='ai'); if(ex) ex.qty=+ex.qty+1; else tray.push({...f,qty:1,src:'db',...(per100(f)&&!f.mode?{mode:'g'}:{})}); renderTray(); flyToTray(b,f,ex?tray.indexOf(ex):tray.length-1);} break;
+    case 'pick': {const f=lastResults[+v]; if(!f) break; if(lookDense()&&!Array.isArray(f.items)&&tapDetail()){fdOpen(f); break} if(Array.isArray(f.items)){f.items.forEach(i=>tray.push({...i,qty:+i.qty||1,src:i.src||'db'})); renderTray(); flyToTray(b,f,tray.length-1); break} const ex=tray.find(i=>foodKey(i)===foodKey(f)&&i.src!=='ai'); if(ex) ex.qty=+ex.qty+1; else tray.push({...f,qty:1,src:'db',...(per100(f)&&!f.mode?{mode:'g'}:{})}); renderTray(); flyToTray(b,f,ex?tray.indexOf(ex):tray.length-1);} break;
     case 'tq': {const i=tray[+v]; if(i){trayStep(i,+b.dataset.d); renderTray();}} break;
     case 'tdel': tray.splice(+v,1); renderTray(); break;
     case 'tmatch': {const i=tray[+v]; if(i){i.picking=!i.picking; if(i.picking&&!USDA) loadUSDA().then(()=>renderTray()).catch(()=>{}); renderTray()}} break;
@@ -5543,6 +5624,7 @@ document.addEventListener('click',async ev=>{
     case 'commit': commitTray(); break;
     case 'ntSrc': showNtSources(v); break;
     case 'restOpen': {const qq=$('#q'); qq.value=v; renderResults(); haptic(); break}
+    case 'addTo': {openAdd(); selMeal=v; renderSeg(); break}
     case 'entry': if(selIds){selIds.has(v)?selIds.delete(v):selIds.add(v); if(!selIds.size) selIds=null; haptic(); renderToday(); break} openEdit(v); break;
     case 'dayst': setDayStatus(b.dataset.d||S.date,v); break;
     case 'repOk': repConfirm(v); break;
