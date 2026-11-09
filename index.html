@@ -4411,7 +4411,7 @@ function manualAdd(){
     ...(mPer!=='srv'?{sz:100,un:mPer,mode:'g'}:sz>0?{sz:r1(sz),un:$('#mUn').value==='ml'?'ml':'g',mode:'g'}:{})};
   if(name){undel(S.foods,'cus:'+foodKey(f)); S.foods.custom=[f,...S.foods.custom.filter(x=>foodKey(x)!==foodKey(f))]; save('foods',S.foods)}
   tray.push({...f,qty:1,src:name?'manual':'quick',ds:{t:'you'},barcode:pendingCode||undefined}); renderTray(); haptic();
-  const li=$$('#tray li')[tray.length-1]; if(li&&motionOK()){li.classList.add('land')} if(f.mode==='g') focusQin(tray.length-1);
+  const li=$$('#tray li')[tray.length-1]; if(li&&motionOK()){li.classList.add('land')}
   ['#mName','#mK','#mP','#mC','#mF','#mSz','#mFb','#mSg','#mNa'].forEach(s=>$(s).value=''); $('#manualBox details.more').open=false; $('#mServ').value='1 serving'; setPer('srv'); $('#manualBox').hidden=true; $('#exactTile').setAttribute('aria-pressed','false');
 }
 document.addEventListener('input',e=>{const id=e.target&&e.target.id; if(id==='mK'||id==='mP'||id==='mC'||id==='mF') exHint()});
