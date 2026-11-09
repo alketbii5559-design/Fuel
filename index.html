@@ -4027,7 +4027,7 @@ async function renderToday(){
     <p class="subtitle dl-sub"><span>${dateLong(S.date)}${isToday?'':` · <button class="txtbtn" style="font-size:15px;padding:0" data-act="today">Go to Today</button>`}</span>${st>1&&isToday?`<span class="streak-t">${st} days in a row</span>`:''}</p>
     ${todayChips(day)}
     <div class="badge" data-sync hidden><i></i><span></span></div>
-    ${dense?(groups||'')+'<div class="gap"></div><h2 class="sec es-sum-h">Energy Summary</h2>'+energySummary(t,P,S.date):tankHero(t,P,M)}
+    ${dense?energySummary(t,P,S.date)+(groups||''):tankHero(t,P,M)}
     ${isToday&&P.tDay!==0?yesterdayPrompt():''}${isToday&&P.tFits!==0?fitsLine(left,pLeft):''}${isToday&&P.tFits!==0&&checkinDue()?checkinCard():''}
     ${weighRow(isToday)}
     ${whoopCard(isToday)}
