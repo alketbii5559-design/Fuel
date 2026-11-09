@@ -1676,6 +1676,19 @@ body[data-look="dense"] .start-card h2{font-size:28px}
 .dy-h .dy-add::before{content:"";position:absolute;inset:-9px}
 .dy-h>div>b{display:flex;align-items:center}
 .es-sum-h{margin-top:4px}
+
+/* ---------- Fast logging (9 Nov) ---------- */
+.ql{display:flex;gap:8px;overflow-x:auto;scrollbar-width:none;margin:0 -16px 6px;padding:2px 16px;scroll-snap-type:x proximity}
+.ql::-webkit-scrollbar{display:none}
+.ql-b{flex:0 0 auto;scroll-snap-align:start;display:grid;gap:2px;text-align:left;max-width:170px;padding:10px 14px;border-radius:14px;border:0;background:var(--cell);box-shadow:inset 0 0 0 1px var(--hair);color:var(--label)}
+.ql-b b{font:600 15px var(--font);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ql-b span{font-size:12px;color:var(--label2);white-space:nowrap}
+.ql-b:active{transform:scale(.97)}
+.sec .muted{font-weight:400;font-size:12px;color:var(--label3);margin-left:6px}
+.snapbtn{position:fixed;left:calc(50% - 116px);bottom:calc(66px + env(safe-area-inset-bottom));z-index:25;width:52px;height:52px;border-radius:50%;display:grid;place-items:center;background:var(--cell);color:var(--label);box-shadow:inset 0 0 0 1px var(--hair);cursor:pointer}
+.snapbtn svg{width:24px;height:24px}
+.snapbtn:active{transform:scale(.97)}
+.snapbtn[hidden]{display:none}.snapbtn.away{opacity:0;pointer-events:none}
 </style>
 </head>
 <body>
@@ -1687,7 +1700,7 @@ body[data-look="dense"] .start-card h2{font-size:28px}
   <section class="view" id="v-settings" aria-label="Settings" hidden></section>
 </main>
 
-<button class="addbtn" id="addBtn" data-act="add"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>Add Food</button>
+<label class="snapbtn" for="snapIn" id="snapBtn" aria-label="Snap a photo of your food" onclick="openAdd()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M4 8.5A1.5 1.5 0 0 1 5.5 7h2l1.5-2h6l1.5 2h2A1.5 1.5 0 0 1 20 8.5v9a1.5 1.5 0 0 1-1.5 1.5h-13A1.5 1.5 0 0 1 4 17.5z"/><circle cx="12" cy="12.5" r="3.5"/></svg></label><button class="addbtn" id="addBtn" data-act="add"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>Add Food</button>
 
 <div id="setup" class="setup" role="dialog" aria-modal="true" aria-label="Set up Fuel" hidden></div>
 <nav class="tabbar" aria-label="Sections"><div class="wrap"><i class="tb-ind" aria-hidden="true"></i>
@@ -1704,6 +1717,7 @@ body[data-look="dense"] .start-card h2{font-size:28px}
       <div class="sheet-bar"><button class="txtbtn" data-act="closeAdd">Cancel</button><h2 id="addTitle">Add Food</h2><span></span></div></div>
     <div class="sheet-body" id="addBody">
       <div class="seg" id="mealSeg" role="group" aria-label="Meal"></div>
+      <div id="quickLog"></div>
       <div id="usual"></div>
       <div class="tiles">
         <label class="tile press" for="snapIn" id="snapTile"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M4 8.5A1.5 1.5 0 0 1 5.5 7h2l1.5-2h6l1.5 2h2A1.5 1.5 0 0 1 20 8.5v9a1.5 1.5 0 0 1-1.5 1.5h-13A1.5 1.5 0 0 1 4 17.5z"/><circle cx="12" cy="13" r="3.4"/></svg></span>Snap Photo<small>Barcode, label or meal</small></label>
@@ -3779,7 +3793,7 @@ document.addEventListener('pointermove',e=>{if(lpT&&(Math.abs(e.clientX-lpX)>8||
 ['pointerup','pointercancel'].forEach(t=>document.addEventListener(t,()=>{clearTimeout(lpT); lpT=null; if(lpFired){lpFired=false; swallow=true; setTimeout(()=>{swallow=false},350)}},{passive:true}));
 function renderSelBar(){
   let bar=$('#selBar'); const on=selIds&&currentView()==='today';
-  $('#addBtn').classList.toggle('away',!!on); if(!on){if(bar) bar.hidden=true; return}
+  $('#addBtn').classList.toggle('away',!!on); $('#snapBtn').classList.toggle('away',!!on); if(!on){if(bar) bar.hidden=true; return}
   if(!bar){bar=document.createElement('div'); bar.id='selBar'; bar.className='selbar'; document.body.appendChild(bar)}
   const past=S.date<TODAY(), n=selIds.size; bar.hidden=false;
   bar.innerHTML=`<div class="sb-h"><b>${n} selected</b><button class="txtbtn" data-act="selDone">Done</button></div>
@@ -4214,9 +4228,28 @@ function openAdd(){
 function renderSeg(){$('#mealSeg').innerHTML=mealList().map(([k,l])=>`<button data-act="meal" data-v="${k}" aria-pressed="${k===selMeal}">${l}</button>`).join(''); renderTray(); renderUsual()}
 /* "Your usual": the last time this meal was logged, re-logged in one tap. */
 let usualItems=null;
+/* ---------- Quick Log: the foods you log most, with the amount you usually have. One tap logs it. ---------- */
+let QUICK=[];
+function quickFoods(meal){
+  const H=S.hist||{}, seen=new Map(), today=S.date;
+  for(let i=0;i<45;i++){const d=addDays(today,-i), day=S.days[d]||H[d]; if(!day) continue;
+    day.entries.forEach(e=>{if(!e.name||e.src==='quick') return; const k=foodKey(e), o=seen.get(k)||{e,n:0,m:0,last:-1};
+      o.n++; if(e.meal===meal) o.m++; if(o.last<0||i<o.last){o.last=i; o.e=e} seen.set(k,o)})}
+  return [...seen.values()].filter(o=>o.n>=2).sort((a,b)=>(b.m*3+b.n)-(a.m*3+a.n)||a.last-b.last).slice(0,8).map(o=>o.e);
+}
+function renderQuick(){
+  const el=$('#quickLog'); if(!el) return; QUICK=quickFoods(selMeal);
+  el.innerHTML=QUICK.length?`<h2 class="sec">Quick Log <span class="muted">one tap adds to ${esc(mealName(selMeal))}</span></h2><div class="ql">${QUICK.map((e,i)=>`<button class="ql-b" data-act="qlog" data-v="${i}"><b>${esc(e.name.split(',')[0].split(' · ')[0])}</b><span class="num">${esc(qtyLabel(e))} · ${fmt(e.kcal*e.qty)}</span></button>`).join('')}</div>`:'';
+}
+async function quickLog(i){
+  const e=QUICK[i]; if(!e) return; const day=await getDay(S.date), id=uid(), {id:_,t:__,u:___,meal:____,...rest}=e;
+  day.entries.push({...rest,id,meal:selMeal,t:Date.now(),u:Date.now()}); pendingDrop=dropsFor([e]); saveDay(day); haptic('confirm');
+  const m=selMeal; closeSheet('#addSheet'); await renderToday();
+  toastUndo(`${e.name.split(',')[0]} added to ${mealName(m)}`,async()=>{const d=await getDay(S.date), x=d.entries.find(y=>y.id===id); if(x){d.entries=d.entries.filter(y=>y.id!==id); d.del=uniqDel(d.del,[id]); saveDay(d); renderToday()}});
+}
 async function renderUsual(){
   const el=$('#usual'), meal=selMeal; usualItems=null; el.innerHTML='';
-  if(!S.hist) await loadHist(); if(meal!==selMeal) return;
+  if(!S.hist) await loadHist(); if(meal!==selMeal) return; renderQuick();
   for(let i=1;i<=14;i++){
     const d=addDays(S.date,-i), day=S.days[d]||S.hist[d], es=day?day.entries.filter(e=>e.meal===meal):[];
     if(!es.length) continue;
@@ -5553,7 +5586,7 @@ function route(keepScroll){
   if(v==='progress') progFresh=true; $$('.view[id^="v-"]').forEach(x=>x.hidden=x.id!=='v-'+v);
   const ind=$('.tb-ind'); if(ind) ind.style.transform=`translateX(${VIEWS.indexOf(v)*100}%)`; tbClip(VIEWS.indexOf(v),!tbClip.done); tbClip.done=1;
   $$('.tabbar [data-route]').forEach(a=>a.setAttribute('aria-current',a.dataset.route===v?'page':'false'));
-  $('#addBtn').hidden=v!=='today'; if(v!=='today') selIds=null; renderSelBar();
+  $('#addBtn').hidden=v!=='today'; $('#snapBtn').hidden=v!=='today'; if(v!=='today') selIds=null; renderSelBar();
   const done=(v==='today'?renderToday():v==='train'?renderTrain():v==='progress'?renderProgress():renderSettings());
   if(keepScroll!==true) window.scrollTo(0,0);
   /* Tab switch only (never on app open or redraws): content slides in from the side you moved toward, softly in focus. */
@@ -5624,6 +5657,7 @@ document.addEventListener('click',async ev=>{
     case 'commit': commitTray(); break;
     case 'ntSrc': showNtSources(v); break;
     case 'restOpen': {const qq=$('#q'); qq.value=v; renderResults(); haptic(); break}
+    case 'qlog': quickLog(+v); break;
     case 'addTo': {openAdd(); selMeal=v; renderSeg(); break}
     case 'entry': if(selIds){selIds.has(v)?selIds.delete(v):selIds.add(v); if(!selIds.size) selIds=null; haptic(); renderToday(); break} openEdit(v); break;
     case 'dayst': setDayStatus(b.dataset.d||S.date,v); break;
