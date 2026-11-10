@@ -1781,6 +1781,35 @@ a.mny-line:active{transition-duration:90ms}
 .mny-file{display:grid;place-items:center;margin-top:14px;cursor:pointer}
 .mny-imp{font-size:15px;padding:0;color:var(--label);font-weight:600;cursor:pointer;position:relative}
 .mny-imp::before{content:"";position:absolute;inset:-12px -8px}
+/* ---------- Budget (v42): over uses the app's one "over" colour; nothing else gets a hue ---------- */
+.mny-big b.over,.stat b.over,b.over,.mny-line b.over{color:var(--red)}
+.mny-delta b.up{color:var(--label)}
+.mny-budl{stroke:var(--label3);stroke-width:1}
+.mny-bar{position:relative;overflow:visible}
+.mny-bar i{max-width:100%}
+.mny-bar.over i{background:var(--red)}
+.mny-bar>b{position:absolute;top:-3px;width:2px;height:10px;margin-left:-1px;border-radius:1px;background:var(--label2)}
+.sec-row{display:flex;align-items:baseline;justify-content:space-between;gap:12px}
+.sec-row .txtbtn{font-size:15px;color:var(--label);font-weight:600;padding:0;min-height:44px;position:relative}
+.row.mny-b .k.mny-done,.row.mny-b .k.mny-done{color:var(--label3)}
+.row.mny-sug{grid-template-columns:minmax(0,1fr) auto auto;grid-template-areas:"t no add" "d no add";gap:2px 4px}
+.row.mny-sug .t{grid-area:t}.row.mny-sug .d{grid-area:d;grid-column:auto}
+.row.mny-sug .txtbtn{min-height:44px;min-width:44px;padding:0 8px;font-size:15px;color:var(--label2)}
+.row.mny-sug [data-b="sugNo"]{grid-area:no}
+.row.mny-sug .mny-add{grid-area:add;color:var(--label);font-weight:600}
+.mny-net .stat b{font-size:22px}
+.k.mny-in{color:var(--label)}
+.sp-kind{grid-template-columns:1fr 1fr}
+.sp-kind button{min-height:44px;font-size:15px}
+.mny-off .t{color:var(--red)}
+.mny-goal{display:grid;gap:10px}
+.mny-goal .mny-big b{font-size:44px}
+.mny-gadd{display:grid;grid-template-columns:minmax(0,1fr) auto auto;gap:8px}
+.mny-gadd .btn{min-height:44px;padding:0 14px}
+.sp-in{min-width:0;min-height:44px;border:0;border-radius:10px;background:var(--fill);color:var(--label);font:400 16px var(--font);padding:0 12px;outline:none}
+.sp-in::placeholder{color:var(--label3)}
+input.stxt[type=month]{color-scheme:dark;width:auto;min-width:120px}
+.bl-cats{margin-top:-4px}
 </style>
 </head>
 <body>
@@ -5302,8 +5331,9 @@ function renderSettings(){
     <ul class="list"><li><label class="row single" for="s-cur"><span class="t">Currency</span><input type="text" id="s-cur" data-p="cur" class="stxt" maxlength="4" autocapitalize="characters" autocomplete="off" spellcheck="false" placeholder="AED" value="${esc(P.cur||'')}"></label></li>
       ${STANDALONE?`<li><button class="row single" data-m="paySetup"><span class="t">Apple Pay Auto-Log</span><span style="color:var(--label2);font-size:15px">${payUsed()?'Working':'Set Up'}</span></button></li>`:''}
       ${STANDALONE?`<li><label class="row single action" style="grid-template-columns:1fr;cursor:pointer" for="spFileIn"><span class="t">Import Purchases File</span></label></li>`:''}
+      <li><button class="row single" data-b="open"><span class="t">Budget</span><span style="color:var(--label2);font-size:15px">${budOn()?mTxt(BUD().total):'Set Up'}</span></button></li>
       <li><button class="row single action" style="grid-template-columns:1fr" data-m="csv"><span class="t">Export Spends as Spreadsheet</span></button></li></ul>
-    <p class="foot">Money tracks what you spent and where, with no budget and no bank login. Spends are saved with the rest of your Fuel data and go into backup files.</p>
+    <p class="foot">Spends, income, budget, bills and goals are saved with the rest of your Fuel data and go into backup files. There is no bank login.</p>
     <div class="gap" style="height:14px"></div><h2 class="sec">Meal Names</h2>
     <ul class="list">${MEALS.map(([k,l])=>`<li><label class="row single" for="s-meal-${k}"><span class="t">${l}</span><input type="text" id="s-meal-${k}" data-p="meal-${k}" class="stxt" maxlength="24" placeholder="${l}" value="${esc(((P.mealNames||{})[k])||'')}"></label></li>`).join('')}</ul>
     <p class="foot">Rename them to match how you eat, like Pre-workout or Suhoor.</p>
@@ -5982,9 +6012,10 @@ function mergeMonth(a,b){
   for(const e of [...(b.list||[]),...(a.list||[])]){ if(!e||!e.id||ds.has(e.id)) continue; const o=m.get(e.id); if(!o||(+e.u||0)>=(+o.u||0)) m.set(e.id,e) }
   return {...b,...a,kind:'money',del,list:[...m.values()].sort(byT)};
 }
-const normCfg=c=>({kind:'mcfg',...(c||{}),rules:{...((c&&c.rules)||{})}});
+const normCfg=c=>({kind:'mcfg',...(c||{}),rules:{...((c&&c.rules)||{})},bud:{...((c&&c.bud)||{})},bills:Array.isArray(c&&c.bills)?c.bills:[],goals:Array.isArray(c&&c.goals)?c.goals:[]});
 function mergeCfg(a,b){a=normCfg(a); if(!b) return a; b=normCfg(b); const rules={...b.rules};
-  Object.entries(a.rules).forEach(([k,r])=>{if(!rules[k]||(+r.u||0)>=(+rules[k].u||0)) rules[k]=r}); return {...b,...a,kind:'mcfg',rules}}
+  Object.entries(a.rules).forEach(([k,r])=>{if(!rules[k]||(+r.u||0)>=(+rules[k].u||0)) rules[k]=r});
+  return {...b,...a,kind:'mcfg',rules,bud:(+a.bud.u||0)>=(+b.bud.u||0)?a.bud:b.bud,bills:mergeById(a.bills,b.bills),goals:mergeById(a.goals,b.goals,(w,o)=>({...w,adds:mergeById(w.adds,o.adds)}))}}
 async function getMonth(ym){
   if(S.money[ym]) return S.money[ym];
   const key='m-'+ym, local=LS.get(key); let d=null;
@@ -5997,7 +6028,7 @@ async function getMonth(ym){
 }
 function saveMonth(d){S.money[d.ym]=d; save('m-'+d.ym,d)}
 const mDocSync=ym=>S.money[ym]||LS.get('m-'+ym);
-const mList=d=>((d&&d.list)||[]).filter(e=>e&&+e.amt>0);
+const mList=d=>((d&&d.list)||[]).filter(e=>e&&!e.in&&+e.amt>0);   // spends only; income is mIns
 async function loadMoneyAll(){
   const out={}; LS.keys().filter(k=>/^m-\d{4}-\d{2}$/.test(k)).forEach(k=>{const v=LS.get(k); if(v&&v.ym) out[v.ym]={...emptyMonth(v.ym),...v}});
   if(base){try{const snap=await base.where('kind','==','money').limit(240).get(); snap.docs.forEach(s=>{const v=s.data(); if(v&&v.ym){const r={...emptyMonth(v.ym),...clone(v)}; out[v.ym]=dirty.has('m-'+v.ym)&&out[v.ym]?mergeMonth(out[v.ym],r):r}})}catch(e){}}
@@ -6062,21 +6093,23 @@ function moneyBetween(a,b){   // spends from day a to day b (both included), fro
 const mSum=L=>L.reduce((a,e)=>a+e.amt,0);
 const niceMax=v=>{if(!(v>0)) return 100; const p=Math.pow(10,Math.floor(Math.log10(v))), f=v/p; return (f<=1?1:f<=2?2:f<=5?5:10)*p};
 /* Running total through the month: this month a solid line, the month before dotted behind it. No target line: nothing here is a limit. */
-function moneyChart(ym,st,pst,upto,anim){
+function moneyChart(ym,st,pst,upto,anim,BG){
+  if(BG>0) pst=null;
   const W=340,H=150,L=42,R=8,T=10,B=20,n=ymDays(ym),iw=W-L-R,ih=H-T-B, pym=ymAdd(ym,-1), pn=ymDays(pym);
   const cur=[]; let s=0; for(let d=1;d<=upto;d++){s+=st.days[d]||0; cur.push(s)}
   const pv=[]; if(pst&&pst.tot>0){let q=0; for(let d=1;d<=n;d++){q+=pst.days[d]||0; if(d===n) for(let x=n+1;x<=pn;x++) q+=pst.days[x]||0; pv.push(q)}}
-  const max=niceMax(Math.max(s,pv.length?pv[pv.length-1]:0,1)), x=d=>L+(n>1?(d-1)/(n-1):0)*iw, y=v=>T+(1-v/max)*ih, mon=ymName(ym,{month:'short'});
+  const max=niceMax(Math.max(s,pv.length?pv[pv.length-1]:0,BG||0,1)), x=d=>L+(n>1?(d-1)/(n-1):0)*iw, y=v=>T+(1-v/max)*ih, mon=ymName(ym,{month:'short'});
   const pts=a=>a.map((v,i)=>`${x(i+1).toFixed(1)},${y(v).toFixed(1)}`).join(' ');
   let g=`<svg class="chart mny-chart" viewBox="0 0 ${W} ${H}" role="img" aria-label="Running total for ${ymName(ym)}: ${mTxt(st.tot)}${pv.length?`, ${ymName(pym)} ${mTxt(pst.tot)}`:''}">`;
   [0,max].forEach(v=>{g+=`<line class="g" x1="${L}" x2="${W-R}" y1="${y(v)}" y2="${y(v)}"/><text x="${L-6}" y="${y(v)+4}" text-anchor="end">${fmt(v)}</text>`});
   if(pv.length) g+=`<polyline class="mny-prev" points="${pts(pv)}" fill="none"/>`;
+  if(BG>0) g+=`<line class="mny-budl" x1="${L}" x2="${W-R}" y1="${y(BG).toFixed(1)}" y2="${y(BG).toFixed(1)}"/><text x="${W-R}" y="${(y(BG)-5).toFixed(1)}" text-anchor="end">Budget ${fmt(BG)}</text><polyline class="mny-prev" points="${x(1).toFixed(1)},${y(BG/n).toFixed(1)} ${x(n).toFixed(1)},${y(BG).toFixed(1)}" fill="none"/>`;
   if(cur.length>1) g+=`<polyline points="${pts(cur)}" fill="none" stroke="var(--label)" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round" pathLength="1"${anim?' class="draw"':''}/>`;
   if(cur.length) g+=`<circle cx="${x(cur.length).toFixed(1)}" cy="${y(s).toFixed(1)}" r="5" fill="var(--label)" stroke="var(--cell)" stroke-width="2"/>`;
   const bw=iw/Math.max(1,n-1);
-  for(let d=1;d<=n;d++){const tip=d<=upto?`${d} ${mon} · ${mTxt(st.days[d]||0)} · ${mTxt(cur[d-1])} so far`:pv.length?`${d} ${ymName(pym,{month:'short'})} · ${mTxt(pv[d-1])} by then`:''; if(tip) g+=`<rect x="${(x(d)-bw/2).toFixed(1)}" y="${T}" width="${bw.toFixed(1)}" height="${ih}" fill="transparent" data-tip="${tip}"/>`}
+  for(let d=1;d<=n;d++){const tip=d<=upto?`${d} ${mon} · ${mTxt(st.days[d]||0)} · ${mTxt(cur[d-1])} so far${BG>0?` · even pace ${mTxt(BG*d/n)}`:''}`:BG>0?`${d} ${mon} · even pace ${mTxt(BG*d/n)}`:pv.length?`${d} ${ymName(pym,{month:'short'})} · ${mTxt(pv[d-1])} by then`:''; if(tip) g+=`<rect x="${(x(d)-bw/2).toFixed(1)}" y="${T}" width="${bw.toFixed(1)}" height="${ih}" fill="transparent" data-tip="${tip}"/>`}
   return g+`<text x="${L}" y="${H-5}">1 ${mon}</text><text x="${W-R}" y="${H-5}" text-anchor="end">${n} ${mon}</text></svg>`+
-    (pv.length?`<div class="legend"><span><i style="background:var(--label)"></i>${ymName(ym)}</span><span><i class="mny-dash"></i>${ymName(pym)}</span></div>`:'');
+    (BG>0?`<div class="legend"><span><i style="background:var(--label)"></i>${ymName(ym)}</span><span><i class="mny-dash"></i>Even pace</span></div>`:pv.length?`<div class="legend"><span><i style="background:var(--label)"></i>${ymName(ym)}</span><span><i class="mny-dash"></i>${ymName(pym)}</span></div>`:'');
 }
 function monthBars(rows,sel){
   const W=340,H=112,L=42,R=4,T=16,B=20,n=rows.length,iw=W-L-R,ih=H-T-B, max=niceMax(Math.max(...rows.map(r=>r.tot),1)), bw=iw/n, w=Math.min(30,bw*.56), y=v=>T+(1-v/max)*ih;
@@ -6087,20 +6120,21 @@ function monthBars(rows,sel){
     g+=`<rect x="${(L+i*bw).toFixed(1)}" y="${T}" width="${bw.toFixed(1)}" height="${ih+B}" fill="transparent" data-m="go" data-v="${r.ym}" data-tip="${ymName(r.ym)} · ${r.tot>0?mTxt(r.tot):'nothing logged'}"/>`});
   return g+'</svg>';
 }
-const M_SRC={pay:'Apple Pay',sms:'Bank text',rep:'Usual'};
+const M_SRC={pay:'Apple Pay',sms:'Bank text',rep:'Usual',bill:'Bill'};
 const dayHead=d=>{const T=TODAY(); return d===T?'Today':d===addDays(T,-1)?'Yesterday':DF(parseYmd(d),{weekday:'short',day:'numeric',month:'short'})};
 function spendRows(L,cap){
   const by=new Map(); [...L].sort((a,b)=>b.t-a.t).slice(0,cap||1e9).forEach(e=>{const d=ymd(new Date(e.t)); if(!by.has(d)) by.set(d,[]); by.get(d).push(e)});
-  const all=new Map(); L.forEach(e=>{const d=ymd(new Date(e.t)); all.set(d,(all.get(d)||0)+e.amt)});
-  const cnt=new Map(); L.forEach(e=>{const d=ymd(new Date(e.t)); cnt.set(d,(cnt.get(d)||0)+1)});
-  return [...by.entries()].map(([d,es])=>`<li class="dy-h"><div><b>${dayHead(d)}</b>${cnt.get(d)>1?`<span class="num">${fmt(all.get(d))}</span>`:''}</div></li>${es.map(e=>{const c=mCat(e.cat)[1];
-    return `<li><button class="row dy-r mny-r" data-m="edit" data-v="${e.id}" data-ym="${ymOf(e.t)}"><span class="tm num">${e.nt?'':DF(new Date(e.t),{hour:'2-digit',minute:'2-digit',hour12:false})}</span><span class="t">${esc(e.name||c)}</span><span class="d">${e.name?esc(c)+' ':''}${M_SRC[e.src]?`<span class="ds">${M_SRC[e.src]}</span>`:''}</span><span class="k num">${mNum(e.amt)}</span></button></li>`}).join('')}`).join('');
+  const all=new Map(), cnt=new Map(); L.forEach(e=>{if(e.in) return; const d=ymd(new Date(e.t)); all.set(d,(all.get(d)||0)+e.amt); cnt.set(d,(cnt.get(d)||0)+1)});
+  return [...by.entries()].map(([d,es])=>`<li class="dy-h"><div><b>${dayHead(d)}</b>${cnt.get(d)>1?`<span class="num">${fmt(all.get(d))}</span>`:''}</div></li>${es.map(e=>{const c=e.in?inCat(e.cat)[1]:mCat(e.cat)[1];
+    return `<li><button class="row dy-r mny-r" data-m="edit" data-v="${e.id}" data-ym="${ymOf(e.t)}"><span class="tm num">${e.nt?'':DF(new Date(e.t),{hour:'2-digit',minute:'2-digit',hour12:false})}</span><span class="t">${esc(e.name||c)}</span><span class="d">${e.name?esc(c)+' ':''}${M_SRC[e.src]?`<span class="ds">${M_SRC[e.src]}</span>`:''}</span><span class="k num${e.in?' mny-in':''}">${e.in?'+':''}${mNum(e.amt)}</span></button></li>`}).join('')}`).join('');
 }
 let mView=null, mFresh=true, mAll=false;
 async function renderMoney(){
   const now=ymOf(Date.now()); if(!mView||mView>now) mView=now; const ym=mView, isNow=ym===now;
-  const yms=[...Array(6)].map((_,i)=>ymAdd(ym,i-5)), docs=await Promise.all(yms.map(getMonth)); if(currentView()!=='money') return;
+  if(isNow) await runBills().catch(()=>{});
+  const yms=[...Array(6)].map((_,i)=>ymAdd(ym,i-5)), docs=await Promise.all(yms.map(getMonth)); await loadRoll(ym); if(currentView()!=='money') return;
   const st=moneyStats(docs[5]), pst=moneyStats(docs[4]), T=TODAY(), dom=isNow?new Date().getDate():ymDays(ym), pym=yms[4];
+  const ins=mIns(docs[5]), inTot=mSum(ins), bud=budOn(), N=bud?budNums(ym):null, lim=limOn();
   const anim=mFresh&&motionLv()>=2&&motionOK(); mFresh=false;
   /* against last month: the same day of the month while this one is running, the whole month once it's over */
   const pcmp=isNow?mCum(pst,Math.min(dom,ymDays(pym))):pst.tot, diff=st.tot-pcmp;
@@ -6110,27 +6144,33 @@ async function renderMoney(){
   const stat=(l,v,s)=>`<div class="stat"><span>${l}</span><b>${v}</b><small>${s}</small></div>`;
   const food=(st.cats.find(c=>c.c==='eat')||{v:0,n:0}), groc=(st.cats.find(c=>c.c==='groc')||{v:0,n:0});
   const months=yms.map((y,i)=>({ym:y,tot:mSum(mList(docs[i]))})), monthsOn=months.filter(r=>r.tot>0).length;
+  const act=[...st.L,...ins], any=act.length>0, nT=st.L.filter(e=>ymd(new Date(e.t))===T).length;
+  const plainHero=()=>`<section class="card tipbox mny-hero" aria-label="Spent in ${ymName(ym)}">
+      <div><span class="mny-lab">Spent${isNow?' so far':''}</span><p class="mny-big"><b class="num">${fmt(st.tot)}</b><span>${mCur()}</span></p><p class="mny-delta">${delta}</p></div>
+      ${moneyChart(ym,st,pst,dom,anim)}
+      <div class="stats mny-stats">${isNow?stat('Today',fmt(today),today?`${nT} spend${nT===1?'':'s'}`:'nothing yet')+stat('This week',fmt(wk),'since Monday')
+        :stat('Spends',st.L.length,'logged')+stat('Biggest',big?fmt(big.amt):'0',big?esc(big.name||mCat(big.cat)[1]):'')}${stat('A day',fmt(st.tot/dom),'average')}</div>
+    </section>`;
   $('#smallTitle').textContent='Money';
   $('#v-money').innerHTML=`<div class="titlebar"><h1 class="large">Money</h1>
       <div class="daynav"><button class="circ" data-m="mon" data-v="-1" aria-label="Previous month">${ICON_L}</button><button class="circ" data-m="mon" data-v="1" aria-label="Next month"${isNow?' disabled':''}>${ICON_R}</button></div></div>
     <p class="subtitle dl-sub"><span>${ymName(ym,{month:'long',year:'numeric'})}${isNow?'':` · <button class="txtbtn" style="font-size:15px;padding:0" data-m="now">Go to This Month</button>`}</span>${isNow&&LS.get('payFile')?`<label class="txtbtn mny-imp" for="spFileIn">Import Purchases</label>`:''}</p>
     <div class="badge" data-sync hidden><i></i><span></span></div>
-    ${st.L.length?`<section class="card tipbox mny-hero" aria-label="Spent in ${ymName(ym)}">
-      <div><span class="mny-lab">Spent${isNow?' so far':''}</span><p class="mny-big"><b class="num">${fmt(st.tot)}</b><span>${mCur()}</span></p><p class="mny-delta">${delta}</p></div>
-      ${moneyChart(ym,st,pst,dom,anim)}
-      <div class="stats mny-stats">${isNow?stat('Today',fmt(today),today?`${st.L.filter(e=>ymd(new Date(e.t))===T).length} spend${st.L.filter(e=>ymd(new Date(e.t))===T).length===1?'':'s'}`:'nothing yet')+stat('This week',fmt(wk),'since Monday')
-        :stat('Spends',st.L.length,'logged')+stat('Biggest',fmt(big.amt),esc(big.name||mCat(big.cat)[1]))}${stat('A day',fmt(st.tot/dom),'average')}</div>
-    </section>
-    <div class="gap"></div><h2 class="sec">Where It Goes</h2>
-    <ul class="list">${st.cats.map(c=>`<li><button class="row mny-c" data-m="cat" data-v="${c.c}"><span class="t">${mCat(c.c)[1]}</span><span class="k num">${fmt(c.v)}</span><span class="mny-bar" aria-hidden="true"><i style="width:${Math.max(1.5,c.v/st.cats[0].v*100).toFixed(1)}%"></i></span><span class="d">${Math.round(c.v/st.tot*100)}% · ${c.n} spend${c.n===1?'':'s'}</span></button></li>`).join('')}</ul>
-    ${food.v+groc.v>0?`<p class="foot">Food is ${Math.round((food.v+groc.v)/st.tot*100)}% of this month${food.n?`: ${mTxt(food.v)} eating out over ${food.n} time${food.n===1?'':'s'} (${mTxt(food.v/food.n)} each)`:''}${groc.v?`${food.n?' and':':'} ${mTxt(groc.v)} on groceries`:''}.</p>`:''}
-    ${st.places.length>1?`<div class="gap"></div><h2 class="sec">Top Places</h2><ul class="list">${st.places.slice(0,5).map(p=>`<li><div class="row"><span class="t">${esc(p.name)}</span><span class="d">${p.n} time${p.n===1?'':'s'}</span><span class="k num">${fmt(p.v)}</span></div></li>`).join('')}</ul>`:''}`
-    :`<section class="card empty-state"><h3>Nothing logged in ${ymName(ym)}</h3><p>${isNow?'Tap Add Spend after you pay. Type the amount, tap a category, done.':'No spends were logged this month.'}</p>
+    ${bud&&(isNow||st.L.length)?budHero(ym,isNow,st,N,anim,pst):st.L.length?plainHero():`<section class="card empty-state"><h3>Nothing logged in ${ymName(ym)}</h3><p>${isNow?'Tap Add Spend after you pay. Type the amount, tap a category, done.':'No spends were logged this month.'}</p>
       ${isNow&&STANDALONE?`<button class="btn tint mny-setup" data-m="paySetup">Set Up Apple Pay Auto-Log</button>`:''}</section>`}
+    ${!bud&&isNow?`<div class="gap" style="height:14px"></div><ul class="list"><li><button class="row single action" style="grid-template-columns:1fr" data-b="open"><span class="t">Set a Monthly Budget</span></button></li></ul>
+      <p class="foot">Pick what you want to spend in a month. Fuel shows what’s left each day, logs your bills and warns before a category runs out.</p>`:''}
+    ${inTot>0?`<div class="gap"></div><h2 class="sec">In and Out</h2><section class="card"><div class="stats mny-net">${stat('In',fmt(inTot),`${ins.length} time${ins.length===1?'':'s'}`)}${stat('Out',fmt(st.tot),'spent')}${stat(inTot>=st.tot?'Kept':'Short',fmt(Math.abs(inTot-st.tot)),inTot>=st.tot?`${Math.round((inTot-st.tot)/inTot*100)}% of income`:'more out than in')}</div></section>`:''}
+    ${st.L.length||lim?`<div class="gap"></div><div class="sec-row"><h2 class="sec">Where It Goes</h2>${bud||lim?`<button class="txtbtn" data-b="open">Edit Budget</button>`:''}</div>
+    <ul class="list">${catRows(ym,isNow,st)}</ul>`:''}
+    ${food.v+groc.v>0?`<p class="foot">Food is ${Math.round((food.v+groc.v)/st.tot*100)}% of this month${food.n?`: ${mTxt(food.v)} eating out over ${food.n} time${food.n===1?'':'s'} (${mTxt(food.v/food.n)} each)`:''}${groc.v?`${food.n?' and':':'} ${mTxt(groc.v)} on groceries`:''}.</p>`:''}
+    ${isNow?billRows(ym):''}
+    ${isNow?goalRows():''}
+    ${st.places.length>1?`<div class="gap"></div><h2 class="sec">Top Places</h2><ul class="list">${st.places.slice(0,5).map(p=>`<li><div class="row"><span class="t">${esc(p.name)}</span><span class="d">${p.n} time${p.n===1?'':'s'}</span><span class="k num">${fmt(p.v)}</span></div></li>`).join('')}</ul>`:''}
     ${monthsOn>1?`<div class="gap"></div><h2 class="sec">Month by Month</h2><section class="card tipbox">${monthBars(months,ym)}</section>`:''}
-    ${st.L.length?`<div class="gap"></div><h2 class="sec">Spends</h2><ul class="list dy mny-list">${spendRows(st.L,mAll?0:30)}</ul>
-      ${!mAll&&st.L.length>30?`<div class="gap" style="height:10px"></div><ul class="list"><li><button class="row single action" style="grid-template-columns:1fr" data-m="all"><span class="t">Show All ${st.L.length} Spends</span></button></li></ul>`:''}`:''}
-    <p class="foot">Money tracks what you spent and where. There is no budget and no bank login.${STANDALONE&&st.L.length&&!st.L.some(e=>e.src==='pay')?` <button class="txtbtn inl" data-m="paySetup">Set up Apple Pay auto-log</button>`:''}</p>`;
+    ${any?`<div class="gap"></div><h2 class="sec">${ins.length?'Spends and Income':'Spends'}</h2><ul class="list dy mny-list">${spendRows(act,mAll?0:30)}</ul>
+      ${!mAll&&act.length>30?`<div class="gap" style="height:10px"></div><ul class="list"><li><button class="row single action" style="grid-template-columns:1fr" data-m="all"><span class="t">Show All ${act.length}</span></button></li></ul>`:''}`:''}
+    <p class="foot">No bank login: spends come from you, Apple Pay or a pasted bank text.${STANDALONE&&st.L.length&&!st.L.some(e=>e.src==='pay')?` <button class="txtbtn inl" data-m="paySetup">Set up Apple Pay auto-log</button>`:''}</p>`;
   setSync(syncState);
 }
 /* ---- one card on Today, three numbers in Week in Review ---- */
@@ -6138,7 +6178,9 @@ let mKick=0;
 function moneyLine(isToday){
   if(!isToday||S.profile.tMoney===0) return ''; const ym=ymOf(Date.now()), d=mDocSync(ym);
   if(base&&!S.money[ym]&&!mKick){mKick=1; getMonth(ym).then(x=>{if(mList(x).length&&currentView()==='today'&&!sheetOpen()&&!SP) renderToday()}).catch(()=>{})}
-  const L=mList(d); if(!L.length) return ''; const T=TODAY(), td=mSum(L.filter(e=>ymd(new Date(e.t))===T));
+  const L=mList(d); if(!L.length&&!budOn()) return ''; const T=TODAY(), td=mSum(L.filter(e=>ymd(new Date(e.t))===T));
+  if(budOn()){const N=budNums(ym), o=N.leftToday<0, mo=N.left<0;
+    return `<a class="card mny-line" href="#money" aria-label="Money: ${mTxt(Math.abs(N.leftToday))} ${o?'over':'left'} today, ${mTxt(Math.abs(N.left))} ${mo?'over':'left'} in ${ymName(ym)}"><span class="mny-lab">${o?'Over today':'Left today'}</span><b class="num${o?' over':''}">${fmt(Math.abs(N.leftToday))}<i> ${mCur()}</i></b><span class="s num">${fmt(Math.abs(N.left))} ${mo?'over':'left'} in ${ymName(ym)}</span>${CHEV}</a>`}
   return `<a class="card mny-line" href="#money" aria-label="Money: ${mTxt(td)} spent today, ${mTxt(mSum(L))} in ${ymName(ym)}"><span class="mny-lab">Spent today</span><b class="num">${mNum(td)}<i> ${mCur()}</i></b><span class="s num">${fmt(mSum(L))} in ${ymName(ym)}</span>${CHEV}</a>`;
 }
 function weekMoney(w){
@@ -6146,7 +6188,7 @@ function weekMoney(w){
   const tot=mSum(cur), pt=mSum(prev), eat=cur.filter(e=>e.cat==='eat'), d=Math.round(tot-pt), u=`<i> ${mCur()}</i>`;
   return `<div class="stat"><span>Spent</span><b>${fmt(tot)}${u}</b><small>${prev.length?(d===0?'same as week before':`${fmt(Math.abs(d))} ${d>0?'more':'less'} than week before`):'first week tracked'}</small></div>
       <div class="stat"><span>Eating out</span><b>${fmt(mSum(eat))}${u}</b><small>${eat.length} time${eat.length===1?'':'s'}</small></div>
-      <div class="stat"><span>A day</span><b>${fmt(tot/Math.max(1,w.elapsed))}${u}</b><small>average</small></div>`;
+      ${budOn()?(()=>{const share=+BUD().total*12/365*w.elapsed, df=Math.round(tot-share); return `<div class="stat"><span>Budget</span><b>${fmt(Math.abs(df))}${u}</b><small>${df>0?'over':'under'} the week’s share</small></div>`})():`<div class="stat"><span>A day</span><b>${fmt(tot/Math.max(1,w.elapsed))}${u}</b><small>average</small></div>`}`;
 }
 /* ---- the spend pad: digits, then a category tap saves it. Its own keypad, like the amount pad. ---- */
 let SP=null, spBusy=false;
@@ -6158,37 +6200,39 @@ function usualSpends(){
 }
 async function spOpen(o){
   o=o||{}; const now=Date.now(); await Promise.all([getMonth(ymOf(now)),getMonth(ymAdd(ymOf(now),-1))]);
-  let e=null; if(o.id){e=mList(await getMonth(o.ym)).find(x=>x.id===o.id); if(!e) return}
-  SP=e?{mode:'edit',id:e.id,ym:o.ym,str:String(m2(e.amt)),fresh:true,name:e.name||'',cat:mCat(e.cat)[0],date:ymd(new Date(e.t)),t:e.t,src:e.src,card:e.card,nt:e.nt,quick:!!o.quick,touched:false,note:o.note||''}
-    :{mode:'add',str:o.amt?String(m2(o.amt)):'',fresh:!!o.amt,name:o.name||'',cat:o.cat||'',date:TODAY(),src:o.src||'you',card:o.card||'',touched:false,note:o.note||'',usual:usualSpends()};
+  let e=null; if(o.id){e=((await getMonth(o.ym)).list||[]).find(x=>x&&x.id===o.id&&+x.amt>0); if(!e) return}
+  SP=e?{mode:'edit',id:e.id,ym:o.ym,str:String(m2(e.amt)),fresh:true,name:e.name||'',cat:e.in?inCat(e.cat)[0]:mCat(e.cat)[0],inc:!!e.in,bill:e.bill,date:ymd(new Date(e.t)),t:e.t,src:e.src,card:e.card,nt:e.nt,quick:!!o.quick,touched:false,note:o.note||''}
+    :{mode:'add',inc:!!o.inc,str:o.amt?String(m2(o.amt)):'',fresh:!!o.amt,name:o.name||'',cat:o.cat||'',date:TODAY(),src:o.src||'you',card:o.card||'',touched:false,note:o.note||'',usual:usualSpends()};
   let el=$('#sp'); if(!el){el=document.createElement('div'); el.id='sp'; el.className='amt sp'; el.hidden=true; document.body.appendChild(el)}
   spRender(); el.hidden=false; requestAnimationFrame(()=>el.classList.add('on')); haptic();
 }
 function spClose(){const el=$('#sp'); if(!el) return; el.classList.remove('on','typing'); SP=null; if(document.activeElement&&el.contains(document.activeElement)) document.activeElement.blur(); setTimeout(()=>{if(!SP) el.hidden=true},motionOK()?240:0)}
 function spHint(){
   if(!SP) return ''; if(SP.note) return SP.note; const v=spVal(), ed=SP.mode==='edit'&&!SP.quick;
-  return ed?'':!v?'Type the amount, then tap a category':SP.cat?`Tap ${mCat(SP.cat)[1]} to save, or pick another`:'Pick a category to save';
+  const nm=k=>(SP.inc?inCat(k):mCat(k))[1];
+  return ed?'':!v?(SP.inc?'Type the amount, then tap where it came from':'Type the amount, then tap a category'):SP.cat?`Tap ${nm(SP.cat)} to save, or pick another`:'Pick a category to save';
 }
 function spRender(){
-  const el=$('#sp'); if(!el||!SP) return; const ed=SP.mode==='edit', us=!ed&&SP.usual||[];
-  el.innerHTML=`<div class="amt-bg" data-sp="cancel"></div><div class="amt-p sp-p" role="dialog" aria-label="${ed?'Edit spend':'Add a spend'}">
-    <div class="amt-top"><button class="txtbtn" data-sp="cancel">Cancel</button><b>${ed?(SP.quick?'Pick a Category':'Edit Spend'):'Add Spend'}</b>${ed?`<button class="amt-done" data-sp="done">Done</button>`:`<button class="txtbtn sp-paste" data-sp="paste">Paste</button>`}</div>
+  const el=$('#sp'); if(!el||!SP) return; const ed=SP.mode==='edit', us=!ed&&!SP.inc&&SP.usual||[], CATS=SP.inc?M_IN:M_CATS;
+  el.innerHTML=`<div class="amt-bg" data-sp="cancel"></div><div class="amt-p sp-p" role="dialog" aria-label="${ed?'Edit':'Add a spend or income'}">
+    <div class="amt-top"><button class="txtbtn" data-sp="cancel">Cancel</button><b>${ed?(SP.quick?'Pick a Category':SP.inc?'Edit Income':'Edit Spend'):SP.inc?'Add Income':'Add Spend'}</b>${ed?`<button class="amt-done" data-sp="done">Done</button>`:`<button class="txtbtn sp-paste" data-sp="paste">Paste</button>`}</div>
+    ${SP.quick||SP.bill?'':`<div class="seg sp-kind" role="group" aria-label="Spend or income"><button data-sp="kind" data-v="0" aria-pressed="${!SP.inc}">Spend</button><button data-sp="kind" data-v="1" aria-pressed="${!!SP.inc}">Income</button></div>`}
     ${us.length?`<div class="amt-q sp-usual" role="group" aria-label="Your usual spends">${us.map((u,i)=>`<button class="chip2" data-sp="usual" data-v="${i}">${esc(u.name)} <b class="num">${mNum(u.amt)}</b></button>`).join('')}</div>`:''}
     <div id="spPasteBox" class="sp-pb" hidden><textarea id="spPasteIn" rows="3" aria-label="Bank text" placeholder="Paste the bank text here"></textarea><button class="btn tint" data-sp="read">Read It</button></div>
     <div class="amt-v sp-v${SP.fresh?' fresh':''}" aria-live="polite"><span>${mCur()}</span><b class="num" id="spAmt">${esc(SP.str||'0')}</b></div>
-    <div class="sp-row"><input type="text" id="spName" maxlength="40" autocomplete="off" autocapitalize="words" enterkeyhint="done" aria-label="Where or what" placeholder="Where or what (optional)" value="${esc(SP.name)}"><label class="sp-date"><span id="spDateT">${dayHead(SP.date)}</span><input type="date" id="spDate" aria-label="Date" max="${TODAY()}" value="${SP.date}"></label></div>
-    <div class="sp-cats" role="group" aria-label="Category">${M_CATS.map(([k,l])=>`<button class="chip2" data-sp="cat" data-v="${k}" aria-pressed="${SP.cat===k&&!(SP.quick&&!SP.touched)}">${l}</button>`).join('')}</div>
+    <div class="sp-row"><input type="text" id="spName" maxlength="40" autocomplete="off" autocapitalize="words" enterkeyhint="done" aria-label="Where or what"  placeholder="${SP.inc?'From (optional)':'Where or what (optional)'}" value="${esc(SP.name)}"><label class="sp-date"><span id="spDateT">${dayHead(SP.date)}</span><input type="date" id="spDate" aria-label="Date" max="${TODAY()}" value="${SP.date}"></label></div>
+    <div class="sp-cats" role="group" aria-label="Category">${CATS.map(([k,l])=>`<button class="chip2" data-sp="cat" data-v="${k}" aria-pressed="${SP.cat===k&&!(SP.quick&&!SP.touched)}">${l}</button>`).join('')}</div>
     <p class="amt-note" id="spHint" aria-live="polite">${esc(spHint())}</p>
     <div class="amt-keys">${['1','2','3','4','5','6','7','8','9','.','0','del'].map(k=>`<button data-sp="key" data-v="${k}"${k==='del'?' aria-label="Delete"':''}>${k==='del'?'<svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 5h11v14H9l-6-7z"/><path d="M12.5 9.5l5 5M17.5 9.5l-5 5"/></svg>':k}</button>`).join('')}</div>
-    ${ed?`<div class="sp-foot"><button class="txtbtn" data-sp="meal"${SP.cat==='eat'?'':' hidden'}>Log What You Ate</button><button class="txtbtn sp-del" data-sp="del">Delete</button></div>`:''}</div>`;
+    ${ed?`<div class="sp-foot"><button class="txtbtn" data-sp="meal"${SP.cat==='eat'&&!SP.inc?'':' hidden'}>Log What You Ate</button><button class="txtbtn sp-del" data-sp="del">Delete</button></div>`:''}</div>`;
 }
 function spUpd(){
   if(!SP) return; const a=$('#spAmt'); if(a){a.textContent=SP.str||'0'; a.parentNode.classList.toggle('fresh',!!SP.fresh)}
   $$('#sp [data-sp="cat"]').forEach(b=>b.setAttribute('aria-pressed',b.dataset.v===SP.cat&&!(SP.quick&&!SP.touched))); const h=$('#spHint'); if(h) h.textContent=spHint();
-  const u=$('#sp .sp-usual'); if(u) u.hidden=!!SP.str; const ml=$('#sp [data-sp="meal"]'); if(ml) ml.hidden=SP.cat!=='eat';
+  const u=$('#sp .sp-usual'); if(u) u.hidden=!!SP.str; const ml=$('#sp [data-sp="meal"]'); if(ml) ml.hidden=SP.cat!=='eat'||!!SP.inc;
 }
 const moneyRefresh=()=>currentView()==='money'?renderMoney():currentView()==='today'&&!sheetOpen()?renderToday():null;
-async function putSpend(e){const d=await getMonth(ymOf(e.t)); d.list=[...d.list.filter(x=>x.id!==e.id),e].sort(byT); undel(d,e.id); saveMonth(d); return d}
+async function putSpend(e){const d=await getMonth(ymOf(e.t)); d.list=[...d.list.filter(x=>x.id!==e.id),e].sort(byT); undel(d,e.id); linkInDoc(d,e); saveMonth(d); return d}
 async function dropSpend(id,ym){const d=await getMonth(ym), e=d.list.find(x=>x.id===id); d.list=d.list.filter(x=>x.id!==id); addDel(d,id); saveMonth(d); return e}
 const chainFor=name=>{const n=normT(name); return REST&&n?REST.chains.find(c=>[...c.key].some(k=>k.length>2&&(n.includes(k)||k.includes(n))))||null:null};
 function logMeal(q){spClose(); const go=()=>{openAdd(); if(q){$('#q').value=q; renderResults()}}; if(location.hash!=='#today'&&location.hash!==''){location.hash='#today'; setTimeout(go,350)} else go()}
@@ -6200,7 +6244,9 @@ async function swipeSpend(row,li){   // a row swiped away on Money, the same ges
 function toastAct(m,label,fn){undoFn=fn; const t=$('#toast'); t.innerHTML=`${esc(m)} <button class="txtbtn" style="font-size:15px;padding:0 0 0 10px;font-weight:600" data-act="undo">${esc(label)}</button>`; toastOpen(5200,()=>{undoFn=null})}
 /* after a new spend: Undo, or for a restaurant Fuel has the menu of, the way straight to logging the meal */
 async function spendToast(e){
-  const msg=`${mTxt(e.amt)} · ${e.name||mCat(e.cat)[1]}`; let chain=null;
+  if(e.in){toastUndo(`+${mTxt(e.amt)} · ${e.name||inCat(e.cat)[1]}`,async()=>{await dropSpend(e.id,ymOf(e.t)); moneyRefresh()}); return}
+  const bl=e.bill&&bills().find(b=>b.id===e.bill), al=budAlert(e);
+  const msg=`${mTxt(e.amt)} · ${e.name||mCat(e.cat)[1]}${bl?` · counted as your ${bl.name} bill`:''}${al?`. ${al}`:''}`; let chain=null;
   if(e.cat==='eat'&&e.name&&ymd(new Date(e.t))===TODAY()){try{await loadRest(); chain=chainFor(e.name)}catch(x){}}
   if(chain) toastAct(msg,'Log Meal',()=>logMeal(chain.name));
   else toastUndo(msg,async()=>{await dropSpend(e.id,ymOf(e.t)); moneyRefresh()});
@@ -6212,9 +6258,9 @@ async function spSave(){
   spBusy=true;
   try{const name=(($('#spName')||{}).value||'').trim().slice(0,40), date=(($('#spDate')||{}).value)||s.date; let t;
     let nt=0; if(s.mode==='edit'&&date===ymd(new Date(s.t))){t=s.t; nt=s.nt?1:0} else if(date>=TODAY()) t=Date.now(); else {const d=parseYmd(date); d.setHours(12,0,0,0); t=d.getTime(); nt=1}
-    const e={id:s.mode==='edit'?s.id:'s'+uid(),t,amt,cat:s.cat,...(name?{name}:{}),src:s.src||'you',...(s.card?{card:s.card}:{}),...(nt?{nt:1}:{}),u:Date.now()};
+    const e={id:s.mode==='edit'?s.id:'s'+uid(),t,amt,cat:s.cat,...(s.inc?{in:1}:{}),...(s.bill?{bill:s.bill}:{}),...(name?{name}:{}),src:s.src||'you',...(s.card?{card:s.card}:{}),...(nt?{nt:1}:{}),u:Date.now()};
     if(s.mode==='edit'&&s.ym!==ymOf(t)) await dropSpend(s.id,s.ym);
-    await putSpend(e); if(name&&(s.touched||s.mode==='add')) learnCat(name,s.cat);
+    await putSpend(e); if(name&&!s.inc&&(s.touched||s.mode==='add')) learnCat(name,s.cat);
     spClose(); haptic('confirm'); if(currentView()==='money') mView=ymOf(t); await moneyRefresh();
     if(s.mode==='add'||s.quick) spendToast(e);
   } finally{spBusy=false}
@@ -6227,13 +6273,16 @@ function spRead(text){
   const r=parseBankText(text);
   if(!r){toast('No amount found in that text'); haptic('error'); return false}
   if(r.kind==='otp'){toast('That is a security code, not a purchase'); haptic('error'); return false}
-  if(r.kind==='in'){toast('That text is money coming in, so it isn’t a spend'); haptic('error'); return false}
   const pb=$('#spPasteBox'); if(pb) pb.hidden=true; $('#sp').classList.remove('typing');
+  if(r.kind==='in'){const t=String(text); Object.assign(SP,{inc:true,cat:/salary|payroll|wage/i.test(t)?'sal':/refund|revers|cashback/i.test(t)?'refund':'oin',src:'sms',name:r.name&&!/your account/i.test(r.name)?r.name:''});
+    if(r.cur&&r.cur!==mCur()){SP.str=''; SP.fresh=false; SP.note=`That was ${r.cur} ${mNum(r.amt)}. Type what it was in ${mCur()}.`} else {SP.str=String(r.amt); SP.fresh=true; SP.note=`Money coming in. Tap ${inCat(SP.cat)[1]} to save it as income.`}
+    haptic('confirm'); spRender(); return true}
+  const was=SP.inc; if(was){SP.inc=false; SP.cat=''}
   if(r.name){SP.name=r.name; const n=$('#spName'); if(n) n.value=r.name; const g=catFor(r.name); if(g.sure||g.guess) SP.cat=g.c}
   if(r.card) SP.card=r.card; SP.src='sms';
   if(r.cur&&r.cur!==mCur()){SP.str=''; SP.fresh=false; SP.note=`That was ${r.cur} ${mNum(r.amt)}. Type what it cost in ${mCur()}.`}
   else {SP.str=String(r.amt); SP.fresh=true; SP.note=''}
-  haptic('confirm'); spUpd(); return true;
+  haptic('confirm'); was?spRender():spUpd(); return true;
 }
 async function spPaste(){
   let t=''; try{if(navigator.clipboard&&navigator.clipboard.readText) t=await navigator.clipboard.readText()}catch(e){}
@@ -6248,6 +6297,7 @@ function spAct(b){
     SP.str=s; SP.fresh=false; SP.note=''; buzz(); spUpd(); return}
   if(a==='cat'){SP.cat=v; SP.touched=true; if(SP.mode==='add'||SP.quick){spUpd(); spSave()} else {haptic(); spUpd()} return}
   if(a==='usual'){spUsual(+v); return}
+  if(a==='kind'){const inc=v==='1'; if(inc===!!SP.inc) return; const n=$('#spName'); if(n) SP.name=n.value; SP.inc=inc; SP.cat=''; SP.note=''; haptic(); spRender(); return}
   if(a==='paste'){spPaste(); return}
   if(a==='read'){const i=$('#spPasteIn'); if(i&&i.value.trim()) spRead(i.value); else if(i) i.focus(); return}
   if(a==='meal'){const q=(($('#spName')||{}).value||SP.name||'').trim(); loadRest().then(()=>{const c=chainFor(q); logMeal(c?c.name:'')}).catch(()=>logMeal('')); return}
@@ -6264,7 +6314,7 @@ document.addEventListener('keydown',e=>{if(!SP||AMT) return; const k=e.key, inFi
 document.addEventListener('focusin',e=>{if(SP&&e.target.closest&&e.target.closest('#sp')&&/^(spName|spPasteIn)$/.test(e.target.id)) $('#sp').classList.add('typing')});
 document.addEventListener('focusout',e=>{if(SP&&/^(spName|spPasteIn)$/.test(e.target.id)) setTimeout(()=>{const el=$('#sp'); if(el&&!el.contains(document.activeElement)) el.classList.remove('typing')},60)});
 document.addEventListener('change',e=>{if(SP&&e.target.id==='spDate'){const v=e.target.value&&e.target.value<=TODAY()?e.target.value:TODAY(); e.target.value=v; SP.date=v; const t=$('#spDateT'); if(t) t.textContent=dayHead(v)}});
-document.addEventListener('input',e=>{if(!SP||e.target.id!=='spName') return; SP.name=e.target.value; if(!SP.touched){const g=catFor(SP.name); if(g.sure||g.guess){SP.cat=g.c; spUpd()}}});
+document.addEventListener('input',e=>{if(!SP||e.target.id!=='spName') return; SP.name=e.target.value; if(!SP.inc&&!SP.touched){const g=catFor(SP.name); if(g.sure||g.guess){SP.cat=g.c; spUpd()}}});
 /* ---- Apple Pay: a Shortcuts automation opens Fuel with ?pay=<amount>|<merchant>|<card> (or ?spend=&m=&c=) ---- */
 function payParams(href){
   let u; try{u=new URL(href||location.href)}catch(e){return null} let q=u.searchParams;
@@ -6309,7 +6359,7 @@ async function importSpendFile(text){
     const t=r.t&&r.t<=now+6e4?r.t:now, id=lineId(r.t?ln:ln+'#'+i), d=await getMonth(ymOf(t));
     if(d.list.some(e=>e.id===id)||(d.del||[]).includes(id)){dup++; continue}
     const g=catFor(r.name); if(!g.sure&&!g.guess) other++;
-    d.list.push({id,t,amt:r.amt,cat:g.c,...(r.name?{name:r.name}:{}),src:'pay',...(r.card?{card:r.card}:{}),u:now}); touched.set(d.ym,d); add++;
+    const ne={id,t,amt:r.amt,cat:g.c,...(r.name?{name:r.name}:{}),src:'pay',...(r.card?{card:r.card}:{}),u:now}; d.list.push(ne); linkInDoc(d,ne); touched.set(d.ym,d); add++;
   }
   touched.forEach(d=>{d.list.sort(byT); saveMonth(d)});
   if(add){LS.set('payFile',1); haptic('confirm')} mView=ymOf(now); if(location.hash!=='#money') location.hash='#money'; else await renderMoney();
@@ -6344,8 +6394,8 @@ function showPaySetup(){
     <p class="foot">Add Spend → Paste also reads a copied bank text message.</p>`,`<button class="txtbtn r" data-g="closeG">Done</button>`);
 }
 async function exportMoneyCSV(){
-  const all=await loadMoneyAll(), q=s=>`"${String(s==null?'':s).replace(/"/g,'""')}"`, lines=['date,time,amount,currency,category,place,source,card'];
-  Object.keys(all).sort().forEach(ym=>mList(all[ym]).sort(byT).forEach(e=>{const d=new Date(e.t); lines.push([ymd(d),`${pad(d.getHours())}:${pad(d.getMinutes())}`,m2(e.amt).toFixed(2),mCur(),q(mCat(e.cat)[1]),q(e.name),q(M_SRC[e.src]||'Typed'),q(e.card)].join(','))}));
+  const all=await loadMoneyAll(), q=s=>`"${String(s==null?'':s).replace(/"/g,'""')}"`, lines=['date,time,amount,currency,category,place,source,card,type'];
+  Object.keys(all).sort().forEach(ym=>[...mList(all[ym]),...mIns(all[ym])].sort(byT).forEach(e=>{const d=new Date(e.t); lines.push([ymd(d),`${pad(d.getHours())}:${pad(d.getMinutes())}`,m2(e.amt).toFixed(2),mCur(),q(e.in?inCat(e.cat)[1]:mCat(e.cat)[1]),q(e.name),q(M_SRC[e.src]||'Typed'),q(e.card),e.in?'Income':'Spend'].join(','))}));
   if(lines.length<2){toast('No spends to export yet'); return}
   const csv=lines.join('\n'), fn=`fuel-spends-${TODAY()}.csv`;
   if(dl){try{await dl.save({filename:fn,data:csv});return}catch(e){}}
@@ -6370,6 +6420,242 @@ document.addEventListener('click',async ev=>{
     case 'payCopy': if(!await copyText(payLink(),'Link copied')) toast('Copy didn’t work here. Press and hold the link to copy it.'); break;
     case 'payTest': closeSheet('#gSheet'); setTimeout(()=>payIntake({amt:mCur()+' 1.00',m:'Test Shop',c:'',t:'test-'+Date.now()}),300); break;
     case 'csv': exportMoneyCSV(); break;
+  }
+});
+
+/* ===================== BUDGET =====================
+   Calendar-month budget on top of Money (v42). All settings live in the synced mcfg doc:
+   bud {total, inc, cats:{<cat>:{lim, roll, since}}, u}  · bills [{id,name,amt,cat,day,auto,from,u,del?}]  · goals [{id,name,target,by,adds:[{id,amt,t}],u,del?}].
+   "Left today" works like calories left: what the rest of the month allows per day, minus what today already took.
+   Bills due later this month are held back from it. Income entries ({in:1}) never count as spending. */
+const M_IN=[['sal','Salary'],['allow','Allowance'],['refund','Refund'],['oin','Other']];
+const inCat=k=>M_IN.find(c=>c[0]===k)||M_IN[M_IN.length-1];
+const mIns=d=>((d&&d.list)||[]).filter(e=>e&&e.in&&+e.amt>0);
+const BUD=()=>S.mcfg.bud||{};
+const budOn=()=>+BUD().total>0;
+const limOn=()=>Object.values(BUD().cats||{}).some(c=>c&&+c.lim>0);
+const bills=()=>(S.mcfg.bills||[]).filter(b=>b&&b.id&&!b.del);
+const goals=()=>(S.mcfg.goals||[]).filter(g=>g&&g.id&&!g.del);
+const saveCfg=()=>save('mcfg',S.mcfg);
+function setBud(p){S.mcfg.bud={...BUD(),...p,u:Date.now()}; saveCfg()}
+const mW=v=>`${mCur()}\u00a0${fmt(v)}`;   // whole numbers for budget figures
+const mIn=v=>{const p=parseMoney(v); return p&&p.amt>0?p.amt:0};
+const signedM=v=>`${v<0?'−':''}${fmt(Math.abs(v))}`;
+/* ---- bills ---- */
+const billKey=(b,ym)=>'bl'+b.id+'_'+ym;
+const billDate=(b,ym)=>`${ym}-${pad(Math.min(Math.max(1,+b.day||1),ymDays(ym)))}`;
+const billLive=(b,ym)=>billDate(b,ym)>=(b.from||'0');
+function billPaid(b,ym){const d=mDocSync(ym); return d?(d.list||[]).find(e=>e&&!e.in&&(e.id===billKey(b,ym)||e.bill===b.id))||null:null}
+function billGone(b,ym){const d=mDocSync(ym); return !!(d&&(d.del||[]).includes(billKey(b,ym))&&!billPaid(b,ym))}
+async function runBills(){   // log automatic bills whose day has come (this month and last), once; the id is fixed so two phones agree
+  if(!bills().some(b=>b.auto)) return 0; const T=TODAY(), now=ymOf(Date.now()); let n=0;
+  for(const ym of [ymAdd(now,-1),now]){const d=await getMonth(ym); let ch=false;
+    for(const b of bills()){if(!b.auto||!billLive(b,ym)) continue; const ds=billDate(b,ym); if(ds>T) continue;
+      const k=billKey(b,ym); if(d.list.some(e=>e&&(e.id===k||e.bill===b.id))||(d.del||[]).includes(k)) continue;
+      const t=parseYmd(ds); t.setHours(9,0,0,0); d.list.push({id:k,t:t.getTime(),amt:m2(b.amt),cat:mCat(b.cat)[0],name:b.name,src:'bill',bill:b.id,u:Date.now()}); ch=true; n++}
+    if(ch){d.list.sort(byT); saveMonth(d)}}
+  return n;
+}
+function billFor(e){
+  if(!e||e.in||e.src==='bill'||e.bill) return null; const k=normM(e.name); if(k.length<2) return null;
+  const kw=k.split(' ');
+  return bills().find(b=>{const bk=normM(b.name); return bk&&(bk===k||kw.includes(bk)||bk.split(' ').includes(k)||(bk.length>2&&k.length>2&&(k.includes(bk)||bk.includes(k))))&&Math.abs(e.amt-b.amt)<=Math.max(5,b.amt*.25)})||null;
+}
+/* a spend that is a bill (paid by Apple Pay, a bank text or typed) replaces that month's automatic entry, so it is never counted twice */
+function linkInDoc(d,e){
+  const b=billFor(e); if(!b) return null; const k=billKey(b,d.ym);
+  if(d.list.some(x=>x&&x.bill===b.id&&x.id!==e.id&&x.id!==k)) return null;
+  d.list=d.list.filter(x=>x.id!==k); addDel(d,k); e.bill=b.id; return b;
+}
+function billSuggest(){   // same place, about the same amount, once a month in two of the last four months
+  const now=ymOf(Date.now()), seen={}, no=LS.get('noBill')||{};
+  for(let i=0;i<4;i++){const ym=ymAdd(now,-i), per={}; mList(mDocSync(ym)).forEach(e=>{if(e.src==='bill'||e.bill) return; const k=normM(e.name); if(k.length<2) return; (per[k]=per[k]||[]).push(e)});
+    Object.entries(per).forEach(([k,es])=>{if(es.length!==1) return; (seen[k]=seen[k]||[]).push(es[0])})}
+  return Object.entries(seen).filter(([k,es])=>{if(es.length<2||no[k]) return false; const a=es.map(e=>e.amt), hi=Math.max(...a), lo=Math.min(...a); return hi-lo<=hi*.1&&!billFor({...es[0],bill:0})})
+    .map(([k,es])=>{const e=es.sort(byT)[es.length-1]; return {k,name:e.name,amt:e.amt,cat:mCat(e.cat)[0],day:new Date(e.t).getDate()}}).slice(0,3);
+}
+/* ---- the numbers ---- */
+function budNums(ym){
+  const B=+BUD().total||0, n=ymDays(ym), now=ymOf(Date.now()), isNow=ym===now, dom=isNow?new Date().getDate():(ym<now?n:0), T=TODAY();
+  const L=mList(mDocSync(ym)), spent=mSum(L), today=isNow?mSum(L.filter(e=>ymd(new Date(e.t))===T)):0;
+  const owed=isNow?bills().filter(b=>billLive(b,ym)&&!billPaid(b,ym)&&!billGone(b,ym)&&(billDate(b,ym)>T||!b.auto)):[];
+  const upAmt=mSum(owed), daysLeft=isNow?n-dom+1:0;
+  const A=isNow?(B-(spent-today)-upAmt)/daysLeft:0;   // allowed per day, from the start of today
+  return {B,n,dom,spent,today,left:B-spent,A,leftToday:A-today,owed,upAmt,daysLeft,pace:spent-B*dom/n};
+}
+function catLim(c,ym,depth){   // a category's limit for a month, with what rolled over from the months before
+  const cc=(BUD().cats||{})[c]; if(!cc||!(+cc.lim>0)) return 0; let L=+cc.lim; depth=depth||0;
+  if(cc.roll&&depth<12){const p=ymAdd(ym,-1); if(p>=(cc.since||ym)) L+=catLim(c,p,depth+1)-mSum(mList(mDocSync(p)).filter(e=>mCat(e.cat)[0]===c))}
+  return m2(L);
+}
+async function loadRoll(ym){if(Object.values(BUD().cats||{}).some(c=>c&&c.roll)) await Promise.all([...Array(12)].map((_,i)=>getMonth(ymAdd(ym,-1-i))))}
+function budAlert(e){   // one short line after a new spend, only when it crosses a line
+  if(!e||e.in) return ''; const ym=ymOf(e.t); if(ym!==ymOf(Date.now())) return '';
+  const c=mCat(e.cat)[0], lim=catLim(c,ym), cs=mSum(mList(mDocSync(ym)).filter(x=>mCat(x.cat)[0]===c)), before=cs-e.amt;
+  if(lim>0){if(cs>lim&&before<=lim) return `${mCat(c)[1]} is ${mW(cs-lim)} over its limit`; if(cs>lim) return `${mCat(c)[1]} is now ${mW(cs-lim)} over`; if(cs>=lim*.8&&before<lim*.8) return `${mW(lim-cs)} left for ${mCat(c)[1]}`}
+  if(!budOn()) return ''; const N=budNums(ym);
+  if(N.spent>N.B&&N.spent-e.amt<=N.B) return `That’s ${mW(N.spent-N.B)} over this month’s budget`;
+  if(N.leftToday<0&&N.leftToday+e.amt>=0) return `That’s ${mW(-N.leftToday)} over today’s amount`;
+  return '';
+}
+/* ---- goals ---- */
+const gSaved=g=>m2((g.adds||[]).reduce((a,x)=>a+(+x.amt||0),0));
+const gMonths=g=>{if(!g.by) return 0; const [y,m]=ymOf(Date.now()).split('-').map(Number), [by,bm]=g.by.split('-').map(Number); return Math.max(1,(by-y)*12+bm-m+1)};
+const gNeed=g=>{const r=Math.max(0,(+g.target||0)-gSaved(g)), m=gMonths(g); return m?r/m:0};
+const goalNeed=()=>goals().reduce((a,g)=>a+gNeed(g),0);
+/* ---- settings sync: budget whole-object newest wins, bills and goals by id, a goal's money by entry ---- */
+function mergeById(a,b,deep){const m=new Map(); [...(b||[]),...(a||[])].forEach(x=>{if(!x||!x.id) return; const o=m.get(x.id); if(!o) m.set(x.id,x); else {const w=(+x.u||0)>=(+o.u||0)?x:o; m.set(x.id,deep?deep(w,w===x?o:x):w)}}); return [...m.values()]}
+/* ---- Money tab ---- */
+const mBar=(v,lim,dom,n,show)=>`<span class="mny-bar${lim&&v>lim?' over':''}" aria-hidden="true"><i style="width:${Math.min(100,Math.max(v>0?1.5:0,v/(lim||1)*100)).toFixed(1)}%"></i>${show?`<b style="left:${(dom/n*100).toFixed(1)}%"></b>`:''}</span>`;
+function budHero(ym,isNow,st,N,anim,pst){
+  const o=N.left<0, stat=(l,v,s,c)=>`<div class="stat"><span>${l}</span><b${c?' class="over"':''}>${v}</b><small>${s}</small></div>`;
+  const pace=Math.abs(N.pace)<1?'right on pace':N.pace<0?`${mW(-N.pace)} under pace`:`${mW(N.pace)} ahead of pace`;
+  const lt=N.leftToday, cnt=st.L.filter(e=>ymd(new Date(e.t))===TODAY()).length;
+  return `<section class="card tipbox mny-hero" aria-label="Budget for ${ymName(ym)}">
+    <div><span class="mny-lab">${isNow?(o?'Over budget':'Left this month'):(o?'Over budget':'Under budget')}</span><p class="mny-big"><b class="num${o?' over':''}">${fmt(Math.abs(N.left))}</b><span>${mCur()}</span></p>
+      <p class="mny-delta">${mW(N.spent)} of ${mW(N.B)} spent${isNow?` · <b class="${N.pace<-1?'dn':N.pace>1?'up':''}">${pace}</b>`:''}</p></div>
+    ${moneyChart(ym,st,pst,N.dom||ymDays(ym),anim,N.B)}
+    <div class="stats mny-stats">${isNow?stat(lt<0?'Over today':'Left today',fmt(Math.abs(lt)),N.A>0?`${lt<0?'allowed':'of'} ${fmt(N.A)} a day`:'nothing left a day',lt<0)
+        +stat('Spent today',fmt(N.today),cnt?`${cnt} spend${cnt===1?'':'s'}`:'nothing yet')
+        +(N.owed.length?stat('Bills to come',fmt(N.upAmt),`${N.owed.length} bill${N.owed.length===1?'':'s'}`):stat('Days left',N.daysLeft,`in ${ymName(ym,{month:'short'})}`))
+      :stat('Spends',st.L.length,'logged')+stat('A day',fmt(N.spent/N.n),'average')+stat('Budget',fmt(N.B),'for the month')}</div>
+  </section>`;
+}
+function catRows(ym,isNow,st){
+  const n=ymDays(ym), dom=isNow?new Date().getDate():n, have=new Map(st.cats.map(c=>[c.c,c]));
+  M_CATS.forEach(([k])=>{if(!have.has(k)&&catLim(k,ym)>0) have.set(k,{c:k,v:0,n:0})});
+  const rows=[...have.values()].sort((a,b)=>b.v-a.v||catLim(b.c,ym)-catLim(a.c,ym)), top=Math.max(1,...rows.map(r=>r.v)), tot=Math.max(1,st.tot);
+  return rows.map(c=>{const lim=catLim(c.c,ym), cc=(BUD().cats||{})[c.c]||{}, carry=lim&&cc.roll?m2(lim-(+cc.lim)):0;
+    const d=lim?(c.v>lim?`<b class="over">${mW(c.v-lim)} over</b> · limit ${fmt(lim)}`:`${mW(lim-c.v)} left of ${fmt(lim)}`)+(carry?` · ${carry>0?'+':'−'}${fmt(Math.abs(carry))} rolled over`:''):`${Math.round(c.v/tot*100)}% · ${c.n} spend${c.n===1?'':'s'}`;
+    return `<li><button class="row mny-c" data-m="cat" data-v="${c.c}"><span class="t">${mCat(c.c)[1]}</span><span class="k num">${fmt(c.v)}</span>${lim?mBar(c.v,lim,dom,n,isNow):mBar(c.v,top,0,1,false)}<span class="d">${d}</span></button></li>`}).join('');
+}
+function billRows(ym){
+  const T=TODAY(), L=bills().filter(b=>billLive(b,ym)||billPaid(b,ym)).sort((a,b)=>(+a.day||0)-(+b.day||0)), sg=billSuggest();
+  if(!L.length&&!sg.length) return '';
+  const short=ds=>DF(parseYmd(ds),{day:'numeric',month:'short'});
+  const rows=L.map(b=>{const p=billPaid(b,ym), ds=billDate(b,ym), gone=billGone(b,ym);
+    const s=p?`Paid ${short(ymd(new Date(p.t)))}`:gone?'Skipped this month':ds<=T?`<b class="over">Due ${short(ds)}</b> · tap to mark paid`:`${short(ds)}${b.auto?' · logs itself':''}`;
+    return `<li><button class="row mny-b" data-b="bill" data-v="${b.id}"><span class="t">${esc(b.name)}</span><span class="d">${s}</span><span class="k num${p||gone?' mny-done':''}">${fmt(b.amt)}</span></button></li>`}).join('');
+  const sug=sg.map((s,i)=>`<li><div class="row mny-sug"><span class="t">${esc(s.name)}</span><span class="d">${mW(s.amt)} each month · add it as a bill?</span><button class="txtbtn" data-b="sugNo" data-v="${esc(s.k)}">No</button><button class="txtbtn mny-add" data-b="sugAdd" data-v="${i}">Add</button></div></li>`).join('');
+  const N=budNums(ym);
+  return `<div class="gap"></div><h2 class="sec">Bills</h2>${rows?`<ul class="list">${rows}</ul>`:''}${N.upAmt>0?`<p class="foot">${mW(N.upAmt)} still to come this month${budOn()?', held back from what’s left each day':''}.</p>`:''}
+    ${sug?`${rows?'<div class="gap" style="height:10px"></div>':''}<ul class="list">${sug}</ul>`:''}`;
+}
+function goalRows(){
+  const G=goals(); if(!G.length) return '';
+  return `<div class="gap"></div><h2 class="sec">Goals</h2><ul class="list">${G.map(g=>{const s=gSaved(g), t=+g.target||0, need=gNeed(g);
+    return `<li><button class="row mny-c" data-b="goal" data-v="${g.id}"><span class="t">${esc(g.name)}</span><span class="k num">${t?Math.min(100,Math.round(s/t*100))+'%':''}</span>${mBar(s,t,0,1,false).replace(' over','')}<span class="d">${mW(s)} of ${fmt(t)}${g.by?` · ${need>0?`${mW(need)} a month to `:''}reach it by ${ymName(g.by,{month:'short',year:'numeric'})}`:''}</span></button></li>`}).join('')}</ul>`;
+}
+/* ---- Budget sheet ---- */
+let budBack=false;
+function budFoot(){
+  const B=+BUD().total||0, sum=M_CATS.reduce((a,[k])=>a+(+(((BUD().cats||{})[k]||{}).lim)||0),0);
+  return !B?'Set the budget first. Category limits are optional.':!sum?`No category limits yet. Add some to be warned before one runs out.`:sum>B?`Category limits add up to ${mW(sum)}, ${mW(sum-B)} more than the budget.`:`Limits cover ${mW(sum)}. ${mW(B-sum)} is free for anything.`;
+}
+function budSug(){const b=BUD(), inc=+b.inc||0, sugg=inc?Math.round(Math.max(0,inc-goalNeed())):0;
+  return sugg>0&&sugg!==Math.round(+b.total||0)?` <button class="txtbtn inl" data-b="useInc" data-v="${sugg}">Use ${mW(sugg)} (income${goalNeed()>0?' minus goals':''})</button>`:''}
+function rollList(){   // only categories with a limit can roll over
+  const c=BUD().cats||{}, ks=M_CATS.filter(([k])=>+((c[k]||{}).lim)>0); if(!ks.length) return '';
+  return `<div class="gap" style="height:14px"></div><h2 class="sec">Roll Over</h2>
+    <ul class="list">${ks.map(([k,l])=>`<li><label class="row single" for="br-${k}"><span class="t">${l}</span><input type="checkbox" switch id="br-${k}" data-b="roll" data-v="${k}"${(c[k]||{}).roll?' checked':''}></label></li>`).join('')}</ul>
+    <p class="foot">Roll over adds what a category didn’t use to next month’s limit, and takes off what it went over.</p>`;
+}
+function showBudget(){
+  const b=BUD(), c=b.cats||{};
+  const inp=(id,key,v,ph)=>`<input type="text" inputmode="decimal" id="${id}" class="stxt" data-b="${key}" autocomplete="off" placeholder="${ph}" value="${v?m2(v):''}">`;
+  gSheet('Budget',`<ul class="list">
+      <li><label class="row single" for="bd-total"><span class="t">Monthly budget</span>${inp('bd-total','total',b.total,mCur())}</label></li>
+      <li><label class="row single" for="bd-inc"><span class="t">Monthly income</span>${inp('bd-inc','inc',b.inc,'Optional')}</label></li></ul>
+    <p class="foot">What you plan to spend in a calendar month, bills included. Fuel shows what’s left for each day.<span id="budSug">${budSug()}</span></p>
+    <div class="gap" style="height:14px"></div><h2 class="sec">Category Limits</h2>
+    <ul class="list">${M_CATS.map(([k,l])=>`<li><label class="row single" for="bd-${k}"><span class="t">${l}</span>${inp('bd-'+k,'lim',(c[k]||{}).lim,'No limit').replace('data-b="lim"',`data-b="lim" data-v="${k}"`)}</label></li>`).join('')}</ul>
+    <p class="foot" id="budFoot">${budFoot()}</p>
+    <div id="budRoll">${rollList()}</div>
+    <div class="gap" style="height:14px"></div><h2 class="sec">Bills and Subscriptions</h2>
+    <ul class="list">${bills().sort((a,z)=>(+a.day||0)-(+z.day||0)).map(x=>`<li><button class="row" data-b="bill" data-v="${x.id}"><span class="t">${esc(x.name)}</span><span class="d">Day ${x.day} · ${mCat(x.cat)[1]}${x.auto?' · logs itself':''}</span><span class="k num">${fmt(x.amt)}</span>${CHEV}</button></li>`).join('')}
+      <li><button class="row single action" style="grid-template-columns:1fr" data-b="bill" data-v=""><span class="t">Add a Bill</span></button></li></ul>
+    <div class="gap" style="height:14px"></div><h2 class="sec">Savings Goals</h2>
+    <ul class="list">${goals().map(g=>`<li><button class="row" data-b="goal" data-v="${g.id}"><span class="t">${esc(g.name)}</span><span class="d">${mW(gSaved(g))} of ${fmt(+g.target||0)}${g.by?` · by ${ymName(g.by,{month:'short',year:'numeric'})}`:''}</span><span class="k num">${g.target?Math.min(100,Math.round(gSaved(g)/g.target*100))+'%':''}</span>${CHEV}</button></li>`).join('')}
+      <li><button class="row single action" style="grid-template-columns:1fr" data-b="goal" data-v=""><span class="t">Add a Goal</span></button></li></ul>
+    ${budOn()||limOn()?`<div class="gap" style="height:14px"></div><ul class="list"><li><button class="row single action mny-off" style="grid-template-columns:1fr" data-b="off"><span class="t">Turn Off Budget</span></button></li></ul><p class="foot">Keeps your spends, bills and goals.</p>`:''}`,
+    `<button class="txtbtn r" data-g="closeG">Done</button>`);
+}
+let blCat='bills';
+function showBill(id,pre){
+  const b=id?bills().find(x=>x.id===id):null; if(id&&!b) return; const v=b||pre||{}; blCat=mCat(v.cat||'bills')[0];
+  const ym=ymOf(Date.now()), paid=b&&billPaid(b,ym);
+  gSheet(b?'Bill':'New Bill',`<ul class="list">
+      <li><label class="row single" for="bl-name"><span class="t">Name</span><input type="text" id="bl-name" class="stxt" maxlength="40" autocomplete="off" autocapitalize="words" placeholder="du, rent, Netflix" value="${esc(v.name||'')}"></label></li>
+      <li><label class="row single" for="bl-amt"><span class="t">Amount</span><input type="text" inputmode="decimal" id="bl-amt" class="stxt" autocomplete="off" placeholder="${mCur()}" value="${v.amt?m2(v.amt):''}"></label></li>
+      <li><label class="row single" for="bl-day"><span class="t">Day of the month</span><input type="text" inputmode="numeric" id="bl-day" class="stxt" maxlength="2" autocomplete="off" placeholder="1–31" value="${v.day||''}"></label></li>
+      <li><label class="row single" for="bl-auto"><span class="t">Log it by itself</span><input type="checkbox" switch id="bl-auto"${v.auto===false?'':' checked'}></label></li></ul>
+    <div class="gap" style="height:14px"></div><h2 class="sec">Category</h2>
+    <div class="sp-cats bl-cats" role="group" aria-label="Category">${M_CATS.map(([k,l])=>`<button class="chip2" data-b="blCat" data-v="${k}" aria-pressed="${k===blCat}">${l}</button>`).join('')}</div>
+    <p class="foot">On its day Fuel logs it as a spend. If you pay it by Apple Pay or a pasted bank text, Fuel matches it by name and doesn’t count it twice.</p>
+    ${b?`<div class="gap" style="height:14px"></div><ul class="list">${paid?'':`<li><button class="row single action" style="grid-template-columns:1fr" data-b="billPaid" data-v="${b.id}"><span class="t">Mark Paid This Month</span></button></li>`}
+      <li><button class="row single action mny-off" style="grid-template-columns:1fr" data-b="billDel" data-v="${b.id}"><span class="t">Delete Bill</span></button></li></ul>
+      <p class="foot">Deleting keeps the times it was already logged.</p>`:''}`,
+    `<button class="txtbtn r" data-b="billSave" data-v="${b?b.id:''}">Save</button>`);
+}
+function showGoal(id){
+  const g=id?goals().find(x=>x.id===id):null; if(id&&!g) return; const s=g?gSaved(g):0, t=g?+g.target||0:0, need=g?gNeed(g):0;
+  gSheet(g?esc(g.name):'New Goal',`${g?`<section class="card mny-goal"><span class="mny-lab">Saved</span><p class="mny-big"><b class="num">${fmt(s)}</b><span>of ${fmt(t)} ${mCur()}</span></p>${mBar(s,t,0,1,false).replace(' over','')}
+      <p class="mny-delta">${s>=t?'Reached. Nice.':g.by?`${mW(need)} a month reaches it by ${ymName(g.by,{month:'long',year:'numeric'})}`:`${mW(t-s)} to go`}</p>
+      <div class="mny-gadd"><input type="text" inputmode="decimal" id="gl-add" class="sp-in" autocomplete="off" aria-label="Amount" placeholder="Amount"><button class="btn tint" data-b="gAdd" data-v="1">Add</button><button class="btn tint" data-b="gAdd" data-v="-1">Take Out</button></div></section>
+      <div class="gap" style="height:14px"></div>`:''}
+    <ul class="list">
+      <li><label class="row single" for="gl-name"><span class="t">Name</span><input type="text" id="gl-name" class="stxt" maxlength="40" autocomplete="off" autocapitalize="sentences" placeholder="New phone, trip" value="${esc(g?g.name:'')}"></label></li>
+      <li><label class="row single" for="gl-target"><span class="t">Target</span><input type="text" inputmode="decimal" id="gl-target" class="stxt" autocomplete="off" placeholder="${mCur()}" value="${t?m2(t):''}"></label></li>
+      <li><label class="row single" for="gl-by"><span class="t">Reach it by</span><input type="month" id="gl-by" class="stxt" min="${ymOf(Date.now())}" value="${g&&g.by||''}"></label></li>
+      ${g?'':`<li><label class="row single" for="gl-start"><span class="t">Saved so far</span><input type="text" inputmode="decimal" id="gl-start" class="stxt" autocomplete="off" placeholder="0" value=""></label></li>`}</ul>
+    <p class="foot">Money you put toward a goal isn’t counted as spending.${g?'':' With a date, Fuel shows what to set aside each month.'}</p>
+    ${g?`<div class="gap" style="height:14px"></div><ul class="list"><li><button class="row single action mny-off" style="grid-template-columns:1fr" data-b="goalDel" data-v="${g.id}"><span class="t">Delete Goal</span></button></li></ul>`:''}`,
+    `<button class="txtbtn r" data-b="goalSave" data-v="${g?g.id:''}">Save</button>`);
+}
+const putList=(key,x)=>{S.mcfg[key]=[...(S.mcfg[key]||[]).filter(y=>y&&y.id!==x.id),x]; saveCfg()};
+const backToBudget=()=>{if(budBack) showBudget(); else closeSheet('#gSheet'); moneyRefresh()};
+document.addEventListener('change',e=>{
+  const el=e.target, k=el.dataset&&el.dataset.b; if(!k||!el.closest('#gBody')) return;
+  if(k==='total'||k==='inc'){const v=mIn(el.value); el.value=v?m2(v):''; setBud({[k]:v})}
+  else if(k==='lim'||k==='roll'){const cats={...(BUD().cats||{})}, c={...(cats[el.dataset.v]||{})};
+    if(k==='lim'){const v=mIn(el.value); el.value=v?m2(v):''; c.lim=v} else {c.roll=el.checked; if(el.checked) c.since=ymOf(Date.now())}
+    cats[el.dataset.v]=c; setBud({cats})}
+  else return;
+  if(k==='lim'){const r=$('#budRoll'); if(r) r.innerHTML=rollList()}
+  const f=$('#budFoot'); if(f) f.textContent=budFoot(); const sg=$('#budSug'); if(sg) sg.innerHTML=budSug(); if(currentView()==='money') renderMoney();
+});
+document.addEventListener('click',async ev=>{
+  const b=ev.target.closest&&ev.target.closest('[data-b]'); if(!b||b.closest('#sp')||b.tagName==='INPUT') return; const a=b.dataset.b, v=b.dataset.v;
+  switch(a){
+    case 'open': budBack=true; showBudget(); break;
+    case 'useInc': {const el=$('#bd-total'); if(el){el.value=v; el.dispatchEvent(new Event('change',{bubbles:true}))} haptic()} break;
+    case 'off': {const prev=BUD(); setBud({total:0,cats:{}}); closeSheet('#gSheet'); moneyRefresh(); toastUndo('Budget turned off',()=>{setBud({total:prev.total,cats:prev.cats}); moneyRefresh()})} break;
+    case 'bill': budBack=!$('#gSheet').hidden&&$('#gTitle').textContent==='Budget'; showBill(v); break;
+    case 'blCat': blCat=v; $$('#gBody [data-b="blCat"]').forEach(x=>x.setAttribute('aria-pressed',x.dataset.v===v)); haptic(); break;
+    case 'billSave': {const name=($('#bl-name').value||'').trim().slice(0,40), amt=mIn($('#bl-amt').value), day=Math.round(+$('#bl-day').value)||new Date().getDate();
+      if(!name){toast('Give the bill a name'); haptic('error'); $('#bl-name').focus(); return} if(!amt){toast('Type the amount'); haptic('error'); $('#bl-amt').focus(); return}
+      if(day<1||day>31){toast('Day of the month is 1 to 31'); haptic('error'); return}
+      const old=v?bills().find(x=>x.id===v):null;
+      putList('bills',{...(old||{}),id:old?old.id:'k'+uid(),name,amt,day,cat:blCat,auto:$('#bl-auto').checked,from:old?old.from:TODAY(),u:Date.now()});
+      haptic('confirm'); await runBills(); toast(old?'Bill saved':`${name} added. Fuel logs it on day ${day}.`); backToBudget()} break;
+    case 'billDel': {const old=bills().find(x=>x.id===v); if(!old) return; putList('bills',{...old,del:1,u:Date.now()}); backToBudget(); toastUndo(`Deleted ${old.name}`,()=>{putList('bills',{...old,del:0,u:Date.now()}); moneyRefresh()})} break;
+    case 'billPaid': {const x=bills().find(y=>y.id===v); if(!x) return; const ym=ymOf(Date.now()), d=await getMonth(ym), k=billKey(x,ym); undel(d,k);
+      d.list=[...d.list.filter(e=>e.id!==k),{id:k,t:Date.now(),amt:m2(x.amt),cat:mCat(x.cat)[0],name:x.name,src:'bill',bill:x.id,u:Date.now()}].sort(byT); saveMonth(d); haptic('confirm');
+      closeSheet('#gSheet'); await moneyRefresh(); toastUndo(`${x.name} marked paid`,async()=>{await dropSpend(k,ym); moneyRefresh()})} break;
+    case 'sugAdd': {const s=billSuggest()[+v]; if(!s) return; budBack=false; showBill('',{name:s.name,amt:s.amt,cat:s.cat,day:s.day,auto:true})} break;
+    case 'sugNo': {const no=LS.get('noBill')||{}; no[v]=Date.now(); LS.set('noBill',no); haptic(); renderMoney()} break;
+    case 'goal': budBack=!$('#gSheet').hidden&&$('#gTitle').textContent==='Budget'; showGoal(v); break;
+    case 'goalSave': {const name=($('#gl-name').value||'').trim().slice(0,40), target=mIn($('#gl-target').value), by=($('#gl-by').value||'').slice(0,7);
+      if(!name){toast('Give the goal a name'); haptic('error'); $('#gl-name').focus(); return} if(!target){toast('Type the target'); haptic('error'); $('#gl-target').focus(); return}
+      const old=v?goals().find(x=>x.id===v):null, st=old?0:mIn(($('#gl-start')||{}).value||'');
+      putList('goals',{...(old||{}),id:old?old.id:'g'+uid(),name,target,by:/^\d{4}-\d{2}$/.test(by)?by:'',adds:old?old.adds||[]:st?[{id:'a'+uid(),amt:st,t:Date.now()}]:[],u:Date.now()});
+      haptic('confirm'); toast(old?'Goal saved':'Goal added'); backToBudget()} break;
+    case 'gAdd': {const g=goals().find(x=>$('#gTitle').textContent===x.name)||null, el=$('#gl-add'), amt=mIn(el&&el.value); const id=(($('#gBody [data-b="goalDel"]')||{}).dataset||{}).v, G=goals().find(x=>x.id===id);
+      if(!G) return; if(!amt){toast('Type an amount'); haptic('error'); if(el) el.focus(); return}
+      const sgn=+v<0?-1:1; if(sgn<0&&amt>gSaved(G)+.001){toast(`Only ${mW(gSaved(G))} is saved`); haptic('error'); return}
+      putList('goals',{...G,adds:[...(G.adds||[]),{id:'a'+uid(),amt:sgn*amt,t:Date.now()}],u:Date.now()}); haptic('confirm'); showGoal(G.id); moneyRefresh();
+      toast(`${sgn>0?'Added':'Took out'} ${mW(amt)}${sgn>0&&gSaved(goals().find(x=>x.id===G.id))>=(+G.target||0)?'. Goal reached.':''}`)} break;
+    case 'goalDel': {const old=goals().find(x=>x.id===v); if(!old) return; putList('goals',{...old,del:1,u:Date.now()}); backToBudget(); toastUndo(`Deleted ${old.name}`,()=>{putList('goals',{...old,del:0,u:Date.now()}); moneyRefresh()})} break;
   }
 });
 /* ---------- design-engineering pass 2 ---------- */
