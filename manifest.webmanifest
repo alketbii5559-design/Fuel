@@ -1,7 +1,7 @@
 {
   "name": "Fuel",
   "short_name": "Fuel",
-  "description": "Calories, protein and training in one place.",
+  "description": "Food, training and money in one place.",
   "start_url": "./index.html",
   "scope": "./",
   "display": "standalone",

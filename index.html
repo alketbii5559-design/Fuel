@@ -127,7 +127,7 @@ button.row:active,label.row:active{background:var(--fill)}
 
 /* Tab bar */
 .tabbar{position:fixed;left:0;right:0;bottom:0;z-index:30;background:var(--bar);backdrop-filter:blur(20px) saturate(180%);-webkit-backdrop-filter:blur(20px) saturate(180%);box-shadow:0 -.5px 0 var(--sep);padding-bottom:env(safe-area-inset-bottom)}
-.tabbar .wrap{display:grid;grid-template-columns:repeat(4,1fr);height:52px}
+.tabbar .wrap{display:grid;grid-template-columns:repeat(5,1fr);height:52px}
 .tabbar a{display:grid;justify-items:center;align-content:center;gap:2px;text-decoration:none;color:var(--label3);font-size:11px;font-weight:500;letter-spacing:.01em}
 .tabbar a svg{width:25px;height:25px}
 .tabbar a[aria-current="page"]{color:var(--blue)}
@@ -1148,7 +1148,7 @@ input[switch]{accent-color:var(--pro)}
   background:rgba(20,20,26,.84);backdrop-filter:blur(26px) saturate(170%);-webkit-backdrop-filter:blur(26px) saturate(170%);
   box-shadow:inset 0 0 0 1px rgba(255,255,255,.08),inset 0 1px 0 rgba(255,255,255,.06),0 14px 40px rgba(0,0,0,.55)}
 .tabbar .wrap{position:relative;height:60px;padding:6px;box-sizing:border-box}
-.tb-ind{position:absolute;left:6px;top:6px;bottom:6px;width:calc((100% - 12px)/4);border-radius:24px;background:rgba(255,255,255,.09);box-shadow:inset 0 0 0 1px rgba(255,255,255,.06);transition:transform 480ms cubic-bezier(.32,1.25,.5,1);will-change:transform}
+.tb-ind{position:absolute;left:6px;top:6px;bottom:6px;width:calc((100% - 12px)/5);border-radius:24px;background:rgba(255,255,255,.09);box-shadow:inset 0 0 0 1px rgba(255,255,255,.06);transition:transform 480ms cubic-bezier(.32,1.25,.5,1);will-change:transform}
 .tabbar a{position:relative;z-index:1;font-size:11px;font-weight:600;gap:4px;transition:color .2s}
 .tabbar a svg{width:22px;height:22px}
 .tabbar a[aria-current="page"] svg{animation:none}
@@ -1452,7 +1452,7 @@ body.in-wk .toast.on{transform:translate(-50%,0)}
 }
 /* ---------- design-engineering pass 2: components and unseen details ---------- */
 /* tab bar: labels change colour exactly under the moving pill (a clipped copy of the tabs in the active colour) */
-.tb-on{position:absolute;inset:0;display:grid;grid-template-columns:repeat(4,1fr);padding:6px;box-sizing:border-box;pointer-events:none;z-index:2;transition:clip-path 260ms var(--e-out)}
+.tb-on{position:absolute;inset:0;display:grid;grid-template-columns:repeat(5,1fr);padding:6px;box-sizing:border-box;pointer-events:none;z-index:2;transition:clip-path 260ms var(--e-out)}
 .tabbar .tb-on a{color:var(--label)}
 .tabbar.tb-glide a[aria-current="page"]{color:var(--label3)}
 .tabbar a[aria-current="page"] svg,.tabbar .tb-on svg{animation:none}
@@ -1497,7 +1497,7 @@ p,.foot{text-wrap:pretty}
 .schips{grid-template-columns:minmax(0,1fr)}
 /* Gauge rule: numbers in the gauge face, words in the legible face (Atkinson's zero is always slashed, which is
    right for reading words and noisy in data) */
-:is(#v-today,#v-train,#v-progress,#v-settings,#wk,.sheet) :is(.num,.dl-tile b,.tk-s,.tk-k em,.stats .stat b,.sum-grid b,.row .k,.exh-r .num,.wk-prev,.wk-in,.sum-mus li b,.mmap .ms-row b,.cd,.wk-best,.mm-nav span,.sum-hero p,.num small,.wk-plates b){font-family:var(--num)}
+:is(#v-today,#v-train,#v-money,#v-progress,#v-settings,#wk,.sheet) :is(.num,.dl-tile b,.tk-s,.tk-k em,.stats .stat b,.sum-grid b,.row .k,.exh-r .num,.wk-prev,.wk-in,.sum-mus li b,.mmap .ms-row b,.cd,.wk-best,.mm-nav span,.sum-hero p,.num small,.wk-plates b){font-family:var(--num)}
 @font-face{font-family:"Fuel Digits";src:url(data:font/woff2;base64,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) format("woff2");font-weight:100 449;unicode-range:U+0030-0039;size-adjust:96%;font-display:block}
 @font-face{font-family:"Fuel Digits";src:url(data:font/woff2;base64,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) format("woff2");font-weight:450 549;unicode-range:U+0030-0039;size-adjust:96%;font-display:block}
 @font-face{font-family:"Fuel Digits";src:url(data:font/woff2;base64,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) format("woff2");font-weight:550 649;unicode-range:U+0030-0039;size-adjust:96%;font-display:block}
@@ -1689,6 +1689,98 @@ body[data-look="dense"] .start-card h2{font-size:28px}
 .snapbtn svg{width:24px;height:24px}
 .snapbtn:active{transform:scale(.97)}
 .snapbtn[hidden]{display:none}.snapbtn.away{opacity:0;pointer-events:none}
+/* ---------- Money ----------
+   The fifth tab. Plain tracking, so there is no target line and nothing turns red: spending is drawn in the label
+   colour (luminance, like training's chalk) and the food colours stay food's. Sizes, gaps and corners are on Fuel's scales. */
+.mny-hero{display:grid;gap:14px}
+.mny-lab{display:block;font:500 13px var(--font);color:var(--label2)}
+.mny-big{display:flex;align-items:baseline;gap:6px;margin:2px 0 0}
+.mny-big b{font:600 54px/1 var(--num);letter-spacing:-.02em;font-variant-numeric:tabular-nums}
+.mny-big span{font:500 17px var(--font);color:var(--label2)}
+.mny-delta{margin:6px 0 0;font:400 13px var(--font);color:var(--label2);min-height:18px}
+.mny-delta b{font-weight:600;color:var(--label)}
+.mny-delta b.dn{color:var(--green)}
+.chart.mny-chart{margin-top:0}
+.mny-prev{stroke:var(--label3);stroke-width:1.5;stroke-dasharray:2 4;stroke-linecap:round}
+.legend i.mny-dash{width:12px;height:0;border-radius:0;border-top:2px dotted var(--label3);background:none!important;vertical-align:3px}
+.mny-stats .stat b{font-size:28px}
+.row.mny-c{grid-template-columns:minmax(0,1fr) auto;grid-template-areas:"t k" "bar bar" "d d";gap:6px 10px;padding:12px 16px}
+.row.mny-c .t{grid-area:t}
+.row.mny-c .k{grid-area:k;color:var(--label);font:600 17px var(--num)}
+.row.mny-c .d{grid-area:d;font-size:13px}
+.mny-bar{grid-area:bar;display:block;height:4px;border-radius:2px;background:var(--fill);overflow:hidden}
+.mny-bar i{display:block;height:100%;border-radius:2px;background:var(--label)}
+.row.mny-r .k{color:var(--label)}
+.row.mny-r .d .ds{margin-right:0}
+.mny-setup{margin-top:14px}
+a.mny-line{display:grid;grid-template-columns:minmax(0,1fr) auto auto;grid-template-areas:"l v c" "s v c";align-items:center;gap:2px 10px;padding:12px 16px;margin-top:10px;text-decoration:none;color:var(--label)}
+.mny-line .mny-lab{grid-area:l}
+.mny-line b{grid-area:v;font:600 22px/1 var(--num);letter-spacing:-.01em}
+.mny-line b i{font:500 13px var(--font);font-style:normal;color:var(--label2);letter-spacing:0}
+.mny-line .s{grid-area:s;font:400 13px var(--font);color:var(--label2)}
+.mny-line .chev{grid-area:c;width:8px;height:14px;color:var(--label3)}
+a.mny-line:active{transform:scale(.97)}
+.mny-how .bk-t{font-weight:400;line-height:1.4;margin:0}
+.mny-steps{list-style:none;margin:14px 0 0;padding:0;display:grid;gap:12px}
+.mny-steps li{display:grid;grid-template-columns:24px minmax(0,1fr);gap:10px;font-size:15px;line-height:1.4;color:var(--label2)}
+.mny-steps li>b{width:24px;height:24px;border-radius:50%;background:var(--fill);color:var(--label);display:grid;place-items:center;font:600 13px var(--num)}
+.mny-steps span b,.mny-how .bk-t b{color:var(--label);font-weight:600}
+.mny-link{display:grid;gap:8px;margin-top:14px}
+.mny-link code{display:block;font:500 12px/1.5 var(--mono);color:var(--label2);background:var(--fill);border-radius:8px;padding:10px 12px;overflow-wrap:anywhere;-webkit-user-select:all;user-select:all}
+/* the spend pad sits on the amount pad's shell; it follows the visible area so the keyboard never covers it */
+.amt.sp{inset:auto 0 auto 0;top:var(--vvt,0px);height:var(--vvh,100dvh)}
+.sp-v{align-items:baseline}
+.sp-v span{order:-1}
+.sp-row{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:8px}
+.sp-row input{min-width:0;min-height:44px;border:0;border-radius:10px;background:var(--fill);color:var(--label);font:400 16px var(--font);padding:0 12px;outline:none;-webkit-appearance:none;appearance:none}
+.sp-row input::placeholder{color:var(--label3)}
+.sp-row input:focus-visible{box-shadow:inset 0 0 0 1.5px var(--label2)}
+.sp-date{position:relative;display:grid;place-items:center;min-height:44px;padding:0 14px;border-radius:10px;background:var(--fill);color:var(--label);font:500 15px var(--font);white-space:nowrap}
+.sp-date input{position:absolute;inset:0;width:100%;height:100%;min-height:0;padding:0;opacity:0;color-scheme:dark}
+.sp-date:focus-within{box-shadow:inset 0 0 0 1.5px var(--label2)}
+.sp-cats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:6px}
+.sp-cats .chip2{position:relative;min-height:44px;padding:0 4px;border-radius:10px;font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sp-cats .chip2::before{display:none}
+.sp-cats .chip2[aria-pressed="true"]{box-shadow:inset 0 0 0 1.5px var(--label)}
+.sp .amt-note{min-height:18px}
+.sp-usual .chip2 b{font:600 15px var(--num);color:var(--label2);margin-left:4px}
+.sp-pb{display:grid;gap:8px}
+.sp-pb textarea{width:100%;box-sizing:border-box;border:0;border-radius:10px;background:var(--fill);color:var(--label);font:400 16px/1.4 var(--font);padding:10px 12px;resize:none;outline:none}
+.sp-foot{display:flex;justify-content:space-between;align-items:center;min-height:44px}
+.sp-foot .txtbtn{font-size:15px;color:var(--label2);padding:0}
+.sp-foot .sp-del{color:var(--red);margin-left:auto}
+.amt-top .sp-paste{color:var(--label);font-weight:600}
+.sp.typing .amt-keys,.sp.typing .sp-usual,.sp.typing .sp-foot{display:none}
+[hidden].sp-usual,.sp-pb[hidden]{display:none}
+#v-money .list .row .k{color:var(--label)}
+/* a toast is as wide as its words (it used to wrap at half the screen because it is centred from left:50%) */
+.toast{width:max-content}
+a.mny-line{transition:transform 160ms var(--e-out)}
+a.mny-line:active{transition-duration:90ms}
+.sp-foot .txtbtn{min-height:44px}
+/* leaving is quicker than arriving */
+.amt.sp:not(.on) .amt-p{transition-duration:200ms}
+.amt.sp:not(.on) .amt-bg{transition-duration:160ms}
+/* swipe a spend left to delete it, as on Today */
+#v-money .list>li.swiping button.row{background:var(--cell)!important}
+#v-money .list>li.swiping{background:var(--red)}
+#v-money .list>li.swiping::after{content:"Delete";position:absolute;right:20px;top:50%;transform:translateY(-50%);color:#fff;font-weight:600;font-size:17px;z-index:0;opacity:.55;transition:opacity .15s}
+#v-money .list>li.swiping.armed::after{opacity:1}
+#v-money .list>li.gone{transition:height .25s var(--ease-out),opacity .2s;overflow:hidden;opacity:0}
+#v-money .list button.mny-r{touch-action:pan-y;position:relative;z-index:1;background:var(--cell)}
+#v-money .list .row.mny-c,#v-money .list .row.mny-r,#gBody .row.mny-r{padding-top:10px;padding-bottom:10px}
+.sp .amt-top .txtbtn{min-height:44px}
+.sp .amt-done{min-height:44px;padding:0 20px}
+.amt-keys button{font-size:22px}
+.sp .amt-p{max-height:100%;overflow-y:auto;overscroll-behavior:contain}
+@media (max-height:700px){.sp .amt-p{gap:8px}.sp .amt-keys button{height:44px}.sp .sp-v b{font-size:44px}}
+.sp .amt-top{grid-template-columns:minmax(0,1fr) auto minmax(0,1fr)}
+.sp .amt-top>:first-child{justify-self:start}
+.sp .amt-top>:last-child{justify-self:end}
+.mny-steps kbd{display:inline-grid;place-items:center;min-width:20px;height:20px;padding:0 4px;border-radius:6px;background:var(--fill);color:var(--label);font:500 13px var(--mono)}
+.mny-file{display:grid;place-items:center;margin-top:14px;cursor:pointer}
+.mny-imp{font-size:15px;padding:0;color:var(--label);font-weight:600;cursor:pointer;position:relative}
+.mny-imp::before{content:"";position:absolute;inset:-12px -8px}
 </style>
 </head>
 <body>
@@ -1696,16 +1788,18 @@ body[data-look="dense"] .start-card h2{font-size:28px}
 <main class="wrap">
   <section class="view" id="v-today" aria-label="Today"></section>
   <section class="view" id="v-train" aria-label="Train" hidden></section>
+  <section class="view" id="v-money" aria-label="Money" hidden></section>
   <section class="view" id="v-progress" aria-label="Progress" hidden></section>
   <section class="view" id="v-settings" aria-label="Settings" hidden></section>
 </main>
 
-<label class="snapbtn" for="snapIn" id="snapBtn" aria-label="Snap a photo of your food" onclick="openAdd()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M4 8.5A1.5 1.5 0 0 1 5.5 7h2l1.5-2h6l1.5 2h2A1.5 1.5 0 0 1 20 8.5v9a1.5 1.5 0 0 1-1.5 1.5h-13A1.5 1.5 0 0 1 4 17.5z"/><circle cx="12" cy="12.5" r="3.5"/></svg></label><button class="addbtn" id="addBtn" data-act="add"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>Add Food</button>
+<label class="snapbtn" for="snapIn" id="snapBtn" aria-label="Snap a photo of your food" onclick="openAdd()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M4 8.5A1.5 1.5 0 0 1 5.5 7h2l1.5-2h6l1.5 2h2A1.5 1.5 0 0 1 20 8.5v9a1.5 1.5 0 0 1-1.5 1.5h-13A1.5 1.5 0 0 1 4 17.5z"/><circle cx="12" cy="12.5" r="3.5"/></svg></label><button class="addbtn" id="addBtn" data-act="add"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>Add Food</button><button class="addbtn" id="spendBtn" data-m="add" hidden><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>Add Spend</button>
 
 <div id="setup" class="setup" role="dialog" aria-modal="true" aria-label="Set up Fuel" hidden></div>
 <nav class="tabbar" aria-label="Sections"><div class="wrap"><i class="tb-ind" aria-hidden="true"></i>
   <a href="#today" data-route="today"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><circle cx="12" cy="12" r="8.5" opacity=".3"/><path d="M12 3.5a8.5 8.5 0 0 1 8.2 10.8"/></svg>Today</a>
   <a href="#train" data-route="train"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M6.5 6.5v11M17.5 6.5v11M3.5 9v6M20.5 9v6M6.5 12h11"/></svg>Train</a>
+  <a href="#money" data-route="money"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="6" width="17" height="12.5" rx="2.6"/><path d="M3.5 10.5h17M7 15h3.5"/></svg>Money</a>
   <a href="#progress" data-route="progress"><svg viewBox="0 0 24 24" fill="currentColor"><rect x="3.5" y="12" width="4" height="8" rx="1.4"/><rect x="10" y="7" width="4" height="13" rx="1.4"/><rect x="16.5" y="3.5" width="4" height="16.5" rx="1.4"/></svg>Progress</a>
   <a href="#settings" data-route="settings"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M4 7h9M17 7h3M4 17h3M11 17h9"/><circle cx="15" cy="7" r="2.2"/><circle cx="9" cy="17" r="2.2"/></svg>Settings</a>
 </div></nav>
@@ -1787,6 +1881,7 @@ body[data-look="dense"] .start-card h2{font-size:28px}
   </div>
 </div>
 <input type="file" id="hevyIn" accept=".csv,text/csv,text/plain" hidden>
+<input type="file" id="spFileIn" accept=".txt,text/plain" hidden>
 <div class="toast" id="toast" role="status" hidden></div>
 
 <script>
@@ -1917,7 +2012,7 @@ function migrateProfile(){
 }
 function loadLocal(){
   const stored=LS.get('profile'); S.profile=stored?{...DEF,ver:1,...stored}:{...DEF};
-  S.foods=normFoods(LS.get('foods')); S.weights={list:[],del:[],...(LS.get('weights')||{})}; S.plan=normPlan(LS.get('plan')); S.whoop=normWhoop(LS.get('whoop'));
+  S.foods=normFoods(LS.get('foods')); S.weights={list:[],del:[],...(LS.get('weights')||{})}; S.plan=normPlan(LS.get('plan')); S.whoop=normWhoop(LS.get('whoop')); S.mcfg=normCfg(LS.get('mcfg'));
   migrateProfile(); seedPlan(); loadGymLocal();
 }
 const emptyDay=date=>({kind:'day',date,entries:[],del:[]});
@@ -1943,6 +2038,8 @@ function save(key,obj){
 function current(key){
   if(key.startsWith('d-')) return S.days[key.slice(2)]||LS.get(key);
   if(key.startsWith('wk-')) return S.wk[key.slice(3)]||LS.get(key);
+  if(key.startsWith('m-')) return S.money[key.slice(2)]||LS.get(key);
+  if(key==='mcfg') return S.mcfg;
   return key==='plan'?S.plan:key==='whoop'?S.whoop:key==='foods'?S.foods:key==='weights'?S.weights:key==='profile'?S.profile:key==='routines'?S.routines:key==='lifts'?S.lifts:LS.get(key);
 }
 function flush(key){
@@ -1951,7 +2048,7 @@ function flush(key){
     const obj=current(key); if(!obj){clearDirty(key);return}
     const v=vers[key]||0; let body=clone(obj);
     if(key!=='profile'){const snap=await base.doc(key).get(); if(snap.exists){const r=snap.data();
-      body=key==='routines'?mergeRoutines(body,r):key.startsWith('d-')?mergeDay(body,r):key.startsWith('wk-')?mergeWorkout(body,r):key==='foods'?mergeFoods(body,r):key==='weights'?mergeWeights(body,r):key==='lifts'?mergeLifts(body,r):key==='plan'?mergePlan(body,r):key==='whoop'?mergeWhoop(body,r):body}}
+      body=key==='routines'?mergeRoutines(body,r):key.startsWith('d-')?mergeDay(body,r):key.startsWith('wk-')?mergeWorkout(body,r):key==='foods'?mergeFoods(body,r):key==='weights'?mergeWeights(body,r):key==='lifts'?mergeLifts(body,r):key==='plan'?mergePlan(body,r):key==='whoop'?mergeWhoop(body,r):key.startsWith('m-')?mergeMonth(body,r):key==='mcfg'?mergeCfg(body,r):body}}
     await base.doc(key).set(body);
     if(key.startsWith('d-')){
       const d=key.slice(2), before=S.days[d], sig=x=>x?x.entries.map(e=>e.id+(e.u||'')).join():'';
@@ -1963,6 +2060,9 @@ function flush(key){
     else if(key==='plan'){S.plan=mergePlan(S.plan,body); LS.set(key,S.plan)}
     else if(key==='routines'){S.routines=mergeRoutines(S.routines,body); LS.set(key,S.routines)}
     else if(key==='whoop'){S.whoop=mergeWhoop(S.whoop,body); LS.set(key,S.whoop)}
+    else if(key==='mcfg'){S.mcfg=mergeCfg(S.mcfg,body); LS.set(key,S.mcfg)}
+    else if(key.startsWith('m-')){const ym=key.slice(2), before=S.money[ym], sig=x=>x?x.list.map(e=>e.id+(e.u||'')).join():'', m=mergeMonth(before||body,body); S.money[ym]=m; LS.set(key,m);
+      if(sig(before)!==sig(m)&&currentView()==='money'&&!sheetOpen()&&!SP) renderMoney()}
     else if(key.startsWith('wk-')){const id=key.slice(3), m=mergeWorkout(S.wk[id]||body,body); S.wk[id]=m; LS.set(key,m); if(S.active&&S.active.id===id){S.active=m; if(!$('#wk').hidden&&!S.ui.edit&&!document.activeElement.classList.contains('wk-in')) renderWorkout()}}
     if((vers[key]||0)===v) clearDirty(key);
     if(!dirty.size||[...dirty].every(k=>timers[k])) setSync(dirty.size?'saving':'ok');
@@ -2044,7 +2144,8 @@ async function connect(){
     if(rt.exists&&!dirty.has('routines')){S.routines=clone(rt.data()); LS.set('routines',S.routines)} else if(!rt.exists) markDirty('routines');
     S.lifts=mergeLifts(S.lifts,lf.exists?clone(lf.data()):null); LS.set('lifts',S.lifts); if(!lf.exists) markDirty('lifts');
     try{const wh=await col.doc('whoop').get(); S.whoop=mergeWhoop(S.whoop,wh.exists?clone(wh.data()):null); LS.set('whoop',S.whoop); if(!wh.exists&&whoopHas()) markDirty('whoop')}catch(e){}
-    if(!p.exists) LS.keys().filter(k=>k.startsWith('wk-')).forEach(markDirty);
+    try{const mc=await col.doc('mcfg').get(); S.mcfg=mergeCfg(S.mcfg,mc.exists?clone(mc.data()):null); LS.set('mcfg',S.mcfg); if(!mc.exists&&Object.keys(S.mcfg.rules).length) markDirty('mcfg')}catch(e){}
+    if(!p.exists) LS.keys().filter(k=>k.startsWith('wk-')||/^m-\d{4}-\d{2}$/.test(k)).forEach(markDirty);
     if(!p.exists){
       LS.keys().filter(k=>k.startsWith('d-')).forEach(markDirty); ['profile','foods','weights'].forEach(markDirty);
     } else {
@@ -2054,7 +2155,7 @@ async function connect(){
       S.weights=mergeWeights(S.weights,w.exists?clone(w.data()):null);
       LS.set('profile',S.profile); LS.set('foods',S.foods); LS.set('weights',S.weights);
     }
-    base=col; S.days={}; S.hist=null; S.wkLoaded=false; setSync(dirty.size?'saving':'ok');
+    base=col; S.days={}; S.money={}; S.hist=null; S.wkLoaded=false; setSync(dirty.size?'saving':'ok');
     if(S.active){try{const r=await col.doc('wk-'+S.active.id).get(); if(r.exists){S.active=mergeWorkout(S.active,clone(r.data())); S.wk[S.active.id]=S.active; if(!$('#wk').hidden) renderWorkout()}}catch(e){}}
     migrateProfile();
     for(const k of [...dirty]){ try{await flush(k)}catch(e){} }
@@ -2066,7 +2167,7 @@ let lastToday=TODAY();
 async function resume(){
   await flushAll().catch(()=>{});
   const t=TODAY(); if(t!==lastToday){if(S.date===lastToday) S.date=t; lastToday=t}
-  if(base){S.days={}; S.hist=null; S.wkLoaded=false}
+  if(base){S.days={}; S.money={}; S.hist=null; S.wkLoaded=false}
   if(!$('#wk').hidden){tickRest(); requestWake(); return}
   if(!sheetOpen()) route(true);
 }
@@ -4031,6 +4132,7 @@ async function renderToday(){
     ${isToday&&P.tDay!==0?yesterdayPrompt():''}${isToday&&P.tFits!==0?fitsLine(left,pLeft):''}${isToday&&P.tFits!==0&&checkinDue()?checkinCard():''}
     ${weighRow(isToday)}
     ${whoopCard(isToday)}
+    ${moneyLine(isToday)}
     ${isToday&&P.tWeek!==0?'<div id="weekRow"></div>':''}
     ${P.tWeek!==0?`<div class="gap" style="height:10px"></div>
     <div class="dl-pair">${waterCard(day)}<a class="dl-tile train" href="#train"><span class="k">Training</span><b>${gymTarget()?`${wkWeek} of ${gymTarget()}`:`${wkWeek} this week`}</b><span class="plates" aria-hidden="true">${[...Array(Math.max(1,gymTarget()))].map((_,i)=>i).map(i=>`<i${i<wkWeek?' class="on"':''}></i>`).join('')}</span><span class="s">${S.active?'Workout running':nextR?esc(nextR.name)+' next':'this week'}</span></a></div>`:''}
@@ -4661,6 +4763,7 @@ function paceTag(wl,rate){
 }
 async function renderProgress(){
   if(!S.hist) await loadHist(); if(!S.wkLoaded) await loadWorkouts();
+  await Promise.all([0,-1].map(n=>getMonth(ymAdd(ymOf(Date.now()),n)))).catch(()=>{});
   progAnim=progFresh&&motionLv()>=2; progFresh=false; setTimeout(()=>playMotion($('#v-progress'),120),0);
   const P=S.profile, rows=[...Array(7)].map((_,i)=>{const d=addDays(TODAY(),i-6), day=S.days[d]||S.hist[d], t=day?totals(day):{kcal:0,p:0}; return {d,logged:!!(day&&day.entries.length),...t}});
   const lg=rows.filter(r=>r.logged&&r.d!==TODAY()), avg=k=>lg.length?lg.reduce((a,r)=>a+r[k],0)/lg.length:0;
@@ -4745,6 +4848,7 @@ function weekCard(){
       <div class="stat"><span>Gym</span><b>${w.gym}${gt?`<i>/${gt}</i>`:''}</b><small>${w.prs.length?`${w.prs.length} PR${w.prs.length===1?'':'s'}`:'sessions'}</small></div>
       <div class="stat"><span>Weight</span><b>${wc==null?'–':`${signed(wc,1)}<i> ${bU()}</i>`}</b><small>${wc==null?'weigh in both weeks':'vs week before'}</small></div>
       <div class="stat"><span>Best day</span><b>${w.best?dayShort(w.best.d):'–'}</b><small>${w.best?`${fmt(w.best.t.kcal)} kcal · ${r0(w.best.t.p)} g`:'log a full day'}</small></div>
+      ${weekMoney(w)}
     </div>
     <button class="btn tint wrv-share" data-px="shareWeek" data-v="${w.start}"${w.logged||w.gym?'':' disabled'}>Share as Image</button>
   </section></div>`;
@@ -5192,8 +5296,14 @@ function renderSettings(){
     <p class="foot">Sports you pick show on the Train tab with quick time buttons.</p>
     ${whoopSettings()}
     <div class="gap" style="height:14px"></div><h2 class="sec">Today Screen</h2>
-    <ul class="list"><li><label class="row single" for="s-tap"><span class="t">Tapping a food</span><select id="s-tap" data-p="tapFood" class="ssel">${[['detail','Opens its details'],['tray','Adds it to the tray']].map(([v,t])=>`<option value="${v}"${(tapDetail()?'detail':'tray')===v?' selected':''}>${t}</option>`).join('')}</select></label></li><li><label class="row single" for="s-look"><span class="t">Layout</span><select id="s-look" data-p="look" class="ssel">${[['dense','Detailed'],['tank','Tank']].map(([v,t])=>`<option value="${v}"${(lookDense()?'dense':'tank')===v?' selected':''}>${t}</option>`).join('')}</select></label></li>${sw('tWeek','Week, water and training')}${sw('tFits','Food ideas and check-in card')}${sw('tVit','Vitamins and fiber')}${sw('tDay','“Logged everything?” questions')}${whoopHas()||P.whoopLive?sw('tWhoop','WHOOP recovery, sleep and strain'):''}</ul>
+    <ul class="list"><li><label class="row single" for="s-tap"><span class="t">Tapping a food</span><select id="s-tap" data-p="tapFood" class="ssel">${[['detail','Opens its details'],['tray','Adds it to the tray']].map(([v,t])=>`<option value="${v}"${(tapDetail()?'detail':'tray')===v?' selected':''}>${t}</option>`).join('')}</select></label></li><li><label class="row single" for="s-look"><span class="t">Layout</span><select id="s-look" data-p="look" class="ssel">${[['dense','Detailed'],['tank','Tank']].map(([v,t])=>`<option value="${v}"${(lookDense()?'dense':'tank')===v?' selected':''}>${t}</option>`).join('')}</select></label></li>${sw('tWeek','Week, water and training')}${sw('tFits','Food ideas and check-in card')}${sw('tVit','Vitamins and fiber')}${sw('tDay','“Logged everything?” questions')}${sw('tMoney','Money spent today')}${whoopHas()||P.whoopLive?sw('tWhoop','WHOOP recovery, sleep and strain'):''}</ul>
     <p class="foot">Turn cards off to keep Today short. The weekly check-in is always on Progress.</p>
+    <div class="gap" style="height:14px"></div><h2 class="sec">Money</h2>
+    <ul class="list"><li><label class="row single" for="s-cur"><span class="t">Currency</span><input type="text" id="s-cur" data-p="cur" class="stxt" maxlength="4" autocapitalize="characters" autocomplete="off" spellcheck="false" placeholder="AED" value="${esc(P.cur||'')}"></label></li>
+      ${STANDALONE?`<li><button class="row single" data-m="paySetup"><span class="t">Apple Pay Auto-Log</span><span style="color:var(--label2);font-size:15px">${payUsed()?'Working':'Set Up'}</span></button></li>`:''}
+      ${STANDALONE?`<li><label class="row single action" style="grid-template-columns:1fr;cursor:pointer" for="spFileIn"><span class="t">Import Purchases File</span></label></li>`:''}
+      <li><button class="row single action" style="grid-template-columns:1fr" data-m="csv"><span class="t">Export Spends as Spreadsheet</span></button></li></ul>
+    <p class="foot">Money tracks what you spent and where, with no budget and no bank login. Spends are saved with the rest of your Fuel data and go into backup files.</p>
     <div class="gap" style="height:14px"></div><h2 class="sec">Meal Names</h2>
     <ul class="list">${MEALS.map(([k,l])=>`<li><label class="row single" for="s-meal-${k}"><span class="t">${l}</span><input type="text" id="s-meal-${k}" data-p="meal-${k}" class="stxt" maxlength="24" placeholder="${l}" value="${esc(((P.mealNames||{})[k])||'')}"></label></li>`).join('')}</ul>
     <p class="foot">Rename them to match how you eat, like Pre-workout or Suhoor.</p>
@@ -5235,6 +5345,7 @@ function renderSettings(){
 let goalT=null;
 function onSetting(e){const el=e.target.closest('[data-p]'); if(!el) return; const k=el.dataset.p;
   if(k==='name'){S.profile.name=el.value.trim().slice(0,40); save('profile',S.profile); return}
+  if(k==='cur'){S.profile.cur=el.value.replace(/[^A-Za-z]/g,'').slice(0,4).toUpperCase(); el.value=S.profile.cur; save('profile',S.profile); return}
   if(k.startsWith('meal-')){S.profile.mealNames={...(S.profile.mealNames||{}),[k.slice(5)]:el.value.trim().slice(0,24)}; save('profile',S.profile); renderSeg&&$('#mealSeg')&&renderSeg(); return}
   if(k==='goal'||k==='act'){S.profile[k]=el.value; save('profile',S.profile); renderSettings(); return}
   if(k==='tapFood'){try{localStorage.setItem('fuel-tap',el.value)}catch(e){} haptic(); return}
@@ -5269,7 +5380,7 @@ async function exportCSV(){
 
 async function exportJSON(){
   if(!S.hist) await loadHist(); if(!S.wkLoaded) await loadWorkouts();
-  const data=JSON.stringify({app:'fuel',v:2,exported:new Date().toISOString(),profile:S.profile,plan:S.plan,foods:S.foods,weights:S.weights,days:S.hist,routines:S.routines,lifts:S.lifts,whoop:S.whoop,workouts:Object.values(S.wk).filter(w=>w&&!w.deleted)});
+  const data=JSON.stringify({app:'fuel',v:2,exported:new Date().toISOString(),profile:S.profile,plan:S.plan,foods:S.foods,weights:S.weights,days:S.hist,routines:S.routines,lifts:S.lifts,whoop:S.whoop,money:{months:Object.values(await loadMoneyAll()),cfg:S.mcfg},workouts:Object.values(S.wk).filter(w=>w&&!w.deleted)});
   const done=()=>{LS.set('lastBackup',TODAY()); if(currentView()==='settings') renderSettings()};
   if(dl){try{await dl.save({filename:`fuel-backup-${TODAY()}.json`,data});done();toast('Backup saved');return}catch(e){}}
   if(STANDALONE&&await saveFile(`fuel-backup-${TODAY()}.json`,data,'application/json')){done(); return}
@@ -5285,6 +5396,7 @@ async function restoreJSON(file){
   if(b.weights){S.weights=mergeWeights(S.weights,b.weights); save('weights',S.weights)}
   if(b.lifts){S.lifts=mergeLifts(S.lifts,b.lifts); save('lifts',S.lifts)}
   if(b.whoop&&typeof b.whoop==='object'){S.whoop=mergeWhoop(S.whoop,b.whoop); save('whoop',S.whoop)}
+  if(b.money&&Array.isArray(b.money.months)){for(const m of b.money.months){if(!m||!/^\d{4}-\d{2}$/.test(m.ym)||!Array.isArray(m.list)) continue; saveMonth(mergeMonth(await getMonth(m.ym),{...emptyMonth(m.ym),...m,kind:'money'}))} if(b.money.cfg){S.mcfg=mergeCfg(S.mcfg,b.money.cfg); save('mcfg',S.mcfg)}}
   if(b.routines&&Array.isArray(b.routines.list)){S.routines=b.routines; save('routines',S.routines)}
   if(Array.isArray(b.workouts)) for(const w of b.workouts){if(w&&w.id&&w.kind==='workout'){const m=mergeWorkout(S.wk[w.id],w); S.wk[w.id]=m; save('wk-'+w.id,m)}}
   if(b.profile&&+b.profile.kcal>0){S.profile={...S.profile,...b.profile,ver:PROFILE_VER,setup:1}; save('profile',S.profile)}
@@ -5524,8 +5636,8 @@ document.addEventListener('focusin',e=>{const el=e.target; if(!el.matches||!el.m
 /* Swipes: a food row left to delete (past 40% it arms, with a tick), the summary card sideways to change day. 10px of slop before a direction is chosen. */
 let sw=null, swallow=false;
 document.addEventListener('pointerdown',e=>{
-  if(e.pointerType==='mouse'&&e.button!==0) return; if(sheetOpen()||selIds) return;
-  const row=e.target.closest('#v-today button.row[data-act="entry"]'), hero=row?null:e.target.closest('#v-today .dl-top, #v-today .es');
+  if(e.pointerType==='mouse'&&e.button!==0) return; if(sheetOpen()||selIds||SP) return;
+  const row=e.target.closest('#v-today button.row[data-act="entry"],#v-money button.mny-r'), hero=row?null:e.target.closest('#v-today .dl-top, #v-today .es');
   if(!row&&!hero) return; sw={row,hero,x:e.clientX,y:e.clientY,dx:0,on:false,id:e.pointerId};
 },{passive:true});
 document.addEventListener('pointermove',e=>{
@@ -5538,7 +5650,7 @@ document.addEventListener('pointermove',e=>{
 },{passive:true});
 function swEnd(e){
   if(!sw||(e&&e.pointerId!==sw.id)) return; const s=sw; sw=null; if(!s.on) return; swallow=true; setTimeout(()=>{swallow=false},350);
-  if(s.row){ if(s.armed&&e.type!=='pointercancel'){s.row.classList.add('snap'); s.row.style.transform=`translateX(${-s.w}px)`; setTimeout(()=>deleteEntry(s.row.dataset.v,s.li),200)}
+  if(s.row){ if(s.armed&&e.type!=='pointercancel'){s.row.classList.add('snap'); s.row.style.transform=`translateX(${-s.w}px)`; setTimeout(()=>s.row.dataset.m?swipeSpend(s.row,s.li):deleteEntry(s.row.dataset.v,s.li),200)}
     else {s.row.classList.add('snap'); s.row.style.transform=''; setTimeout(()=>{s.row.classList.remove('snap'); s.li.classList.remove('swiping','armed')},360)} return }
   const el=s.hero; el.classList.add('snap'); el.style.transform=''; setTimeout(()=>el.classList.remove('snap'),360);
   if(e.type==='pointercancel') return;
@@ -5578,16 +5690,16 @@ document.addEventListener('visibilitychange',()=>document.hidden?toastPause():to
   const up=e=>{if(e.pointerId!==pid) return; pid=null; toastHeld=false; t.style.transition=''; const v=Math.abs(dy)/Math.max(1,e.timeStamp-t0);
     if(dy*edge()>0&&(Math.abs(dy)>=24||v>0.11)) toastClose(); else {t.style.transform=''; toastTick()}};
   t.addEventListener('pointerup',up); t.addEventListener('pointercancel',up)})();
-const currentView=()=>{const h=(location.hash||'#today').slice(1); return ['today','train','progress','settings'].includes(h)?h:'today'};
+const currentView=()=>{const h=(location.hash||'#today').slice(1).split('?')[0]; return VIEWS.includes(h)?h:'today'};
 let progFresh=true, lastView=null;
-const VIEWS=['today','train','progress','settings'];
+const VIEWS=['today','train','money','progress','settings'];
 function route(keepScroll){
   const v=currentView(), moved=lastView&&lastView!==v, dir=moved?Math.sign(VIEWS.indexOf(v)-VIEWS.indexOf(lastView)):0; lastView=v;
   if(v==='progress') progFresh=true; $$('.view[id^="v-"]').forEach(x=>x.hidden=x.id!=='v-'+v);
   const ind=$('.tb-ind'); if(ind) ind.style.transform=`translateX(${VIEWS.indexOf(v)*100}%)`; tbClip(VIEWS.indexOf(v),!tbClip.done); tbClip.done=1;
   $$('.tabbar [data-route]').forEach(a=>a.setAttribute('aria-current',a.dataset.route===v?'page':'false'));
-  $('#addBtn').hidden=v!=='today'; $('#snapBtn').hidden=v!=='today'; if(v!=='today') selIds=null; renderSelBar();
-  const done=(v==='today'?renderToday():v==='train'?renderTrain():v==='progress'?renderProgress():renderSettings());
+  $('#addBtn').hidden=v!=='today'; $('#snapBtn').hidden=v!=='today'; $('#spendBtn').hidden=v!=='money'; if(v!=='today') selIds=null; renderSelBar();
+  const done=(v==='today'?renderToday():v==='train'?renderTrain():v==='money'?renderMoney():v==='progress'?renderProgress():renderSettings());
   if(keepScroll!==true) window.scrollTo(0,0);
   /* Tab switch only (never on app open or redraws): content slides in from the side you moved toward, softly in focus. */
   applyMotionPref(); applyLook(); if(moved&&motionLv()>=2) Promise.resolve(done).then(()=>{const el=$('#v-'+v); el.style.setProperty('--dx',(dir*14)+'px'); el.classList.remove('enter'); void el.offsetWidth; el.classList.add('enter'); clearTimeout(route.t); route.t=setTimeout(()=>el.classList.remove('enter'),700)});
@@ -5837,11 +5949,434 @@ const rdgEnd=e=>{if(!rdg||e.pointerId!==rdg.id) return; const d=rdg; rdg=null; c
   showRoutines(); $('#gBody').scrollTop=st};
 document.addEventListener('pointerup',rdgEnd); document.addEventListener('pointercancel',rdgEnd);
 document.addEventListener('click',e=>{if(Date.now()-swpEat<350){e.stopPropagation(); e.preventDefault()}},true);
+/* ===================== MONEY =====================
+   Plain tracking: what was spent and where it went. No budget, no limit, no bank login (UAE bank data is only open to
+   licensed providers). A spend arrives four ways: typed on the pad, one tap on a usual spend, an Apple Pay tap that
+   opens Fuel through a Shortcut (?pay=amount|merchant|card), or a pasted bank text. One document per month
+   (m-YYYY-MM) merged by id like days; mcfg holds the place → category choices so a place is only sorted once. */
+S.money={}; S.mcfg={kind:'mcfg',rules:{}};
+const M_CATS=[['eat','Eating Out'],['groc','Groceries'],['move','Transport'],['shop','Shopping'],['bills','Bills'],['fun','Fun'],['health','Health'],['other','Other']];
+const mCat=k=>M_CATS.find(c=>c[0]===k)||M_CATS[M_CATS.length-1];
+/* first guess for a place nobody has sorted yet; the user's own choice always replaces it (learnCat) */
+const M_GUESS=[
+  ['groc',/carrefour|lulu|spinneys|waitrose|union coop|choithram|\bviva\b|grandiose|kibsons|al maya|nesto|geant|hypermarket|supermarket|grocer|baqala|instashop|west zone|al adil|aswaaq/],
+  ['eat',/talabat|deliveroo|noon food|careem food|mcdonald|\bkfc\b|burger|pizza|shawarma|starbucks|costa|tim hortons|cafe|coffee|restaurant|cafeteria|kitchen|grill|sushi|bakery|low calories|subway|hardee|five guys|shake shack|nando|zaatar|karak|juice|dunkin|krispy|baskin|gelato|texas chicken|popeyes|pf chang|operation falafel|al baik|albaik/],
+  ['move',/careem|uber|\brta\b|\bnol\b|salik|enoc|adnoc|emarat|eppco|parking|taxi|metro|\bhala\b|petrol|\bdarb\b|flydubai|air arabia|etihad air|emirates air/],
+  ['bills',/\bdu\b|etisalat|e&|dewa|addc|sewa|fewa|virgin mobile|empower|tabreed|\brent\b|insurance|tasjeel|\btamm\b|dubai police|\bfines?\b/],
+  ['fun',/\bvox\b|reel cinema|roxy|netflix|spotify|playstation|\bsteam\b|xbox|nintendo|youtube|anghami|shahid|\bosn\b|disney|apple com bill|itunes|cinema|bowling|padel|global village|ski dubai|aquaventure/],
+  ['health',/pharmacy|aster|life ph|boots|supercare|clinic|hospital|medical|dental|\bgym\b|fitness|gymnation|barber|salon|whoop/],
+  ['shop',/amazon|noon|namshi|shein|ikea|sharaf|jumbo|apple store|virgin megastore|zara|h&m|nike|adidas|decathlon|sun & sand|centrepoint|home centre|temu|ounass|6thstreet|lego|\bmall\b/]];
+const mCur=()=>String((S.profile&&S.profile.cur)||'AED').replace(/[^A-Za-z]/g,'').slice(0,4).toUpperCase()||'AED';
+const NF2=new Intl.NumberFormat('en-US',{minimumFractionDigits:2,maximumFractionDigits:2});
+const m2=v=>Math.round((+v||0)*100)/100;
+const mNum=v=>{v=m2(v); return Number.isInteger(v)?NF0.format(v):NF2.format(v)};
+const mTxt=v=>`${mCur()} ${mNum(v)}`;
+const ymOf=t=>{const d=new Date(t); return `${d.getFullYear()}-${pad(d.getMonth()+1)}`};
+const ymAdd=(ym,n)=>{const [y,m]=ym.split('-').map(Number), d=new Date(y,m-1+n,1); return `${d.getFullYear()}-${pad(d.getMonth()+1)}`};
+const ymDays=ym=>{const [y,m]=ym.split('-').map(Number); return new Date(y,m,0).getDate()};
+const ymName=(ym,o)=>{const [y,m]=ym.split('-').map(Number); return DF(new Date(y,m-1,1),o||{month:'long'})};
+const emptyMonth=ym=>({kind:'money',ym,list:[],del:[]});
+const byT=(a,b)=>(+a.t||0)-(+b.t||0);
+function mergeMonth(a,b){
+  if(!b) return a; if(!a) return b; const del=uniqDel(a.del,b.del), ds=new Set(del), m=new Map();
+  for(const e of [...(b.list||[]),...(a.list||[])]){ if(!e||!e.id||ds.has(e.id)) continue; const o=m.get(e.id); if(!o||(+e.u||0)>=(+o.u||0)) m.set(e.id,e) }
+  return {...b,...a,kind:'money',del,list:[...m.values()].sort(byT)};
+}
+const normCfg=c=>({kind:'mcfg',...(c||{}),rules:{...((c&&c.rules)||{})}});
+function mergeCfg(a,b){a=normCfg(a); if(!b) return a; b=normCfg(b); const rules={...b.rules};
+  Object.entries(a.rules).forEach(([k,r])=>{if(!rules[k]||(+r.u||0)>=(+rules[k].u||0)) rules[k]=r}); return {...b,...a,kind:'mcfg',rules}}
+async function getMonth(ym){
+  if(S.money[ym]) return S.money[ym];
+  const key='m-'+ym, local=LS.get(key); let d=null;
+  if(base){
+    for(let i=0;i<2&&!d;i++){try{const s=await base.doc(key).get(); d=s.exists?clone(s.data()):emptyMonth(ym)}catch(e){if(i===0) await wait(600)}}
+    if(!d) d=local; else if(local&&dirty.has(key)) d=mergeMonth(local,d);
+  } else d=local;
+  if(S.money[ym]) return S.money[ym];
+  d={...emptyMonth(ym),...(d||{})}; if(!Array.isArray(d.list)) d.list=[]; S.money[ym]=d; return d;
+}
+function saveMonth(d){S.money[d.ym]=d; save('m-'+d.ym,d)}
+const mDocSync=ym=>S.money[ym]||LS.get('m-'+ym);
+const mList=d=>((d&&d.list)||[]).filter(e=>e&&+e.amt>0);
+async function loadMoneyAll(){
+  const out={}; LS.keys().filter(k=>/^m-\d{4}-\d{2}$/.test(k)).forEach(k=>{const v=LS.get(k); if(v&&v.ym) out[v.ym]={...emptyMonth(v.ym),...v}});
+  if(base){try{const snap=await base.where('kind','==','money').limit(240).get(); snap.docs.forEach(s=>{const v=s.data(); if(v&&v.ym){const r={...emptyMonth(v.ym),...clone(v)}; out[v.ym]=dirty.has('m-'+v.ym)&&out[v.ym]?mergeMonth(out[v.ym],r):r}})}catch(e){}}
+  Object.assign(out,S.money); return out;
+}
+/* places: one key per place name, so "CARREFOUR" and "Carrefour" are the same shop */
+const normM=s=>String(s||'').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'').replace(/[’'`]/g,'').replace(/[^a-z0-9؀-ۿ&]+/g,' ').replace(/\s+/g,' ').trim().slice(0,40);
+function catFor(name){
+  const k=normM(name); if(!k) return {c:'other',sure:false};
+  const r=S.mcfg.rules[k]; if(r&&mCat(r.c)[0]===r.c) return {c:r.c,sure:true};
+  for(const [c,re] of M_GUESS) if(re.test(k)) return {c,sure:false,guess:true};
+  return {c:'other',sure:false};
+}
+function learnCat(name,c){
+  const k=normM(name); if(!k) return; const R=S.mcfg.rules; if(R[k]&&R[k].c===c) return; R[k]={c,u:Date.now()};
+  const ks=Object.keys(R); if(ks.length>600) ks.sort((a,b)=>(+R[a].u||0)-(+R[b].u||0)).slice(0,ks.length-600).forEach(x=>delete R[x]);
+  save('mcfg',S.mcfg);
+}
+const titleM=s=>{s=String(s||'').trim(); return s&&s===s.toUpperCase()&&/[A-Z]{2}/.test(s)?s.toLowerCase().replace(/(^|[\s\-/&(])([a-zà-ÿ])/g,(m,a,b)=>a+b.toUpperCase()):s};
+const cleanMerchant=s=>titleM(String(s||'').replace(/[*"“”]+/g,' ').replace(/\s+/g,' ').replace(/[\s,\-]+(dubai|abu dhabi|sharjah|ajman|al ain|ras al khaimah|fujairah|uae|ae|are)(?:[\s,\-]+(?:uae|ae|are))?$/i,'').replace(/[\s,.\-]+$/,'').trim()).slice(0,40);
+/* "AED 45.00", "45,50 د.إ", "1,234.5", "$12" → {amt, cur}. With both separators the last one is the decimal point. */
+const M_CUR='AED|DHS?\\.?|USD|SAR|EUR|GBP|QAR|KWD|BHD|OMR|INR|PKR|EGP|TRY|\\$|€|£|د\\.?\\s?إ\\.?';
+function parseMoney(str){
+  let s=String(str||'').replace(/[‎‏؜  ]/g,' ').replace(/[٠-٩]/g,d=>'٠١٢٣٤٥٦٧٨٩'.indexOf(d)).replace(/٫/g,'.').replace(/٬/g,',');
+  const c=s.match(new RegExp('('+M_CUR+')','i')); let n=(s.match(/\d[\d.,]*/)||[''])[0].replace(/[.,]+$/,''); if(!n) return null;
+  const ld=n.lastIndexOf('.'), lc=n.lastIndexOf(',');
+  if(ld>-1&&lc>-1) n=ld>lc?n.replace(/,/g,''):n.replace(/\./g,'').replace(',','.');
+  else if(lc>-1) n=n.split(',').length===2&&/,\d{1,2}$/.test(n)?n.replace(',','.'):n.replace(/,/g,'');
+  else if(ld>-1&&n.split('.').length>2) n=n.replace(/\./g,'');
+  const amt=m2(parseFloat(n)); if(!(amt>=0)||!isFinite(amt)) return null;
+  let cur=c?c[1].toUpperCase().replace(/[.\s]/g,''):''; if(/^DH/.test(cur)||/د/.test(cur)) cur='AED'; cur={'$':'USD','€':'EUR','£':'GBP'}[cur]||cur;
+  return {amt,cur};
+}
+/* A bank text or the Shortcut's clipboard line → {kind:'spend'|'in'|'otp', amt, cur, name, card}. The first amount in the
+   text is the purchase (the balance comes later); the place is what follows "at". Nothing is stored but those fields. */
+function parseBankText(txt){
+  const s=String(txt||'').replace(/\s+/g,' ').trim(); if(!s) return null;
+  if(/\b(otp|one[- ]time (password|pin|code)|verification code|activation code|do not share)\b/i.test(s)) return {kind:'otp'};
+  const m=s.match(new RegExp('(?:'+M_CUR+')\\s*\\d[\\d.,]*','i'))||s.match(new RegExp('\\d[\\d.,]*\\s*(?:'+M_CUR+')','i')); if(!m) return null;
+  const pm=parseMoney(m[0]); if(!pm||!(pm.amt>0)) return null;
+  const head=s.slice(0,m.index+m[0].length+50);
+  const kind=/\b(credited|deposit(ed)?|salary|refund(ed)?|reversal|reversed|received|cashback)\b/i.test(head)&&!/\b(purchase|spent|debited|used|paid|payment|charged|withdraw)/i.test(head)?'in':'spend';
+  const STOP='(?=\\s+(?:on|dated|using|with|via|card|ref|avl|avail|available|bal|balance|for|your|at \\d)\\b|\\s*[.;]|\\s*,\\s|$)', rest=s.slice(m.index+m[0].length);
+  const at=new RegExp('(?:\\bat|@)\\s+(?!\\d{1,2}[:.]\\d{2})(.+?)'+STOP,'i'), to=new RegExp('\\b(?:to|towards)\\s+(?!your\\b)(.+?)'+STOP,'i');
+  const mm=rest.match(at)||s.match(at)||rest.match(to);
+  const card=(s.match(/(?:ending(?: with| in)?|x{2,}|\*{2,})\s*(\d{4})\b/i)||[])[1]||'';
+  return {kind,amt:pm.amt,cur:pm.cur,name:mm?cleanMerchant(mm[1]):'',card};
+}
+/* one month's numbers */
+function moneyStats(doc){
+  const L=mList(doc), cats={}, places={}, days={}; let tot=0;
+  L.forEach(e=>{tot+=e.amt; const c=mCat(e.cat)[0]; (cats[c]=cats[c]||{c,v:0,n:0}).v+=e.amt; cats[c].n++; const d=new Date(e.t).getDate(); days[d]=(days[d]||0)+e.amt;
+    const k=normM(e.name); if(k){const p=places[k]=places[k]||{name:e.name,v:0,n:0}; p.v+=e.amt; p.n++}});
+  return {L,tot,cats:Object.values(cats).sort((a,b)=>b.v-a.v),places:Object.values(places).sort((a,b)=>b.v-a.v),days};
+}
+const mCum=(st,day)=>{let s=0; for(const d in st.days) if(+d<=day) s+=st.days[d]; return s};
+function moneyBetween(a,b){   // spends from day a to day b (both included), from the months already in memory
+  const out=[], lo=parseYmd(a).getTime(), hi=parseYmd(b).getTime()+864e5;
+  for(let ym=a.slice(0,7);ym<=b.slice(0,7);ym=ymAdd(ym,1)) mList(mDocSync(ym)).forEach(e=>{if(e.t>=lo&&e.t<hi) out.push(e)});
+  return out;
+}
+const mSum=L=>L.reduce((a,e)=>a+e.amt,0);
+const niceMax=v=>{if(!(v>0)) return 100; const p=Math.pow(10,Math.floor(Math.log10(v))), f=v/p; return (f<=1?1:f<=2?2:f<=5?5:10)*p};
+/* Running total through the month: this month a solid line, the month before dotted behind it. No target line: nothing here is a limit. */
+function moneyChart(ym,st,pst,upto,anim){
+  const W=340,H=150,L=42,R=8,T=10,B=20,n=ymDays(ym),iw=W-L-R,ih=H-T-B, pym=ymAdd(ym,-1), pn=ymDays(pym);
+  const cur=[]; let s=0; for(let d=1;d<=upto;d++){s+=st.days[d]||0; cur.push(s)}
+  const pv=[]; if(pst&&pst.tot>0){let q=0; for(let d=1;d<=n;d++){q+=pst.days[d]||0; if(d===n) for(let x=n+1;x<=pn;x++) q+=pst.days[x]||0; pv.push(q)}}
+  const max=niceMax(Math.max(s,pv.length?pv[pv.length-1]:0,1)), x=d=>L+(n>1?(d-1)/(n-1):0)*iw, y=v=>T+(1-v/max)*ih, mon=ymName(ym,{month:'short'});
+  const pts=a=>a.map((v,i)=>`${x(i+1).toFixed(1)},${y(v).toFixed(1)}`).join(' ');
+  let g=`<svg class="chart mny-chart" viewBox="0 0 ${W} ${H}" role="img" aria-label="Running total for ${ymName(ym)}: ${mTxt(st.tot)}${pv.length?`, ${ymName(pym)} ${mTxt(pst.tot)}`:''}">`;
+  [0,max].forEach(v=>{g+=`<line class="g" x1="${L}" x2="${W-R}" y1="${y(v)}" y2="${y(v)}"/><text x="${L-6}" y="${y(v)+4}" text-anchor="end">${fmt(v)}</text>`});
+  if(pv.length) g+=`<polyline class="mny-prev" points="${pts(pv)}" fill="none"/>`;
+  if(cur.length>1) g+=`<polyline points="${pts(cur)}" fill="none" stroke="var(--label)" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round" pathLength="1"${anim?' class="draw"':''}/>`;
+  if(cur.length) g+=`<circle cx="${x(cur.length).toFixed(1)}" cy="${y(s).toFixed(1)}" r="5" fill="var(--label)" stroke="var(--cell)" stroke-width="2"/>`;
+  const bw=iw/Math.max(1,n-1);
+  for(let d=1;d<=n;d++){const tip=d<=upto?`${d} ${mon} · ${mTxt(st.days[d]||0)} · ${mTxt(cur[d-1])} so far`:pv.length?`${d} ${ymName(pym,{month:'short'})} · ${mTxt(pv[d-1])} by then`:''; if(tip) g+=`<rect x="${(x(d)-bw/2).toFixed(1)}" y="${T}" width="${bw.toFixed(1)}" height="${ih}" fill="transparent" data-tip="${tip}"/>`}
+  return g+`<text x="${L}" y="${H-5}">1 ${mon}</text><text x="${W-R}" y="${H-5}" text-anchor="end">${n} ${mon}</text></svg>`+
+    (pv.length?`<div class="legend"><span><i style="background:var(--label)"></i>${ymName(ym)}</span><span><i class="mny-dash"></i>${ymName(pym)}</span></div>`:'');
+}
+function monthBars(rows,sel){
+  const W=340,H=112,L=42,R=4,T=16,B=20,n=rows.length,iw=W-L-R,ih=H-T-B, max=niceMax(Math.max(...rows.map(r=>r.tot),1)), bw=iw/n, w=Math.min(30,bw*.56), y=v=>T+(1-v/max)*ih;
+  let g=`<svg class="chart" viewBox="0 0 ${W} ${H}" role="img" aria-label="Spending in each of the last ${n} months"><text x="${L-6}" y="${y(0)+4}" text-anchor="end">0</text><text x="${L-6}" y="${y(max)+4}" text-anchor="end">${fmt(max)}</text><line class="g" x1="${L}" x2="${W-R}" y1="${y(0)}" y2="${y(0)}"/>`;
+  rows.forEach((r,i)=>{const bx=L+i*bw+(bw-w)/2, h=r.tot/max*ih, on=r.ym===sel;
+    if(r.tot>0) g+=`<path d="${barPath(bx,y(r.tot),w,Math.max(2,h))}" fill="${on?'var(--label)':'var(--label3)'}"/>`;
+    g+=`<text x="${(L+i*bw+bw/2).toFixed(1)}" y="${H-5}" text-anchor="middle"${on?' style="fill:var(--label);font-weight:700"':''}>${ymName(r.ym,{month:'short'})}</text>`;
+    g+=`<rect x="${(L+i*bw).toFixed(1)}" y="${T}" width="${bw.toFixed(1)}" height="${ih+B}" fill="transparent" data-m="go" data-v="${r.ym}" data-tip="${ymName(r.ym)} · ${r.tot>0?mTxt(r.tot):'nothing logged'}"/>`});
+  return g+'</svg>';
+}
+const M_SRC={pay:'Apple Pay',sms:'Bank text',rep:'Usual'};
+const dayHead=d=>{const T=TODAY(); return d===T?'Today':d===addDays(T,-1)?'Yesterday':DF(parseYmd(d),{weekday:'short',day:'numeric',month:'short'})};
+function spendRows(L,cap){
+  const by=new Map(); [...L].sort((a,b)=>b.t-a.t).slice(0,cap||1e9).forEach(e=>{const d=ymd(new Date(e.t)); if(!by.has(d)) by.set(d,[]); by.get(d).push(e)});
+  const all=new Map(); L.forEach(e=>{const d=ymd(new Date(e.t)); all.set(d,(all.get(d)||0)+e.amt)});
+  const cnt=new Map(); L.forEach(e=>{const d=ymd(new Date(e.t)); cnt.set(d,(cnt.get(d)||0)+1)});
+  return [...by.entries()].map(([d,es])=>`<li class="dy-h"><div><b>${dayHead(d)}</b>${cnt.get(d)>1?`<span class="num">${fmt(all.get(d))}</span>`:''}</div></li>${es.map(e=>{const c=mCat(e.cat)[1];
+    return `<li><button class="row dy-r mny-r" data-m="edit" data-v="${e.id}" data-ym="${ymOf(e.t)}"><span class="tm num">${e.nt?'':DF(new Date(e.t),{hour:'2-digit',minute:'2-digit',hour12:false})}</span><span class="t">${esc(e.name||c)}</span><span class="d">${e.name?esc(c)+' ':''}${M_SRC[e.src]?`<span class="ds">${M_SRC[e.src]}</span>`:''}</span><span class="k num">${mNum(e.amt)}</span></button></li>`}).join('')}`).join('');
+}
+let mView=null, mFresh=true, mAll=false;
+async function renderMoney(){
+  const now=ymOf(Date.now()); if(!mView||mView>now) mView=now; const ym=mView, isNow=ym===now;
+  const yms=[...Array(6)].map((_,i)=>ymAdd(ym,i-5)), docs=await Promise.all(yms.map(getMonth)); if(currentView()!=='money') return;
+  const st=moneyStats(docs[5]), pst=moneyStats(docs[4]), T=TODAY(), dom=isNow?new Date().getDate():ymDays(ym), pym=yms[4];
+  const anim=mFresh&&motionLv()>=2&&motionOK(); mFresh=false;
+  /* against last month: the same day of the month while this one is running, the whole month once it's over */
+  const pcmp=isNow?mCum(pst,Math.min(dom,ymDays(pym))):pst.tot, diff=st.tot-pcmp;
+  const vs=isNow?`at this point in ${ymName(pym)}`:`in ${ymName(pym)}`;
+  const delta=!(pst.tot>0)?'First month tracked':Math.abs(diff)<1?`Same as ${vs}`:`<b class="${diff<0?'dn':''}">${mCur()} ${fmt(Math.abs(diff))} ${diff<0?'less':'more'}</b> than ${vs}`;
+  const today=mSum(st.L.filter(e=>ymd(new Date(e.t))===T)), wk=isNow?mSum(moneyBetween(monOf(T),T)):0, big=st.L.reduce((a,e)=>e.amt>(a?a.amt:0)?e:a,null);
+  const stat=(l,v,s)=>`<div class="stat"><span>${l}</span><b>${v}</b><small>${s}</small></div>`;
+  const food=(st.cats.find(c=>c.c==='eat')||{v:0,n:0}), groc=(st.cats.find(c=>c.c==='groc')||{v:0,n:0});
+  const months=yms.map((y,i)=>({ym:y,tot:mSum(mList(docs[i]))})), monthsOn=months.filter(r=>r.tot>0).length;
+  $('#smallTitle').textContent='Money';
+  $('#v-money').innerHTML=`<div class="titlebar"><h1 class="large">Money</h1>
+      <div class="daynav"><button class="circ" data-m="mon" data-v="-1" aria-label="Previous month">${ICON_L}</button><button class="circ" data-m="mon" data-v="1" aria-label="Next month"${isNow?' disabled':''}>${ICON_R}</button></div></div>
+    <p class="subtitle dl-sub"><span>${ymName(ym,{month:'long',year:'numeric'})}${isNow?'':` · <button class="txtbtn" style="font-size:15px;padding:0" data-m="now">Go to This Month</button>`}</span>${isNow&&LS.get('payFile')?`<label class="txtbtn mny-imp" for="spFileIn">Import Purchases</label>`:''}</p>
+    <div class="badge" data-sync hidden><i></i><span></span></div>
+    ${st.L.length?`<section class="card tipbox mny-hero" aria-label="Spent in ${ymName(ym)}">
+      <div><span class="mny-lab">Spent${isNow?' so far':''}</span><p class="mny-big"><b class="num">${fmt(st.tot)}</b><span>${mCur()}</span></p><p class="mny-delta">${delta}</p></div>
+      ${moneyChart(ym,st,pst,dom,anim)}
+      <div class="stats mny-stats">${isNow?stat('Today',fmt(today),today?`${st.L.filter(e=>ymd(new Date(e.t))===T).length} spend${st.L.filter(e=>ymd(new Date(e.t))===T).length===1?'':'s'}`:'nothing yet')+stat('This week',fmt(wk),'since Monday')
+        :stat('Spends',st.L.length,'logged')+stat('Biggest',fmt(big.amt),esc(big.name||mCat(big.cat)[1]))}${stat('A day',fmt(st.tot/dom),'average')}</div>
+    </section>
+    <div class="gap"></div><h2 class="sec">Where It Goes</h2>
+    <ul class="list">${st.cats.map(c=>`<li><button class="row mny-c" data-m="cat" data-v="${c.c}"><span class="t">${mCat(c.c)[1]}</span><span class="k num">${fmt(c.v)}</span><span class="mny-bar" aria-hidden="true"><i style="width:${Math.max(1.5,c.v/st.cats[0].v*100).toFixed(1)}%"></i></span><span class="d">${Math.round(c.v/st.tot*100)}% · ${c.n} spend${c.n===1?'':'s'}</span></button></li>`).join('')}</ul>
+    ${food.v+groc.v>0?`<p class="foot">Food is ${Math.round((food.v+groc.v)/st.tot*100)}% of this month${food.n?`: ${mTxt(food.v)} eating out over ${food.n} time${food.n===1?'':'s'} (${mTxt(food.v/food.n)} each)`:''}${groc.v?`${food.n?' and':':'} ${mTxt(groc.v)} on groceries`:''}.</p>`:''}
+    ${st.places.length>1?`<div class="gap"></div><h2 class="sec">Top Places</h2><ul class="list">${st.places.slice(0,5).map(p=>`<li><div class="row"><span class="t">${esc(p.name)}</span><span class="d">${p.n} time${p.n===1?'':'s'}</span><span class="k num">${fmt(p.v)}</span></div></li>`).join('')}</ul>`:''}`
+    :`<section class="card empty-state"><h3>Nothing logged in ${ymName(ym)}</h3><p>${isNow?'Tap Add Spend after you pay. Type the amount, tap a category, done.':'No spends were logged this month.'}</p>
+      ${isNow&&STANDALONE?`<button class="btn tint mny-setup" data-m="paySetup">Set Up Apple Pay Auto-Log</button>`:''}</section>`}
+    ${monthsOn>1?`<div class="gap"></div><h2 class="sec">Month by Month</h2><section class="card tipbox">${monthBars(months,ym)}</section>`:''}
+    ${st.L.length?`<div class="gap"></div><h2 class="sec">Spends</h2><ul class="list dy mny-list">${spendRows(st.L,mAll?0:30)}</ul>
+      ${!mAll&&st.L.length>30?`<div class="gap" style="height:10px"></div><ul class="list"><li><button class="row single action" style="grid-template-columns:1fr" data-m="all"><span class="t">Show All ${st.L.length} Spends</span></button></li></ul>`:''}`:''}
+    <p class="foot">Money tracks what you spent and where. There is no budget and no bank login.${STANDALONE&&st.L.length&&!st.L.some(e=>e.src==='pay')?` <button class="txtbtn inl" data-m="paySetup">Set up Apple Pay auto-log</button>`:''}</p>`;
+  setSync(syncState);
+}
+/* ---- one card on Today, three numbers in Week in Review ---- */
+let mKick=0;
+function moneyLine(isToday){
+  if(!isToday||S.profile.tMoney===0) return ''; const ym=ymOf(Date.now()), d=mDocSync(ym);
+  if(base&&!S.money[ym]&&!mKick){mKick=1; getMonth(ym).then(x=>{if(mList(x).length&&currentView()==='today'&&!sheetOpen()&&!SP) renderToday()}).catch(()=>{})}
+  const L=mList(d); if(!L.length) return ''; const T=TODAY(), td=mSum(L.filter(e=>ymd(new Date(e.t))===T));
+  return `<a class="card mny-line" href="#money" aria-label="Money: ${mTxt(td)} spent today, ${mTxt(mSum(L))} in ${ymName(ym)}"><span class="mny-lab">Spent today</span><b class="num">${mNum(td)}<i> ${mCur()}</i></b><span class="s num">${fmt(mSum(L))} in ${ymName(ym)}</span>${CHEV}</a>`;
+}
+function weekMoney(w){
+  const cur=moneyBetween(w.start,w.end), prev=moneyBetween(addDays(w.start,-7),addDays(w.start,-1)); if(!cur.length&&!prev.length) return '';
+  const tot=mSum(cur), pt=mSum(prev), eat=cur.filter(e=>e.cat==='eat'), d=Math.round(tot-pt), u=`<i> ${mCur()}</i>`;
+  return `<div class="stat"><span>Spent</span><b>${fmt(tot)}${u}</b><small>${prev.length?(d===0?'same as week before':`${fmt(Math.abs(d))} ${d>0?'more':'less'} than week before`):'first week tracked'}</small></div>
+      <div class="stat"><span>Eating out</span><b>${fmt(mSum(eat))}${u}</b><small>${eat.length} time${eat.length===1?'':'s'}</small></div>
+      <div class="stat"><span>A day</span><b>${fmt(tot/Math.max(1,w.elapsed))}${u}</b><small>average</small></div>`;
+}
+/* ---- the spend pad: digits, then a category tap saves it. Its own keypad, like the amount pad. ---- */
+let SP=null, spBusy=false;
+const spVal=()=>{const v=parseFloat(SP&&SP.str); return v>0?m2(v):0};
+function usualSpends(){
+  const lo=Date.now()-45*864e5, m=new Map(), ym=ymOf(Date.now());
+  [...mList(mDocSync(ymAdd(ym,-1))),...mList(mDocSync(ym))].forEach(e=>{if(e.t<lo||!e.name) return; const k=normM(e.name)+'|'+e.cat+'|'+e.amt, o=m.get(k)||{name:e.name,cat:e.cat,amt:e.amt,n:0,t:0}; o.n++; o.t=Math.max(o.t,e.t); m.set(k,o)});
+  return [...m.values()].filter(o=>o.n>=2).sort((a,b)=>b.n-a.n||b.t-a.t).slice(0,6);
+}
+async function spOpen(o){
+  o=o||{}; const now=Date.now(); await Promise.all([getMonth(ymOf(now)),getMonth(ymAdd(ymOf(now),-1))]);
+  let e=null; if(o.id){e=mList(await getMonth(o.ym)).find(x=>x.id===o.id); if(!e) return}
+  SP=e?{mode:'edit',id:e.id,ym:o.ym,str:String(m2(e.amt)),fresh:true,name:e.name||'',cat:mCat(e.cat)[0],date:ymd(new Date(e.t)),t:e.t,src:e.src,card:e.card,nt:e.nt,quick:!!o.quick,touched:false,note:o.note||''}
+    :{mode:'add',str:o.amt?String(m2(o.amt)):'',fresh:!!o.amt,name:o.name||'',cat:o.cat||'',date:TODAY(),src:o.src||'you',card:o.card||'',touched:false,note:o.note||'',usual:usualSpends()};
+  let el=$('#sp'); if(!el){el=document.createElement('div'); el.id='sp'; el.className='amt sp'; el.hidden=true; document.body.appendChild(el)}
+  spRender(); el.hidden=false; requestAnimationFrame(()=>el.classList.add('on')); haptic();
+}
+function spClose(){const el=$('#sp'); if(!el) return; el.classList.remove('on','typing'); SP=null; if(document.activeElement&&el.contains(document.activeElement)) document.activeElement.blur(); setTimeout(()=>{if(!SP) el.hidden=true},motionOK()?240:0)}
+function spHint(){
+  if(!SP) return ''; if(SP.note) return SP.note; const v=spVal(), ed=SP.mode==='edit'&&!SP.quick;
+  return ed?'':!v?'Type the amount, then tap a category':SP.cat?`Tap ${mCat(SP.cat)[1]} to save, or pick another`:'Pick a category to save';
+}
+function spRender(){
+  const el=$('#sp'); if(!el||!SP) return; const ed=SP.mode==='edit', us=!ed&&SP.usual||[];
+  el.innerHTML=`<div class="amt-bg" data-sp="cancel"></div><div class="amt-p sp-p" role="dialog" aria-label="${ed?'Edit spend':'Add a spend'}">
+    <div class="amt-top"><button class="txtbtn" data-sp="cancel">Cancel</button><b>${ed?(SP.quick?'Pick a Category':'Edit Spend'):'Add Spend'}</b>${ed?`<button class="amt-done" data-sp="done">Done</button>`:`<button class="txtbtn sp-paste" data-sp="paste">Paste</button>`}</div>
+    ${us.length?`<div class="amt-q sp-usual" role="group" aria-label="Your usual spends">${us.map((u,i)=>`<button class="chip2" data-sp="usual" data-v="${i}">${esc(u.name)} <b class="num">${mNum(u.amt)}</b></button>`).join('')}</div>`:''}
+    <div id="spPasteBox" class="sp-pb" hidden><textarea id="spPasteIn" rows="3" aria-label="Bank text" placeholder="Paste the bank text here"></textarea><button class="btn tint" data-sp="read">Read It</button></div>
+    <div class="amt-v sp-v${SP.fresh?' fresh':''}" aria-live="polite"><span>${mCur()}</span><b class="num" id="spAmt">${esc(SP.str||'0')}</b></div>
+    <div class="sp-row"><input type="text" id="spName" maxlength="40" autocomplete="off" autocapitalize="words" enterkeyhint="done" aria-label="Where or what" placeholder="Where or what (optional)" value="${esc(SP.name)}"><label class="sp-date"><span id="spDateT">${dayHead(SP.date)}</span><input type="date" id="spDate" aria-label="Date" max="${TODAY()}" value="${SP.date}"></label></div>
+    <div class="sp-cats" role="group" aria-label="Category">${M_CATS.map(([k,l])=>`<button class="chip2" data-sp="cat" data-v="${k}" aria-pressed="${SP.cat===k&&!(SP.quick&&!SP.touched)}">${l}</button>`).join('')}</div>
+    <p class="amt-note" id="spHint" aria-live="polite">${esc(spHint())}</p>
+    <div class="amt-keys">${['1','2','3','4','5','6','7','8','9','.','0','del'].map(k=>`<button data-sp="key" data-v="${k}"${k==='del'?' aria-label="Delete"':''}>${k==='del'?'<svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 5h11v14H9l-6-7z"/><path d="M12.5 9.5l5 5M17.5 9.5l-5 5"/></svg>':k}</button>`).join('')}</div>
+    ${ed?`<div class="sp-foot"><button class="txtbtn" data-sp="meal"${SP.cat==='eat'?'':' hidden'}>Log What You Ate</button><button class="txtbtn sp-del" data-sp="del">Delete</button></div>`:''}</div>`;
+}
+function spUpd(){
+  if(!SP) return; const a=$('#spAmt'); if(a){a.textContent=SP.str||'0'; a.parentNode.classList.toggle('fresh',!!SP.fresh)}
+  $$('#sp [data-sp="cat"]').forEach(b=>b.setAttribute('aria-pressed',b.dataset.v===SP.cat&&!(SP.quick&&!SP.touched))); const h=$('#spHint'); if(h) h.textContent=spHint();
+  const u=$('#sp .sp-usual'); if(u) u.hidden=!!SP.str; const ml=$('#sp [data-sp="meal"]'); if(ml) ml.hidden=SP.cat!=='eat';
+}
+const moneyRefresh=()=>currentView()==='money'?renderMoney():currentView()==='today'&&!sheetOpen()?renderToday():null;
+async function putSpend(e){const d=await getMonth(ymOf(e.t)); d.list=[...d.list.filter(x=>x.id!==e.id),e].sort(byT); undel(d,e.id); saveMonth(d); return d}
+async function dropSpend(id,ym){const d=await getMonth(ym), e=d.list.find(x=>x.id===id); d.list=d.list.filter(x=>x.id!==id); addDel(d,id); saveMonth(d); return e}
+const chainFor=name=>{const n=normT(name); return REST&&n?REST.chains.find(c=>[...c.key].some(k=>k.length>2&&(n.includes(k)||k.includes(n))))||null:null};
+function logMeal(q){spClose(); const go=()=>{openAdd(); if(q){$('#q').value=q; renderResults()}}; if(location.hash!=='#today'&&location.hash!==''){location.hash='#today'; setTimeout(go,350)} else go()}
+async function swipeSpend(row,li){   // a row swiped away on Money, the same gesture as a food row on Today
+  const e=await dropSpend(row.dataset.v,row.dataset.ym); haptic(); if(!e){renderMoney(); return}
+  const done=()=>{renderMoney(); toastUndo(`Deleted ${mTxt(e.amt)}${e.name?' · '+e.name:''}`,async()=>{await putSpend({...e,id:'s'+uid(),u:Date.now()}); moneyRefresh()})};
+  if(li&&motionOK()){li.style.height=li.offsetHeight+'px'; li.classList.add('gone'); requestAnimationFrame(()=>{li.style.height='0px'}); setTimeout(done,260)} else done();
+}
+function toastAct(m,label,fn){undoFn=fn; const t=$('#toast'); t.innerHTML=`${esc(m)} <button class="txtbtn" style="font-size:15px;padding:0 0 0 10px;font-weight:600" data-act="undo">${esc(label)}</button>`; toastOpen(5200,()=>{undoFn=null})}
+/* after a new spend: Undo, or for a restaurant Fuel has the menu of, the way straight to logging the meal */
+async function spendToast(e){
+  const msg=`${mTxt(e.amt)} · ${e.name||mCat(e.cat)[1]}`; let chain=null;
+  if(e.cat==='eat'&&e.name&&ymd(new Date(e.t))===TODAY()){try{await loadRest(); chain=chainFor(e.name)}catch(x){}}
+  if(chain) toastAct(msg,'Log Meal',()=>logMeal(chain.name));
+  else toastUndo(msg,async()=>{await dropSpend(e.id,ymOf(e.t)); moneyRefresh()});
+}
+async function spSave(){
+  if(!SP||spBusy) return; const s=SP, amt=spVal();
+  if(!(amt>0)){toast('Type the amount first'); haptic('error'); return}
+  if(!s.cat){toast('Pick a category'); haptic('error'); return}
+  spBusy=true;
+  try{const name=(($('#spName')||{}).value||'').trim().slice(0,40), date=(($('#spDate')||{}).value)||s.date; let t;
+    let nt=0; if(s.mode==='edit'&&date===ymd(new Date(s.t))){t=s.t; nt=s.nt?1:0} else if(date>=TODAY()) t=Date.now(); else {const d=parseYmd(date); d.setHours(12,0,0,0); t=d.getTime(); nt=1}
+    const e={id:s.mode==='edit'?s.id:'s'+uid(),t,amt,cat:s.cat,...(name?{name}:{}),src:s.src||'you',...(s.card?{card:s.card}:{}),...(nt?{nt:1}:{}),u:Date.now()};
+    if(s.mode==='edit'&&s.ym!==ymOf(t)) await dropSpend(s.id,s.ym);
+    await putSpend(e); if(name&&(s.touched||s.mode==='add')) learnCat(name,s.cat);
+    spClose(); haptic('confirm'); if(currentView()==='money') mView=ymOf(t); await moneyRefresh();
+    if(s.mode==='add'||s.quick) spendToast(e);
+  } finally{spBusy=false}
+}
+async function spUsual(i){
+  if(!SP||spBusy) return; const u=(SP.usual||[])[i]; if(!u) return; spBusy=true;
+  try{const e={id:'s'+uid(),t:Date.now(),amt:u.amt,cat:u.cat,name:u.name,src:'rep',u:Date.now()}; await putSpend(e); spClose(); haptic('confirm'); await moneyRefresh(); spendToast(e)} finally{spBusy=false}
+}
+function spRead(text){
+  const r=parseBankText(text);
+  if(!r){toast('No amount found in that text'); haptic('error'); return false}
+  if(r.kind==='otp'){toast('That is a security code, not a purchase'); haptic('error'); return false}
+  if(r.kind==='in'){toast('That text is money coming in, so it isn’t a spend'); haptic('error'); return false}
+  const pb=$('#spPasteBox'); if(pb) pb.hidden=true; $('#sp').classList.remove('typing');
+  if(r.name){SP.name=r.name; const n=$('#spName'); if(n) n.value=r.name; const g=catFor(r.name); if(g.sure||g.guess) SP.cat=g.c}
+  if(r.card) SP.card=r.card; SP.src='sms';
+  if(r.cur&&r.cur!==mCur()){SP.str=''; SP.fresh=false; SP.note=`That was ${r.cur} ${mNum(r.amt)}. Type what it cost in ${mCur()}.`}
+  else {SP.str=String(r.amt); SP.fresh=true; SP.note=''}
+  haptic('confirm'); spUpd(); return true;
+}
+async function spPaste(){
+  let t=''; try{if(navigator.clipboard&&navigator.clipboard.readText) t=await navigator.clipboard.readText()}catch(e){}
+  if(!SP) return; if(t&&t.trim()&&spRead(t)) return;
+  const pb=$('#spPasteBox'); if(pb){pb.hidden=false; const i=$('#spPasteIn'); if(i){i.value=''; i.focus()}}
+}
+function spAct(b){
+  const a=b.dataset.sp, v=b.dataset.v; if(!SP) return;
+  if(a==='cancel'){spClose(); return}
+  if(a==='done'){spSave(); return}
+  if(a==='key'){let s=SP.fresh?'':SP.str; if(v==='del') s=s.slice(0,-1); else if(v==='.'){if(!s.includes('.')) s=(s||'0')+'.'} else {if(s==='0') s=''; if(s.replace('.','').length<7&&!(s.includes('.')&&s.split('.')[1].length>=2)) s+=v}
+    SP.str=s; SP.fresh=false; SP.note=''; buzz(); spUpd(); return}
+  if(a==='cat'){SP.cat=v; SP.touched=true; if(SP.mode==='add'||SP.quick){spUpd(); spSave()} else {haptic(); spUpd()} return}
+  if(a==='usual'){spUsual(+v); return}
+  if(a==='paste'){spPaste(); return}
+  if(a==='read'){const i=$('#spPasteIn'); if(i&&i.value.trim()) spRead(i.value); else if(i) i.focus(); return}
+  if(a==='meal'){const q=(($('#spName')||{}).value||SP.name||'').trim(); loadRest().then(()=>{const c=chainFor(q); logMeal(c?c.name:'')}).catch(()=>logMeal('')); return}
+  if(a==='del'){const s=SP; spClose(); dropSpend(s.id,s.ym).then(async e=>{await moneyRefresh(); if(e) toastUndo(`Deleted ${mTxt(e.amt)}${e.name?' · '+e.name:''}`,async()=>{await putSpend({...e,id:'s'+uid(),u:Date.now()}); moneyRefresh()})}); return}
+}
+document.addEventListener('click',e=>{const b=e.target.closest&&e.target.closest('#sp [data-sp]'); if(b){e.preventDefault(); e.stopPropagation(); spAct(b)}},true);
+document.addEventListener('keydown',e=>{if(!SP||AMT) return; const k=e.key, inField=e.target&&/^(INPUT|TEXTAREA)$/.test(e.target.tagName);
+  if(inField){if(k==='Enter'&&e.target.id==='spName'){e.preventDefault(); e.target.blur()} if(k==='Escape') e.target.blur(); e.stopImmediatePropagation(); return}
+  if(/^[0-9.]$/.test(k)||k===','){spAct({dataset:{sp:'key',v:k===','?'.':k}}); e.preventDefault(); e.stopImmediatePropagation()}
+  else if(k==='Backspace'){spAct({dataset:{sp:'key',v:'del'}}); e.preventDefault(); e.stopImmediatePropagation()}
+  else if(k==='Enter'){spSave(); e.preventDefault(); e.stopImmediatePropagation()}
+  else if(k==='Escape'){spClose(); e.preventDefault(); e.stopImmediatePropagation()}},true);
+/* typing a place: the iPhone keyboard takes the bottom of the screen, so the keypad steps aside; the category follows the place */
+document.addEventListener('focusin',e=>{if(SP&&e.target.closest&&e.target.closest('#sp')&&/^(spName|spPasteIn)$/.test(e.target.id)) $('#sp').classList.add('typing')});
+document.addEventListener('focusout',e=>{if(SP&&/^(spName|spPasteIn)$/.test(e.target.id)) setTimeout(()=>{const el=$('#sp'); if(el&&!el.contains(document.activeElement)) el.classList.remove('typing')},60)});
+document.addEventListener('change',e=>{if(SP&&e.target.id==='spDate'){const v=e.target.value&&e.target.value<=TODAY()?e.target.value:TODAY(); e.target.value=v; SP.date=v; const t=$('#spDateT'); if(t) t.textContent=dayHead(v)}});
+document.addEventListener('input',e=>{if(!SP||e.target.id!=='spName') return; SP.name=e.target.value; if(!SP.touched){const g=catFor(SP.name); if(g.sure||g.guess){SP.cat=g.c; spUpd()}}});
+/* ---- Apple Pay: a Shortcuts automation opens Fuel with ?pay=<amount>|<merchant>|<card> (or ?spend=&m=&c=) ---- */
+function payParams(href){
+  let u; try{u=new URL(href||location.href)}catch(e){return null} let q=u.searchParams;
+  if(!q.has('pay')&&!q.has('spend')&&u.hash.includes('?')) q=new URLSearchParams(u.hash.slice(u.hash.indexOf('?')+1));
+  if(q.has('pay')){const [a,m,c]=String(q.get('pay')).split('|'); return {amt:a||'',m:m||'',c:c||'',t:q.get('t')||''}}
+  if(q.has('spend')) return {amt:q.get('spend')||'',m:q.get('m')||'',c:q.get('c')||'',t:q.get('t')||''};
+  return null;
+}
+async function payIntake(p){
+  const pm=parseMoney(p.amt), name=cleanMerchant(p.m), now=Date.now();
+  if(!pm||!(pm.amt>0)){toast('Apple Pay sent no amount, so nothing was logged'); return false}
+  const key=p.t?'t:'+p.t:`a:${pm.amt}|${normM(name)}`, seen=LS.get('paySeen')||[];
+  if(seen.some(x=>x.k===key&&(p.t||now-x.at<120000))) return false;
+  LS.set('paySeen',[...seen.filter(x=>now-x.at<3*864e5).slice(-40),{k:key,at:now}]);
+  const card=String(p.c||'').trim().slice(0,24), g=catFor(name);
+  if(location.hash!=='#money') location.hash='#money';
+  if(pm.cur&&pm.cur!==mCur()){await spOpen({name,cat:g.sure||g.guess?g.c:'',src:'pay',card,note:`Apple Pay: ${pm.cur} ${mNum(pm.amt)}${name?' at '+name:''}. Type what it cost in ${mCur()}.`}); return true}
+  const e={id:'s'+uid(),t:now,amt:pm.amt,cat:g.c,...(name?{name}:{}),src:'pay',...(card?{card}:{}),u:now};
+  await putSpend(e); mView=ymOf(now); haptic('confirm'); await renderMoney();
+  /* a place Fuel can't sort yet: the pad opens on it, one category tap finishes it and is remembered */
+  if(!g.sure&&!g.guess) await spOpen({id:e.id,ym:ymOf(now),quick:true,note:`${mTxt(e.amt)}${name?' at '+name:''} is logged.`});
+  else spendToast(e);
+  return true;
+}
+function payBoot(){const p=payParams(); if(!p) return; try{history.replaceState(null,'',location.pathname+'#money')}catch(e){} route(); payIntake(p).catch(()=>{})}
+window.addEventListener('hashchange',()=>{if(payParams()) payBoot()});   // the app was already open and only the link's tail changed
+/* The dependable route: the Shortcut appends one line per purchase to a text file ("date|amount|merchant|card"), and
+   Fuel reads the file when asked. A line's id comes from its text, so importing the same file again adds nothing and a
+   spend deleted in Fuel stays deleted. */
+const lineId=s=>{let h=5381; for(let i=0;i<s.length;i++) h=((h<<5)+h+s.charCodeAt(i))>>>0; return 'f'+h.toString(36)+s.length.toString(36)};
+function parseSpendLine(ln){
+  const parts=ln.split('|').map(x=>x.trim()); if(parts.length<2){const r=parseBankText(ln); return r&&r.kind==='spend'?{t:null,amt:r.amt,cur:r.cur,name:r.name,card:r.card}:null}
+  let t=null; const d0=parts[0], looksDate=!new RegExp(M_CUR,'i').test(d0)&&/\d/.test(d0)&&(/[-/:]/.test(d0)||/[a-z]{3}/i.test(d0));
+  if(looksDate){const ms=Date.parse(d0.replace(/\s+at\s+/i,' ')); if(isFinite(ms)) t=ms; parts.shift()}
+  const pm=parseMoney(parts[0]); if(!pm||!(pm.amt>0)) return null;
+  return {t,amt:pm.amt,cur:pm.cur,name:cleanMerchant(parts[1]||''),card:String(parts[2]||'').slice(0,24)};
+}
+async function importSpendFile(text){
+  const lines=String(text||'').split(/\r?\n/).map(x=>x.trim()).filter(Boolean), now=Date.now(), touched=new Map(); let add=0, other=0, fx=0, bad=0, dup=0;
+  for(const [i,ln] of lines.entries()){
+    const r=parseSpendLine(ln); if(!r){bad++; continue} if(r.cur&&r.cur!==mCur()){fx++; continue}
+    const t=r.t&&r.t<=now+6e4?r.t:now, id=lineId(r.t?ln:ln+'#'+i), d=await getMonth(ymOf(t));
+    if(d.list.some(e=>e.id===id)||(d.del||[]).includes(id)){dup++; continue}
+    const g=catFor(r.name); if(!g.sure&&!g.guess) other++;
+    d.list.push({id,t,amt:r.amt,cat:g.c,...(r.name?{name:r.name}:{}),src:'pay',...(r.card?{card:r.card}:{}),u:now}); touched.set(d.ym,d); add++;
+  }
+  touched.forEach(d=>{d.list.sort(byT); saveMonth(d)});
+  if(add){LS.set('payFile',1); haptic('confirm')} mView=ymOf(now); if(location.hash!=='#money') location.hash='#money'; else await renderMoney();
+  toast(add?`Added ${add} purchase${add===1?'':'s'}${other?`. ${other} ${other===1?'is':'are'} in Other: tap to sort.`:''}`:dup?'Nothing new in that file':fx?`Not in ${mCur()}, so left out: ${fx} purchase${fx===1?'':'s'}`:'No purchases found in that file');
+  return add;
+}
+document.addEventListener('change',e=>{if(e.target.id!=='spFileIn') return; const f=e.target.files[0]; e.target.value=''; if(!f) return; if(!$('#gSheet').hidden) closeSheet('#gSheet'); f.text().then(importSpendFile).catch(()=>toast('Couldn’t read that file.'))});
+const payUsed=()=>[0,-1].some(n=>mList(mDocSync(ymAdd(ymOf(Date.now()),n))).some(e=>e.src==='pay'&&e.name!=='Test Shop'));
+const payLink=()=>`webapp://${location.host}${location.pathname.replace(/index\.html$/,'')}?pay=`;
+function showPaySetup(){
+  const link=payLink(), step=(n,h)=>`<li><b class="num">${n}</b><span>${h}</span></li>`;
+  gSheet('Apple Pay Auto-Log',`<section class="card mny-how"><p class="bk-t">Each tap-to-pay can log itself. Start the same way for both ways below, in the Shortcuts app:</p>
+    <ol class="mny-steps">${step(1,'Open <b>Shortcuts</b>, tap <b>Automation</b>, then <b>+</b>. Choose <b>Wallet</b> (named Transaction before iOS 26).')}
+      ${step(2,'Tick the cards you pay with. Choose <b>Run Immediately</b>, tap <b>Next</b>, then <b>New Blank Automation</b>.')}</ol></section>
+    <div class="gap"></div><h2 class="sec">Way 1: Fuel Opens by Itself</h2>
+    <section class="card mny-how"><ol class="mny-steps" style="margin-top:0">
+      ${step(3,'Add the <b>Text</b> action. In it put <b>Shortcut Input → Amount</b>, type the bar <kbd>|</kbd>, then <b>Shortcut Input → Merchant</b>.')}
+      ${step(4,'Add <b>URL Encode</b>. It encodes that Text.')}
+      ${step(5,'Add <b>URL</b>. Paste the link below, then put <b>URL Encoded Text</b> straight after it.')}
+      ${step(6,'Add <b>Open URLs</b> and tap <b>Done</b>.')}</ol>
+    <div class="mny-link"><code id="payLink">${esc(link)}</code><button class="btn tint" data-m="payCopy">Copy Link</button></div></section>
+    <p class="foot">Pay once with Apple Pay. Fuel should open with the spend logged. On some iOS versions this link opens Safari or says the address is invalid; if so, delete that automation and use Way 2.</p>
+    <div class="gap" style="height:10px"></div><ul class="list"><li><button class="row single action" style="grid-template-columns:1fr" data-m="payTest"><span class="t">Send a Test Spend</span></button></li></ul>
+    <p class="foot">Shows what a tap will do in Fuel: a 1.00 spend at “Test Shop” that you can undo.</p>
+    <div class="gap"></div><h2 class="sec">Way 2: A Purchases File</h2>
+    <section class="card mny-how"><ol class="mny-steps" style="margin-top:0">
+      ${step(3,'Add the <b>Text</b> action with four parts, a bar <kbd>|</kbd> between each: <b>Current Date</b> (tap it and set Date Format to <b>ISO 8601</b>), <b>Amount</b>, <b>Merchant</b>, <b>Card</b>.')}
+      ${step(4,'Add <b>Append to Text File</b>. Name the file <b>Fuel Spends</b> and keep Make New Line on. Tap <b>Done</b>.')}
+      ${step(5,'In Fuel, tap the button below and pick <b>Fuel Spends</b> in iCloud Drive → Shortcuts. Fuel adds what is new.')}</ol>
+    <label class="btn tint mny-file" for="spFileIn">Import Purchases File</label></section>
+    <p class="foot">Every purchase is kept in the file, so nothing is lost if you open Fuel days later. After the first import, an Import Purchases button sits at the top of Money. Either way nothing leaves your iPhone.</p>
+    <p class="foot">Add Spend → Paste also reads a copied bank text message.</p>`,`<button class="txtbtn r" data-g="closeG">Done</button>`);
+}
+async function exportMoneyCSV(){
+  const all=await loadMoneyAll(), q=s=>`"${String(s==null?'':s).replace(/"/g,'""')}"`, lines=['date,time,amount,currency,category,place,source,card'];
+  Object.keys(all).sort().forEach(ym=>mList(all[ym]).sort(byT).forEach(e=>{const d=new Date(e.t); lines.push([ymd(d),`${pad(d.getHours())}:${pad(d.getMinutes())}`,m2(e.amt).toFixed(2),mCur(),q(mCat(e.cat)[1]),q(e.name),q(M_SRC[e.src]||'Typed'),q(e.card)].join(','))}));
+  if(lines.length<2){toast('No spends to export yet'); return}
+  const csv=lines.join('\n'), fn=`fuel-spends-${TODAY()}.csv`;
+  if(dl){try{await dl.save({filename:fn,data:csv});return}catch(e){}}
+  if(STANDALONE&&await saveFile(fn,csv,'text/csv')) return;
+  try{await navigator.clipboard.writeText(csv); toast('Copied. Paste into a spreadsheet.')}catch(e){toast('Export isn’t available here.')}
+}
+function showCatSpends(c){
+  const L=mList(S.money[mView]).filter(e=>mCat(e.cat)[0]===c); if(!L.length) return;
+  gSheet(mCat(c)[1],`<p class="subtitle" style="margin:0 4px 12px">${ymName(mView,{month:'long',year:'numeric'})} · ${mTxt(mSum(L))} over ${L.length} spend${L.length===1?'':'s'}</p><ul class="list dy mny-list">${spendRows(L)}</ul>`,`<button class="txtbtn r" data-g="closeG">Done</button>`);
+}
+document.addEventListener('click',async ev=>{
+  const b=ev.target.closest&&ev.target.closest('[data-m]'); if(!b||b.closest('#sp')) return; const a=b.dataset.m, v=b.dataset.v;
+  switch(a){
+    case 'add': spOpen(); break;
+    case 'edit': if(!$('#gSheet').hidden) closeSheet('#gSheet'); spOpen({id:v,ym:b.dataset.ym}); break;
+    case 'mon': {const n=ymAdd(mView||ymOf(Date.now()),+v); if(n>ymOf(Date.now())) break; mView=n; mAll=false; mFresh=true; haptic(); await renderMoney(); window.scrollTo(0,0)} break;
+    case 'now': mView=ymOf(Date.now()); mAll=false; mFresh=true; renderMoney(); break;
+    case 'go': if(v&&v!==mView){mView=v; mAll=false; mFresh=true; haptic(); await renderMoney(); window.scrollTo(0,0)} break;
+    case 'all': mAll=true; renderMoney(); break;
+    case 'cat': showCatSpends(v); break;
+    case 'paySetup': showPaySetup(); break;
+    case 'payCopy': if(!await copyText(payLink(),'Link copied')) toast('Copy didn’t work here. Press and hold the link to copy it.'); break;
+    case 'payTest': closeSheet('#gSheet'); setTimeout(()=>payIntake({amt:mCur()+' 1.00',m:'Test Shop',c:'',t:'test-'+Date.now()}),300); break;
+    case 'csv': exportMoneyCSV(); break;
+  }
+});
 /* ---------- design-engineering pass 2 ---------- */
 /* Tab bar: a copy of the tabs in the active colour, clipped to the indicator, so a label turns white exactly where the pill is (Emil's clip-path tabs). */
 const tbOn=(()=>{const w=$('.tabbar .wrap'); if(!w) return null; const o=document.createElement('div'); o.className='tb-on'; o.setAttribute('aria-hidden','true');
   w.querySelectorAll(':scope>a').forEach(a=>{const c=a.cloneNode(true); c.removeAttribute('href'); c.removeAttribute('aria-current'); c.removeAttribute('data-route'); c.tabIndex=-1; o.appendChild(c)}); w.appendChild(o); $('.tabbar').classList.add('tb-glide'); return o})();
-function tbClip(i,instant){if(!tbOn||i<0) return; const W2=tbOn.offsetWidth; if(!W2){requestAnimationFrame(()=>tbClip(i,true)); return} const w=(W2-12)/4, L=6+i*w, R=W2-L-w;
+function tbClip(i,instant){if(!tbOn||i<0) return; const W2=tbOn.offsetWidth; if(!W2){requestAnimationFrame(()=>tbClip(i,true)); return} const w=(W2-12)/VIEWS.length, L=6+i*w, R=W2-L-w;
   if(instant) tbOn.style.transition='none'; tbOn.style.clipPath=`inset(6px ${R.toFixed(1)}px 6px ${L.toFixed(1)}px round 24px)`; if(instant){void tbOn.offsetWidth; tbOn.style.transition=''}}
 addEventListener('resize',()=>tbClip(VIEWS.indexOf(currentView()),true));
 
@@ -5886,7 +6421,7 @@ document.addEventListener('pointerup',wscEnd); document.addEventListener('pointe
 
 (async()=>{await storageReady(); (LS.get('dirty')||[]).forEach(k=>dirty.add(k)); const fresh=!LS.get('profile');
   loadLocal(); if(!fresh&&!S.profile.setup){S.profile.setup=1; LS.set('profile',S.profile)}
-  autoCloseStale(); route(); if(S.active) openWorkout(); connect();
+  autoCloseStale(); route(); if(S.active) openWorkout(); connect(); payBoot();
   if(fresh&&STANDALONE) openSetup(false)})();
 </script>
 </body>
