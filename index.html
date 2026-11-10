@@ -1515,7 +1515,7 @@ input[switch]{accent-color:var(--label2)}
 :is(#v-settings,.sheet) .row input[type=number]{font-family:var(--num);font-size:17px}
 .wk-set,.wrv-range{font-family:var(--num)}
 /* long sheets: grid rows size to their content; overflow:hidden lists used to collapse to 0 once a sheet scrolled */
-.sheet-body{grid-auto-rows:max-content}
+.sheet-body{grid-auto-rows:max-content;grid-template-columns:minmax(0,1fr)}   /* one column, never wider than the screen: the Quick Log strip used to stretch Add Food to twice the width */
 /* toggles are controls, not data: neutral when on (native iOS switch uses accent-color; the drawn fallback uses background) */
 input[switch]:checked{background:var(--label2)}
 /* settings: units in one column so the numbers line up */
