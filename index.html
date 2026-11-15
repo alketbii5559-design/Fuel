@@ -3646,7 +3646,7 @@ function loadUSDA(){
   return usdaP;
 }
 /* ---------- Restaurant chains: each chain's own published nutrition (rest.json), never estimates ---------- */
-let REST=null, restP=null; const REST_V='4';   /* bump when rest.json changes so no cache can serve an old list */
+let REST=null, restP=null; const REST_V='5';   /* bump when rest.json changes so no cache can serve an old list */
 const normT=t=>String(t||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[’'`]/g,'').replace(/[^a-z0-9 ]+/g,' ').replace(/\s+/g,' ').trim();
 function loadRest(){
   if(REST) return Promise.resolve(REST);
@@ -3660,7 +3660,7 @@ function restItem(r){
   const c=r.chain, tag=`${c.name}${c.country?' '+c.country:''}`;
   const gm=/^(\d+(?:\.\d+)?) ?(g|ml)\b/.exec(r.serving||'');
   return {name:`${r.name} · ${c.name}`,serving:r.serving,...(gm?{sz:+gm[1],un:gm[2]}:{}),kcal:r0(r.kcal),p:r1(r.p),c:r1(r.c),f:r1(r.f),...nutOf({fb:r.fb,sg:r.sg,na:r.na}),
-    ds:{t:'chain',c:tag,cid:c.id,src:c.src,url:c.url,d:c.checked}};
+    ds:{t:'chain',c:tag,cid:c.id,src:c.src,url:c.url,d:c.checked,ap:c.approx}};
 }
 /* the whole menu when the search is just a chain's name ("mcdonalds", "mcd"), else items matching every word */
 function restSearch(q){
@@ -3803,7 +3803,7 @@ function dsText(e){const d=dsOf(e); if(!d) return 'Logged before sources were tr
   if(d.t==='table') return d.by||'National food composition table.';
   if(d.t==='off') return `Open Food Facts${d.b?` · ${d.b}`:''}${d.uae?' · made in the UAE':''}${d.code?`, barcode ${d.code}`:''} (the package label).`;
   if(d.t==='fdc') return `USDA FoodData Central #${d.id} · ${d.dt==='b'?'brand label'+(d.b?`: ${d.b}`:''):d.dt==='s'?'FNDDS survey dish':'Foundation food'}${e.aiq?' · matched from the AI’s description':''}`;
-  if(d.t==='chain') return `${d.src||d.c}${d.d?` · checked ${d.d}`:''}. The restaurant’s own published numbers; your portion can differ a little.`;
+  if(d.t==='chain') return `${d.src||d.c}${d.d?` · checked ${d.d}`:''}. ${d.ap?'Approximate, so check the menu board when you can.':'The restaurant’s own published numbers; your portion can differ a little.'}`;
   if(d.t==='you') return 'Entered by you.';
   if(d.t==='meal') return 'Your saved meal: each part keeps its own source.';
   return 'AI guess: not from a database. Tap Change match to pick a USDA food.'}
@@ -4422,7 +4422,7 @@ function renderResults(){
     if(RS&&RS.chain){const by={}; RS.items.forEach(r=>(by[r.cat]=by[r.cat]||[]).push(restItem(r))); html+=`<p class="foot rest-src">${esc(RS.chain.name)} ${esc(RS.chain.country||'')} · ${esc(RS.chain.src)}</p>`; Object.entries(by).forEach(([k,l])=>sec(`${RS.chain.name} · ${k}`,l))}
     else if(!REST) loadRest().then(()=>{const qq=$('#q'); if(qq&&qq.value.trim().toLowerCase()===q) resultsLater()}).catch(()=>{});
     /* restaurant items come first only when you name the chain ("mcd fries"); "banana" stays a plain banana first */
-    const named=RS&&!RS.chain&&(!db.length||REST.chains.some(c=>normT(q).split(' ').some(t=>[...c.key].some(k=>k.split(' ').includes(t)))));
+    const named=RS&&!RS.chain&&(!db.length||REST.chains.some(c=>{const w=' '+normT(q)+' '; return [...c.key].some(k=>w.includes(' '+k+' '))}));
     if(RS&&!RS.chain&&named) sec('Restaurants',RS.items.map(restItem));
     sec('Foods',db.slice(0,30));
     if(RS&&!RS.chain&&!named) sec('Restaurants',RS.items.slice(0,12).map(restItem));
