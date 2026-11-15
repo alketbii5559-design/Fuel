@@ -1810,6 +1810,15 @@ a.mny-line:active{transition-duration:90ms}
 .sp-in::placeholder{color:var(--label3)}
 input.stxt[type=month]{color-scheme:dark;width:auto;min-width:120px}
 .bl-cats{margin-top:-4px}
+@font-face{font-family:"Silkscreen";src:url(./fonts/silkscreen.woff2) format("woff2");font-display:swap}
+.gm{display:grid;gap:8px}.gm-top{display:flex;align-items:baseline;gap:10px}.gm-lv{font-size:20px}.gm-st{flex:1;color:var(--label2)}.gm-td{color:var(--green,#30d158);font-size:13px}
+.gm-bar{height:10px;border-radius:5px;background:var(--fill);overflow:hidden}.gm-bar i{display:block;height:100%;background:var(--green,#30d158);border-radius:inherit}
+.gm .s{font-size:13px;color:var(--label2)}
+html.px .card,html.px .list,html.px .tabbar,html.px .tabbar *,html.px [class*="pill"],html.px [class*="fab"],html.px button,html.px input,html.px select,html.px .sheet,html.px .seg,html.px .seg button,html.px .gm-bar,html.px .gm-bar i{border-radius:0!important}
+html.px .card,html.px .list{box-shadow:inset 0 0 0 2px var(--sep),4px 4px 0 var(--sep)}
+html.px h1,html.px h2,html.px h3,html.px .num,html.px .gm-lv,html.px .tabbar span,html.px .sheet-head{font-family:"Silkscreen",var(--font)!important;letter-spacing:0!important;font-weight:400!important}
+html.px .gm-bar i{background-image:repeating-linear-gradient(90deg,transparent 0 8px,rgba(0,0,0,.35) 8px 10px)}
+html.px img,html.px svg{image-rendering:pixelated}
 </style>
 </head>
 <body>
@@ -4161,6 +4170,7 @@ async function renderToday(){
     ${isToday&&P.tDay!==0?yesterdayPrompt():''}${isToday&&P.tFits!==0?fitsLine(left,pLeft):''}${isToday&&P.tFits!==0&&checkinDue()?checkinCard():''}
     ${weighRow(isToday)}
     ${whoopCard(isToday)}
+    ${gameCard(isToday)}
     ${moneyLine(isToday)}
     ${isToday&&P.tWeek!==0?'<div id="weekRow"></div>':''}
     ${P.tWeek!==0?`<div class="gap" style="height:10px"></div>
@@ -5341,7 +5351,7 @@ function renderSettings(){
     <p class="foot">Walks through everything again with your current answers filled in. Your logs stay as they are.</p>
     ${shareSection()}
     <div class="gap"></div><h2 class="sec">Motion, Sounds &amp; Haptics</h2>
-    <ul class="list"><li><label class="row single" for="s-motion"><span class="t">Motion</span><select id="s-motion" data-p="motion" class="ssel">${[['calm','Calm'],['balanced','Balanced'],['lively','Lively']].map(([v,t])=>`<option value="${v}"${(P.motion||'balanced')===v?' selected':''}>${t}</option>`).join('')}</select></label></li>${sw('hap','Haptics')}${sw('snd','Sounds')}</ul>
+    <ul class="list"><li><label class="row single" for="s-motion"><span class="t">Motion</span><select id="s-motion" data-p="motion" class="ssel">${[['calm','Calm'],['balanced','Balanced'],['lively','Lively']].map(([v,t])=>`<option value="${v}"${(P.motion||'balanced')===v?' selected':''}>${t}</option>`).join('')}</select></label></li>${sw('hap','Haptics')}${sw('snd','Sounds')}<li><label class="row single" for="s-px"><span class="t">Pixel Style</span><input type="checkbox" switch id="s-px" data-p="px"${P.px===1?' checked':''}></label></li>${sw('tGame','Level & Streak Card')}</ul>
     <p class="foot">Calm keeps only the food drop and rolling numbers. Lively adds a living tank surface and more movement between tabs. Reduce Motion in iPhone settings always wins.</p>
     <p class="foot">Sounds are the soft clicks, the drop into the tank, stamps and the rest-timer chime. They follow your ringer switch and don’t stop your music.</p>
     ${STANDALONE?`<div class="gap"></div><h2 class="sec">AI Estimates</h2>
@@ -5392,7 +5402,7 @@ function onSetting(e){const el=e.target.closest('[data-p]'); if(!el) return; con
   if(k==='aiCap'){const v=+el.value; S.profile.aiCap=v>0?Math.round(v):0; save('profile',S.profile); return}
   if(k==='notes'){S.profile.notes=el.value; save('profile',S.profile); return}
   if(k==='shareUrl'){S.profile.shareUrl=el.value.trim().slice(0,300); save('profile',S.profile); const sc=window.scrollY; renderSettings(); window.scrollTo(0,sc); return}
-  if(el.type==='checkbox'){S.profile[k]=el.checked?1:0; save('profile',S.profile); if(el.checked&&k==='hap') haptic(); return}
+  if(el.type==='checkbox'){S.profile[k]=el.checked?1:0; save('profile',S.profile); if(k==='px') applyPx(); if(el.checked&&k==='hap') haptic(); return}
   const v=+el.value; if(!(v>0)) return; S.profile[k]=r0(v); save('profile',S.profile); if(GKEYS.includes(k)){clearTimeout(goalT); goalT=setTimeout(recordGoal,800)}}
 async function saveFile(name,data,type){
   try{const file=new File([data],name,{type}); if(navigator.canShare&&navigator.canShare({files:[file]})){await navigator.share({files:[file],title:name}); return true}}catch(e){if(e&&e.name==='AbortError') return true}
@@ -5979,6 +5989,25 @@ const rdgEnd=e=>{if(!rdg||e.pointerId!==rdg.id) return; const d=rdg; rdg=null; c
   showRoutines(); $('#gBody').scrollTop=st};
 document.addEventListener('pointerup',rdgEnd); document.addEventListener('pointercancel',rdgEnd);
 document.addEventListener('click',e=>{if(Date.now()-swpEat<350){e.stopPropagation(); e.preventDefault()}},true);
+/* ---------- Level up (v44): XP, levels and streaks from your food log ---------- */
+function applyPx(){document.documentElement.classList.toggle('px',S.profile.px===1)}
+function dayXP(d){
+  if(!d||!d.entries||!d.entries.length) return 0; const t=totals(d), P=+S.profile.p||0, K=+S.profile.kcal||0;
+  return Math.min(50,d.entries.length*10)+(P&&t.p>=P?50:0)+(K&&Math.abs(t.kcal-K)<=K*.1?30:0);
+}
+let gKick=0;
+function gameStats(){
+  const H={...(S.hist||{}),...S.days}; if(!S.hist&&!gKick){gKick=1; loadHist().then(()=>{if(currentView()==='today'&&!sheetOpen()) renderToday()}).catch(()=>{})}
+  let xp=0; for(const k in H) xp+=dayXP(H[k]);
+  const T=TODAY(), has=k=>H[k]&&H[k].entries&&H[k].entries.length; let d=has(T)?T:addDays(T,-1), st=0; while(has(d)){st++; d=addDays(d,-1)}
+  const lv=Math.floor(Math.sqrt(xp/50))+1, lo=50*(lv-1)**2, hi=50*lv**2;
+  return {xp,lv,st,today:dayXP(H[T]),pct:Math.round((xp-lo)/(hi-lo)*100),need:hi-xp};
+}
+function gameCard(isToday){
+  applyPx(); if(!isToday||S.profile.tGame===0) return ''; const g=gameStats(); if(!g.xp) return '';
+  return `<div class="card gm" aria-label="Level ${g.lv}, ${g.st}-day streak, ${g.need} XP to the next level"><div class="gm-top"><b class="gm-lv">LV ${g.lv}</b><span class="gm-st">${g.st?`${g.st}-day streak`:'Log today to start a streak'}</span><span class="gm-td num">+${g.today} XP today</span></div><div class="gm-bar"><i style="width:${g.pct}%"></i></div><span class="s num">${g.need} XP to level ${g.lv+1}</span></div>`;
+}
+
 /* ===================== MONEY =====================
    Plain tracking: what was spent and where it went. No budget, no limit, no bank login (UAE bank data is only open to
    licensed providers). A spend arrives four ways: typed on the pad, one tap on a usual spend, an Apple Pay tap that
