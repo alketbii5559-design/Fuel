@@ -1936,6 +1936,25 @@ body[data-look="cards"] .tb-on{display:none}
 #kpA::-webkit-inner-spin-button,#kpA::-webkit-outer-spin-button{-webkit-appearance:none;margin:0}#kpA{-moz-appearance:textfield}
 .k-amt output{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:17px}
 .k-chips{gap:4px}.k-chips i{font-size:12px;padding:3px 6px}.k-pr .thumb{flex:none}.k-pr .k-mt small .ds{margin-right:4px}
+#kalAI.open{background:rgba(0,0,0,.6)}#kalAI .panel{background:#16171d;border-radius:28px 28px 0 0}
+.k-hint{color:var(--label2);margin:-4px 0 14px;font-size:15px}
+.k-ta{position:relative}.k-ta textarea{width:100%;box-sizing:border-box;background:#1d1f27;border:1.5px solid var(--sep);border-radius:18px;padding:14px 56px 14px 16px;font:inherit;font-size:17px;color:var(--label);resize:none}
+.k-mic{position:absolute;right:10px;bottom:12px;width:40px;height:40px;border-radius:50%;border:0;background:#9b1b4f;color:#fff;display:grid;place-items:center}.k-mic svg{width:20px;height:20px}
+.k-mic.on{background:#ff453a;animation:kPulse 1s ease-in-out infinite}@keyframes kPulse{50%{box-shadow:0 0 0 8px rgba(255,69,58,.25)}}
+.k-ex{display:flex;flex-wrap:wrap;gap:8px;margin:12px 0 18px}.k-ex button{border:1.5px solid var(--sep);background:#1d1f27;border-radius:99px;padding:8px 12px;font:inherit;font-size:14px;color:var(--label2)}
+.k-err{color:#ff453a;font-weight:600;margin:0 0 10px}
+.k-shot{width:100%;max-height:220px;object-fit:cover;border-radius:20px;margin-bottom:14px;display:block}
+.k-busy{text-align:center;padding:40px 0}.k-busy i{display:block;width:44px;height:44px;margin:0 auto 16px;border-radius:50%;border:4px solid rgba(48,176,255,.2);border-top-color:#30b0ff;animation:kSpin .8s linear infinite}@keyframes kSpin{to{transform:rotate(360deg)}}
+.k-busy h3{margin:0 0 4px}.k-busy p{margin:0;color:var(--label2)}
+.k-it{display:flex;align-items:center;gap:10px;background:#1d1f27;border-radius:18px;padding:10px 10px 10px 12px}.k-it .thumb{flex:none}.k-it .k-mt b{white-space:normal;font-size:15px;margin-bottom:5px}
+.k-q{display:grid;justify-items:center;gap:2px;flex:none;width:64px}.k-q input{width:100%;box-sizing:border-box;background:#121318;border:1.5px solid var(--sep);border-radius:10px;padding:7px 4px;text-align:center;font:inherit;font-weight:700;color:var(--label)}
+.k-q small{font-size:11px;color:var(--label2);max-width:64px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.k-x{border:0;background:none;color:var(--label3);font-size:22px;width:28px;flex:none}
+.k-field{display:grid;gap:6px;margin-bottom:12px}.k-field small{color:var(--label2);font-weight:700}
+.k-field input,.k-fact input{background:#1d1f27;border:1.5px solid var(--sep);border-radius:14px;padding:13px 14px;font:inherit;font-size:17px;color:var(--label);width:100%;box-sizing:border-box}
+.k-fact input{width:72px;padding:6px 8px;font-size:22px;font-weight:800;background:rgba(0,0,0,.25)}
+.k-go[disabled]{opacity:.4}
+.k-q input::-webkit-inner-spin-button,.k-fact input::-webkit-inner-spin-button{-webkit-appearance:none}
 </style>
 </head>
 <body>
@@ -5970,7 +5989,7 @@ document.addEventListener('click',async ev=>{
 let undoFn=null;
 function toastUndo(m,fn){undoFn=fn; const t=$('#toast'); t.innerHTML=`${esc(m)} <button class="txtbtn" style="font-size:15px;padding:0 0 0 10px;font-weight:600" data-act="undo">Undo</button>`; toastOpen(4500,()=>{undoFn=null})}
 $('#q').addEventListener('input',renderResults);
-$('#snapIn').addEventListener('change',e=>{const f=e.target.files[0]; e.target.value=''; if(f) onSnap(f)});
+$('#snapIn').addEventListener('change',e=>{const f=e.target.files[0]; e.target.value=''; if(f){if(kalOn()&&$('#addSheet').hidden) kalPhoto(f); else onSnap(f)}});
 document.addEventListener('change',e=>{if(e.target.id==='restoreIn'){const f=e.target.files[0]; e.target.value=''; if(f) restoreJSON(f)}});
 $('#labelIn').addEventListener('change',e=>{const f=e.target.files[0]; e.target.value=''; if(f) onLabel(f)});
 $('#v-settings').addEventListener('change',onSetting);
@@ -6169,12 +6188,11 @@ function kalVoice(){
   try{r.start(); status('<div>Listening… say what you ate.</div>')}catch(e){box.focus()}
 }
 function kalGo(k){
-  closeSheet('#kalSheet'); if(k==='prod'||k==='meals'||k==='hist'||k==='find'){kalProducts(k==='find'?'all':k); return} if($('#kalProd')) closeSheet('#kalProd'); openAdd();
+  closeSheet('#kalSheet'); if(k==='prod'||k==='meals'||k==='hist'||k==='find'){kalProducts(k==='find'?'all':k); return}
+  if($('#kalProd')) closeSheet('#kalProd');
   if(k==='photo'||k==='code') $('#snapIn').click();
-  else if(k==='text'||k==='voice'){$('#descTile').click(); if(k==='voice') kalVoice(); else setTimeout(()=>$('#descIn').focus(),350)}
-  else if(k==='find') setTimeout(()=>$('#q').focus(),350);
-  else if(k==='man') $('#exactTile').click();
-  else {kalPick=k; renderResults()}
+  else if(k==='text'||k==='voice') kaText(k==='voice');
+  else if(k==='man') kaManual();
 }
 document.addEventListener('click',e=>{const b=e.target.closest('[data-kl]'); if(!b) return; const k=b.dataset.kl;
   if(k==='day'){S.date=b.dataset.v; renderToday()}
@@ -6242,6 +6260,67 @@ document.addEventListener('click',e=>{const b=e.target.closest('[data-kl]'); if(
   else if(k==='kadd') kpAdd();
   else if(k==='kcancel') closeSheet('#kalProd');
 });
+/* ---------- Photo, Text, Voice, Manual: Kalee-style screens on top of Fuel's own AI pipeline ---------- */
+let kaMeal='', kaImg='', kaItems=[];
+const K_MIC='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg>';
+function kaSheet(){let s=$('#kalAI'); if(s) return s; s=document.createElement('div'); s.className='sheet tall'; s.id='kalAI'; s.hidden=true;
+  s.innerHTML='<div class="panel" role="dialog" aria-modal="true" aria-label="Log a meal"><div class="grab"><div class="grabber"></div></div><div class="sheet-body k-log" id="kaBody"></div></div>';
+  document.body.appendChild(s); s.addEventListener('click',e=>{if(e.target===s) closeSheet('#kalAI')}); return s}
+const kaOpen=()=>{kaSheet(); if($('#kalAI').hidden) openSheet('#kalAI'); $('#kaBody').scrollTop=0};
+const kaMeals=()=>`<h3 class="k-lab">Which meal is this?</h3><div class="k-meals4">${mealList().slice(0,4).map(([m,l],i)=>`<button class="k-ml${m===kaMeal?' on':''}" data-kl="kameal" data-v="${m}"><span style="background:${K_MEALC[i]}">${K_MEALI[i]}</span><b>${esc(l)}</b></button>`).join('')}</div>`;
+const kaFacts=(k,p,f,c,inp)=>`<div class="k-facts">${[['kc-k','🔥',k,'kcal','Calories','K'],['kc-p','🍗',p,'g','Protein','P'],['kc-f','🥑',f,'g','Fat','F'],['kc-c','🌾',c,'g','Carbs','C']].map(([cl,ic,v,u,l,id])=>`<div class="k-fact ${cl}"><span>${ic}</span><span>${inp?`<input id="ka${id}" type="number" inputmode="decimal" min="0" step="any" placeholder="0" aria-label="${l}">`:`<b class="num">${v}</b>`} <small>${u}</small><em>${l}</em></span></div>`).join('')}</div>`;
+function kaText(voice){kaMeal=autoMeal(); kaOpen();
+  $('#kaBody').innerHTML=`<h2>Describe your meal</h2><p class="k-hint">Say or type everything you ate, with amounts if you know them.</p>
+  <div class="k-ta"><textarea id="kaIn" rows="4" placeholder="e.g. chicken shawarma, small fries and a karak"></textarea><button class="k-mic" data-kl="kamic" aria-label="Speak">${K_MIC}</button></div>
+  <div class="k-ex">${['2 eggs and toast','Chicken machboos','Protein shake with milk'].map(t=>`<button data-kl="kaex">${t}</button>`).join('')}</div>
+  <p class="k-err" id="kaErr" hidden></p><button class="k-go" data-kl="kago">✦ Analyze meal</button><button class="k-cancel" data-kl="kaclose">Cancel</button>`;
+  if(voice) kaListen(); else setTimeout(()=>$('#kaIn').focus(),350)}
+function kaListen(){const R=window.SpeechRecognition||window.webkitSpeechRecognition, box=$('#kaIn'), m=$('#kalAI .k-mic'); if(!R){box.focus(); return}
+  const r=new R(); r.lang='en-US'; r.interimResults=true; m.classList.add('on');
+  r.onresult=e=>{box.value=[...e.results].map(x=>x[0].transcript).join(' ')}; r.onend=()=>{m.classList.remove('on'); if(box.value.trim()) kaAnalyze()}; r.onerror=()=>{m.classList.remove('on'); box.focus()};
+  try{r.start()}catch(e){m.classList.remove('on'); box.focus()}}
+function kaBusy(t){$('#kaBody').innerHTML=`${kaImg?`<img class="k-shot" src="${kaImg}" alt="">`:''}<div class="k-busy"><i></i><h3>${t}</h3><p>This takes a few seconds.</p></div>`}
+async function kaRun(job,label){tray=[]; status(''); kaBusy(label);
+  try{await job()}catch(e){}
+  kaItems=tray.splice(0); if(kaItems.length) return kaReview();
+  const msg=($('#status')&&$('#status').textContent.trim())||'Couldn’t work that out. Try again or enter it manually.';
+  $('#kaBody').innerHTML=`${kaImg?`<img class="k-shot" src="${kaImg}" alt="">`:''}<div class="k-empty"><div class="k-ei">${K_MAG}</div><h3>Nothing to add yet</h3><p>${esc(msg)}</p></div><button class="k-go" data-kl="kafull">Open full editor</button><button class="k-cancel" data-kl="kaman">Enter it manually</button>`}
+async function kaAnalyze(){const t=$('#kaIn').value.trim(); if(!t) return $('#kaIn').focus(); kaImg=''; $('#descIn').value=t; await kaRun(()=>runDescribe(),'Analyzing your meal…')}
+async function kalPhoto(f){kaMeal=autoMeal(); kaImg=''; try{kaImg=URL.createObjectURL(f)}catch(e){} kaOpen(); await kaRun(()=>onSnap(f),'Reading your photo…')}
+function kaQ(it){return it.sz?r0(it.qty*it.sz):r1(it.qty)}
+function kaReview(){const T=kaItems.reduce((a,i)=>({k:a.k+i.kcal*i.qty,p:a.p+i.p*i.qty,f:a.f+i.f*i.qty,c:a.c+i.c*i.qty}),{k:0,p:0,f:0,c:0});
+  $('#kaBody').innerHTML=`${kaImg?`<img class="k-shot" src="${kaImg}" alt="">`:''}<h2>Your meal</h2>${kaFacts(fmt(T.k),r1(T.p),r1(T.f),r1(T.c))}
+  <h3 class="k-lab">Items (${kaItems.length})</h3><ul class="k-meals">${kaItems.map((it,i)=>`<li class="k-it">${thumb(it,46)}<span class="k-mt"><b>${esc(it.name)}</b>${kChips(it.kcal*it.qty,it.p*it.qty,it.f*it.qty,it.c*it.qty)}</span><label class="k-q"><input type="number" inputmode="decimal" min="0" step="any" value="${kaQ(it)}" data-ka="${i}"><small>${it.sz?esc(it.un||'g'):'× '+esc(it.serving||'')}</small></label><button class="k-x" data-kl="kadel" data-v="${i}" aria-label="Remove">×</button></li>`).join('')}</ul>
+  ${kaMeals()}<button class="k-go" data-kl="kaadd"${kaItems.length?'':' disabled'}>Add to ${S.date===TODAY()?'today’s':'this day’s'} log</button><button class="k-cancel" data-kl="kaclose">Cancel</button>`}
+function kaManual(){kaMeal=autoMeal(); kaImg=''; kaOpen();
+  $('#kaBody').innerHTML=`<h2>Enter it manually</h2><label class="k-field"><small>Name</small><input id="kaN" placeholder="e.g. Mum’s lentil soup" autocomplete="off"></label>
+  <label class="k-field"><small>Serving</small><input id="kaS" placeholder="1 bowl" autocomplete="off"></label><h3 class="k-lab">Nutrition</h3>${kaFacts(0,0,0,0,true)}
+  <p class="k-hint">Leave calories empty and Fuel works them out from the macros.</p>${kaMeals()}
+  <button class="k-save on" data-kl="kasave">${K_MARK}<span>Save to pantry</span><i>✓</i></button><p class="k-err" id="kaErr" hidden></p>
+  <button class="k-go" data-kl="kamadd">Add to ${S.date===TODAY()?'today’s':'this day’s'} log</button><button class="k-cancel" data-kl="kaclose">Cancel</button>`;
+  setTimeout(()=>$('#kaN').focus(),350)}
+async function kaManAdd(){const g=id=>Math.max(0,+$('#ka'+id).value||0), p=g('P'), f=g('F'), c=g('C'); let k=g('K'); if(!k) k=r0(4*p+4*c+9*f);
+  const e=$('#kaErr'); if(!k){e.hidden=false; e.textContent='Add calories or at least one macro.'; return}
+  const name=$('#kaN').value.trim(), it={name:name||'Quick add',serving:$('#kaS').value.trim()||'1 serving',kcal:k,p,c,f,qty:1,src:name?'custom':'quick'};
+  if(name&&$('#kalAI .k-save').classList.contains('on')){const cu={...it}; delete cu.qty; undel(S.foods,'cus:'+foodKey(cu)); S.foods.custom=[cu,...S.foods.custom.filter(x=>foodKey(x)!==foodKey(cu))]}
+  selMeal=kaMeal; closeSheet('#kalAI'); await commitItems([it])}
+document.addEventListener('input',e=>{const i=e.target.dataset&&e.target.dataset.ka; if(i==null) return; const it=kaItems[+i]; if(!it) return; const v=Math.max(0,+e.target.value||0); it.qty=it.sz?v/it.sz:v;
+  const li=e.target.closest('.k-it'); li.querySelector('.k-chips').outerHTML=kChips(it.kcal*it.qty,it.p*it.qty,it.f*it.qty,it.c*it.qty);
+  const T=kaItems.reduce((a,x)=>[a[0]+x.kcal*x.qty,a[1]+x.p*x.qty,a[2]+x.f*x.qty,a[3]+x.c*x.qty],[0,0,0,0]); $$('#kaBody .k-facts b').forEach((b,j)=>b.textContent=j?r1(T[j]):fmt(T[0]))});
+document.addEventListener('click',e=>{const b=e.target.closest('[data-kl]'); if(!b) return; const k=b.dataset.kl;
+  if(k==='kameal'){kaMeal=b.dataset.v; $$('#kalAI .k-ml').forEach(x=>x.classList.toggle('on',x===b))}
+  else if(k==='kamic') kaListen();
+  else if(k==='kaex'){$('#kaIn').value=b.textContent; $('#kaIn').focus()}
+  else if(k==='kago') kaAnalyze();
+  else if(k==='kadel'){kaItems.splice(+b.dataset.v,1); kaReview()}
+  else if(k==='kaadd'){const L=kaItems.filter(i=>+i.qty>0); if(!L.length) return; selMeal=kaMeal; closeSheet('#kalAI'); commitItems(L)}
+  else if(k==='kasave') b.classList.toggle('on');
+  else if(k==='kamadd') kaManAdd();
+  else if(k==='kaman') kaManual();
+  else if(k==='kafull'){closeSheet('#kalAI'); openSheet('#addSheet')}
+  else if(k==='kaclose') closeSheet('#kalAI');
+});
+document.addEventListener('input',e=>{if(!/^ka[PCF]$/.test(e.target.id)) return; const g=id=>+($('#ka'+id).value)||0, k=$('#kaK'); if(k) k.placeholder=String(r0(4*g('P')+4*g('C')+9*g('F'))||0)});
 
 /* ===================== MONEY =====================
    Plain tracking: what was spent and where it went. No budget, no limit, no bank login (UAE bank data is only open to
