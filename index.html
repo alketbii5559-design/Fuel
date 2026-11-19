@@ -1934,6 +1934,8 @@ body[data-look="cards"] .tb-on{display:none}
 .k-go{width:100%;border:0;border-radius:18px;background:#30d158;color:#fff;font:inherit;font-weight:800;font-size:18px;padding:17px}
 .k-cancel{width:100%;border:0;background:none;color:var(--label);font:inherit;font-size:17px;padding:16px}
 #kpA::-webkit-inner-spin-button,#kpA::-webkit-outer-spin-button{-webkit-appearance:none;margin:0}#kpA{-moz-appearance:textfield}
+.k-amt output{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:17px}
+.k-chips{gap:4px}.k-chips i{font-size:12px;padding:3px 6px}.k-pr .thumb{flex:none}.k-pr .k-mt small .ds{margin-right:4px}
 </style>
 </head>
 <body>
@@ -4565,6 +4567,7 @@ function renderResults(){
     if(!lastResults.length&&!/live-wait|usda-wait/.test(html)) html+=`<p class="foot" style="text-align:center">No results for “${esc(q)}”. Try Describe It, or enter it manually.</p>`;
   }
   const R=$('#results'); if(R._h!==html){R.innerHTML=html; R._h=html}
+  if(typeof kpMirror==='function') kpMirror();
 }
 /* Results that arrive late (USDA list, online databases) never redraw the list under a finger:
    a tap that started on the old list finishes first, then the list updates. */
@@ -6166,7 +6169,7 @@ function kalVoice(){
   try{r.start(); status('<div>Listening… say what you ate.</div>')}catch(e){box.focus()}
 }
 function kalGo(k){
-  closeSheet('#kalSheet'); if(k==='prod'){kalProducts(); return} if($('#kalProd')) closeSheet('#kalProd'); openAdd();
+  closeSheet('#kalSheet'); if(k==='prod'||k==='meals'||k==='hist'||k==='find'){kalProducts(k==='find'?'all':k); return} if($('#kalProd')) closeSheet('#kalProd'); openAdd();
   if(k==='photo'||k==='code') $('#snapIn').click();
   else if(k==='text'||k==='voice'){$('#descTile').click(); if(k==='voice') kalVoice(); else setTimeout(()=>$('#descIn').focus(),350)}
   else if(k==='find') setTimeout(()=>$('#q').focus(),350);
@@ -6180,47 +6183,56 @@ document.addEventListener('click',e=>{const b=e.target.closest('[data-kl]'); if(
   else if(['photo','voice','text','code','find','man','prod','meals','hist'].includes(k)) kalGo(k);
 });
 /* Products: packaged foods from Open Food Facts (UAE first), plus your saved products when the box is empty */
-let kpT=0, kpN=0, kpL=[];
+let kpT=0, kpN=0, kpL=[], kpM='prod';
+const KP_T={all:['Search foods','Search foods, dishes, restaurants…','Search everything','Fuel’s foods, UAE restaurants, USDA and packaged products.'],prod:['Products','Search for a product…','Find a packaged product','Search by name or brand. UAE products come first.'],meals:['Meals','Search your favourites…','No saved meals yet','Star a food when you log it and it shows here.'],hist:['History','Search past foods…','Nothing logged yet','Foods you log show up here.']};
 const K_BAG='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M5 8h14l-1 13H6zM9 8V6a3 3 0 0 1 6 0v2"/></svg>', K_GLOBE='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c3 3.2 3 14.8 0 18M12 3c-3 3.2-3 14.8 0 18"/></svg>', K_MARK='<svg viewBox="0 0 24 24" fill="currentColor"><path d="M6 3h12v18l-6-4-6 4z"/></svg>';
 const kChips=(k,p,f,c)=>`<span class="k-chips"><i class="kc-k">🔥 ${fmt(k)}</i><i class="kc-p">🍗 ${r0(p)}g</i><i class="kc-f">🥑 ${r0(f)}g</i><i class="kc-c">🌾 ${r0(c)}g</i></span>`;
-function kpRow(f,i){const off=f.ds&&f.ds.t==='off'; return `<li><button class="k-pr" data-kl="kpick" data-v="${i}"><span class="k-bag">${K_BAG}</span><span class="k-mt"><b>${esc(f.name)}</b><small>${esc(f.serving||'')}${f.ds&&f.ds.uae?' <span class="ds ds-uae">UAE</span>':''}</small>${kChips(f.kcal,f.p,f.f,f.c)}</span><span class="k-src${off?'':' mine'}" aria-label="${off?'Open Food Facts':'Saved'}">${off?K_GLOBE:K_MARK}</span></button></li>`}
+function kpRow(f,i){const off=f.ds&&f.ds.t==='off', mine=!off&&S.foods.custom.some(x=>foodKey(x)===foodKey(f));
+  return `<li><button class="k-pr" data-kl="kpick" data-v="${i}">${off?`<span class="k-bag">${K_BAG}</span>`:thumb(f,52)}<span class="k-mt"><b>${esc(f.name)}</b><small>${off?'':srcTag(f)}${esc(f.serving||'')}${f.ds&&f.ds.uae?' <span class="ds ds-uae">UAE</span>':''}</small>${kChips(f.kcal,f.p,f.f,f.c)}</span>${off?`<span class="k-src" aria-label="Open Food Facts">${K_GLOBE}</span>`:mine?`<span class="k-src mine" aria-label="In your pantry">${K_MARK}</span>`:''}</button></li>`}
 function kpShow(){
-  const q=$('#kpQ').value.trim(), box=$('#kpRes');
-  if(!q){kpL=[...S.foods.custom,...Object.values(S.foods.barcodes)].filter(f=>f&&f.name);
-    box.innerHTML=kpL.length?`<h3 class="k-sub">Your products</h3><ul class="k-meals">${kpL.map(kpRow).join('')}</ul>`:`<div class="k-empty k-pe"><div class="k-ei">${K_MAG}</div><h3>Find a packaged product</h3><p>Search by name or brand. UAE products come first.</p></div>`; return}
+  const q=$('#kpQ').value.trim(), box=$('#kpRes'), T=KP_T[kpM], ql=q.toLowerCase(), hit=f=>!ql||ql.split(/\s+/).every(t=>f.name.toLowerCase().includes(t));
+  const list=(L,h)=>{kpL=L; box.innerHTML=L.length?`${h?`<h3 class="k-sub">${h}</h3>`:''}<ul class="k-meals">${L.map(kpRow).join('')}</ul>`:`<div class="k-empty k-pe"><div class="k-ei">${K_MAG}</div><h3>${q?'No matches':T[2]}</h3><p>${q?'Try another word, or scan the barcode.':T[3]}</p></div>`};
+  if(kpM==='meals') return list(S.foods.favs.filter(hit));
+  if(kpM==='hist') return list(S.foods.recents.filter(hit));
+  if(kpM==='all'){ if(!q) return list(S.foods.recents.slice(0,15),S.foods.recents.length?'Recent':'');
+    $('#q').value=q; renderResults(); return kpMirror()}
+  if(!q) return list([...S.foods.custom,...Object.values(S.foods.barcodes)].filter(f=>f&&f.name),kpL.length?'Your products':'');
   if(q.length<2) return; const n=++kpN; box.innerHTML='<p class="k-load">Searching…</p>';
-  offSearch(q).then(L=>{if(n!==kpN) return; kpL=L.slice(0,40);
-    box.innerHTML=kpL.length?`<ul class="k-meals">${kpL.map(kpRow).join('')}</ul>`:'<p class="k-load">No products found. Try the brand name, or scan the barcode.</p>'})
+  offSearch(q).then(L=>{if(n!==kpN) return; list(L.slice(0,40))})
    .catch(()=>{if(n===kpN) box.innerHTML='<p class="k-load">Couldn’t reach the product catalog. Check your connection.</p>'});
 }
-function kalProducts(){let s=$('#kalProd'); if(!s){s=document.createElement('div'); s.className='sheet tall'; s.id='kalProd'; s.hidden=true;
+/* Search mode reuses Fuel's search (renderResults fills lastResults); show the same list Kalee-style */
+function kpMirror(){const s=$('#kalProd'); if(!s||s.hidden||kpM!=='all'||kpF) return; const q=$('#kpQ').value.trim(); if(!q||$('#q').value.trim()!==q) return;
+  kpL=lastResults.slice(0,60); const wait=/live-wait|usda-wait/.test($('#results').innerHTML);
+  $('#kpRes').innerHTML=kpL.length?`<ul class="k-meals">${kpL.map(kpRow).join('')}</ul>${wait?'<p class="k-load">Searching online databases…</p>':''}`:wait?'<p class="k-load">Searching…</p>':'<div class="k-empty k-pe"><div class="k-ei">'+K_MAG+'</div><h3>No matches</h3><p>Try Text or Photo on the + menu.</p></div>'}
+function kalProducts(m){kpM=m||'prod'; let s=$('#kalProd'); if(!s){s=document.createElement('div'); s.className='sheet tall'; s.id='kalProd'; s.hidden=true;
   s.innerHTML=`<div class="panel" role="dialog" aria-modal="true" aria-label="Products"><div class="grab"><div class="grabber"></div></div><div class="sheet-body k-log">
-  <div class="k-ph"><h2>Products</h2><button class="k-scan" data-kl="code">${K_BARS}Scan barcode</button></div>
+  <div class="k-ph"><h2 id="kpTitle">Products</h2><button class="k-scan" data-kl="code">${K_BARS}Scan barcode</button></div>
   <label class="k-sbox">${K_MAG}<input id="kpQ" type="search" placeholder="Search for a product…" autocomplete="off" enterkeyhint="search"></label><div id="kpRes"></div></div></div>`;
   document.body.appendChild(s); s.addEventListener('click',e=>{if(e.target===s) closeSheet('#kalProd')});
   $('#kpQ').addEventListener('input',()=>{clearTimeout(kpT); kpT=setTimeout(kpShow,350)})}
-  $('#kpQ').value=''; if(kpF) kpBack(); else kpShow(); openSheet('#kalProd');
+  const T=KP_T[kpM]; $('#kpTitle').textContent=T[0]; $('#kpQ').placeholder=T[1]; $('#kalProd .k-scan').hidden=kpM==='meals'||kpM==='hist'; $('#kpQ').value=''; if(kpF) kpBack(); else kpShow(); openSheet('#kalProd'); if(kpM==='all') setTimeout(()=>$('#kpQ').focus(),300);
 }
 let kpF=null, kpAmt=0, kpMeal='', kpSave=true;
 const K_MEALI=['🌅','☀️','🌙','⚡'], K_MEALC=['#8a3a12','#8a4b0e','#4a23a8','#9b1b4f'];
-function kpDetail(f){kpF=f; kpAmt=+f.sz||100; kpMeal=autoMeal(); kpSave=!S.foods.custom.some(x=>foodKey(x)===foodKey(f)); kpDraw()}
-function kpDraw(){const f=kpF, un=f.un||'g', k=kpAmt/(+f.sz||100), box=$('#kpRes'); $('#kalProd .k-ph').hidden=true; $('#kalProd .k-sbox').hidden=true;
+function kpDetail(f){kpF=f; kpAmt=f.sz?+f.sz:1; kpMeal=autoMeal(); kpSave=!S.foods.custom.some(x=>foodKey(x)===foodKey(f)); kpDraw()}
+function kpDraw(){const f=kpF, un=f.sz?f.un||'g':'× '+(f.serving||'serving'), k=kpAmt/(f.sz?+f.sz:1), box=$('#kpRes'); $('#kalProd .k-ph').hidden=true; $('#kalProd .k-sbox').hidden=true;
   const fact=(cls,ic,v,u,l)=>`<div class="k-fact ${cls}"><span>${ic}</span><span><b class="num">${v}</b> <small>${u}</small><em>${l}</em></span></div>`;
   box.innerHTML=`<button class="k-back" data-kl="kback">← Back to results</button>
   <div class="k-dh"><span class="k-dicon">${K_BAG}</span><h2>${esc(f.name)}</h2></div>
-  <h3 class="k-lab">Serving Size</h3><div class="k-amt"><label><small>Amount</small><input id="kpA" type="number" inputmode="decimal" min="0" value="${r0(kpAmt)}"></label><label><small>Unit</small><output>${un}</output></label></div>
-  <h3 class="k-lab" id="kpPer">Nutrition facts per ${r0(kpAmt)} ${un}</h3>
+  <h3 class="k-lab">Serving Size</h3><div class="k-amt"><label><small>Amount</small><input id="kpA" type="number" inputmode="decimal" min="0" step="any" value="${f.sz?r0(kpAmt):kpAmt}"></label><label><small>Unit</small><output>${un}</output></label></div>
+  <h3 class="k-lab" id="kpPer">Nutrition facts for ${f.sz?r0(kpAmt):kpAmt} ${un}</h3>
   <div class="k-facts" id="kpFacts">${fact('kc-k','🔥',fmt(f.kcal*k),'kcal','Calories')}${fact('kc-p','🍗',r1(f.p*k),'g','Protein')}${fact('kc-f','🥑',r1(f.f*k),'g','Fat')}${fact('kc-c','🌾',r1(f.c*k),'g','Carbs')}</div>
   <h3 class="k-lab">Which meal is this?</h3><div class="k-meals4">${mealList().slice(0,4).map(([m,l],i)=>`<button class="k-ml${m===kpMeal?' on':''}" data-kl="kmeal" data-v="${m}"><span style="background:${K_MEALC[i]}">${K_MEALI[i]}</span><b>${esc(l)}</b></button>`).join('')}</div>
   <button class="k-save${kpSave?' on':''}" data-kl="ksave">${K_MARK}<span>Save to pantry</span><i>✓</i></button>
   <button class="k-go" data-kl="kadd">Add to ${S.date===TODAY()?'today’s':'this day’s'} log</button><button class="k-cancel" data-kl="kcancel">Cancel</button>`;
-  $('#kpA').addEventListener('input',e=>{kpAmt=Math.max(0,+e.target.value||0); const k2=kpAmt/(+f.sz||100), v=[fmt(f.kcal*k2),r1(f.p*k2),r1(f.f*k2),r1(f.c*k2)]; $$('#kpFacts b').forEach((b,i)=>b.textContent=v[i]); $('#kpPer').textContent=`Nutrition facts per ${r0(kpAmt)} ${un}`});
+  $('#kpA').addEventListener('input',e=>{kpAmt=Math.max(0,+e.target.value||0); const k2=kpAmt/(f.sz?+f.sz:1), v=[fmt(f.kcal*k2),r1(f.p*k2),r1(f.f*k2),r1(f.c*k2)]; $$('#kpFacts b').forEach((b,i)=>b.textContent=v[i]); $('#kpPer').textContent=`Nutrition facts for ${f.sz?r0(kpAmt):kpAmt} ${un}`});
   $('#kalProd .panel').scrollTop=0; $('#kalProd .sheet-body').scrollTop=0;
 }
 function kpBack(){$('#kalProd .k-ph').hidden=false; $('#kalProd .k-sbox').hidden=false; kpF=null; kpShow()}
 async function kpAdd(){const f=kpF; if(!f||!kpAmt) return;
   if(kpSave&&!S.foods.custom.some(x=>foodKey(x)===foodKey(f))){const c={...f}; delete c.qty; undel(S.foods,'cus:'+foodKey(c)); S.foods.custom=[c,...S.foods.custom]}
-  selMeal=kpMeal; closeSheet('#kalProd'); kpF=null; await commitItems([{...f,qty:kpAmt/(+f.sz||100)}]);
+  selMeal=kpMeal; closeSheet('#kalProd'); kpF=null; await commitItems([{...f,qty:kpAmt/(f.sz?+f.sz:1)}]);
 }
 document.addEventListener('click',e=>{const b=e.target.closest('[data-kl]'); if(!b) return; const k=b.dataset.kl;
   if(k==='kpick'){const f=kpL[+b.dataset.v]; if(f) kpDetail(f)}
