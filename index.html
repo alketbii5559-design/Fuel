@@ -1955,6 +1955,13 @@ body[data-look="cards"] .tb-on{display:none}
 .k-fact input{width:72px;padding:6px 8px;font-size:22px;font-weight:800;background:rgba(0,0,0,.25)}
 .k-go[disabled]{opacity:.4}
 .k-q input::-webkit-inner-spin-button,.k-fact input::-webkit-inner-spin-button{-webkit-appearance:none}
+/* audit fixes */
+.k-head p{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.k-m p{white-space:nowrap}.k-m p b{font-size:clamp(19px,6vw,24px)}.k-m p{font-size:clamp(12px,3.6vw,15px)}.k-m h3{font-size:clamp(13px,3.9vw,15px)}
+.k-man button{padding:12px 4px}
+@media (max-height:700px){.k-fab{width:56px;height:56px;font-size:32px;bottom:calc(env(safe-area-inset-bottom) + 88px)}}
+.dy-add,.cup{position:relative}.dy-add::after{content:"";position:absolute;inset:-9px}.cup::after{content:"";position:absolute;inset:-11px -1px}
+.k-head p{font-size:clamp(14px,4.2vw,17px)}
 </style>
 </head>
 <body>
