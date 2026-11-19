@@ -1819,6 +1819,59 @@ html.px .card,html.px .list{box-shadow:inset 0 0 0 2px var(--sep),4px 4px 0 var(
 html.px h1,html.px h2,html.px h3,html.px .num,html.px .gm-lv,html.px .tabbar span,html.px .sheet-head{font-family:"Silkscreen",var(--font)!important;letter-spacing:0!important;font-weight:400!important}
 html.px .gm-bar i{background-image:repeating-linear-gradient(90deg,transparent 0 8px,rgba(0,0,0,.35) 8px 10px)}
 html.px img,html.px svg{image-rendering:pixelated}
+body[data-look="cards"] #v-today{padding-bottom:130px}
+body[data-look="cards"] #addBtn{display:none}
+.k-head{display:flex;align-items:center;gap:12px;margin:8px 0 16px}.k-head>div{flex:1;min-width:0}
+.k-logo{width:52px;height:52px;border-radius:14px}
+.k-head h1{font-size:28px;font-weight:800;margin:0;line-height:1.1}.k-head p{margin:3px 0 0;color:var(--label2);font-size:17px;font-weight:600}
+.k-streak{padding:8px 14px;border-radius:99px;background:rgba(255,204,0,.14);border:1.5px solid rgba(255,204,0,.35);color:#e6b800;font-weight:800;font-size:17px;white-space:nowrap}
+.k-week{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:6px}
+.k-day{display:grid;justify-items:center;gap:6px;background:none;border:0;padding:0;color:var(--label2);font:inherit}
+.k-day span{font-size:13px;font-weight:600}
+.k-day b{display:grid;place-items:center;width:100%;max-width:48px;aspect-ratio:1;border-radius:14px;border:2px solid var(--sep);color:var(--label);font-size:17px;font-weight:500}
+.k-day.on span{color:#30b0ff}.k-day.on b{background:#30b0ff;border-color:#30b0ff;color:#fff;font-weight:700}
+.k-day.fut b{border-style:dashed;color:var(--label3)}
+.k-wl{margin:8px 0 16px;font-size:13px;font-weight:600;color:var(--label2)}
+.k-card{border-radius:22px;padding:16px 18px}
+.k-card h3{margin:0 0 12px;font-size:17px;font-weight:700;white-space:nowrap}
+.k-card p{margin:12px 0 0;color:var(--label2);font-size:15px}.k-card p b{font-size:28px;font-weight:800;color:var(--label)}
+.k-cal{background:rgba(255,107,61,.12)}
+.k-macros{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin-top:8px}
+.k-m{text-align:center;padding:14px 10px}.k-m h3{font-size:15px}.k-m p b{font-size:24px}
+.k-p{background:rgba(255,69,98,.12)}.k-f{background:rgba(48,209,88,.12)}.k-c{background:rgba(10,132,255,.13)}
+.k-bar{height:8px;border-radius:4px;background:color-mix(in srgb,var(--c) 22%,transparent);overflow:hidden}
+.k-bar i{display:block;height:100%;background:var(--c);border-radius:inherit;transition:width .5s}
+.k-seg{display:grid;grid-template-columns:1fr 1fr;margin:14px 0 20px;padding:4px;border-radius:14px;background:var(--fill)}
+.k-seg button{border:0;background:none;padding:11px;border-radius:11px;font:inherit;font-weight:700;color:var(--label2)}
+.k-seg button[aria-pressed="true"]{background:var(--cell);color:var(--label);box-shadow:0 1px 3px rgba(0,0,0,.2)}
+.k-h{font-size:24px;font-weight:800;margin:0 0 10px}
+.k-meals{list-style:none;margin:0 0 16px;padding:0;display:grid;gap:8px}
+.k-meal{display:flex;align-items:center;gap:12px;width:100%;text-align:left;border:0;border-radius:18px;background:var(--cell);padding:10px 14px;font:inherit;color:var(--label)}
+.k-meal img,.k-mi{width:46px;height:46px;border-radius:12px;object-fit:cover;flex:none;display:grid;place-items:center;background:var(--fill)}
+.k-mt{flex:1;min-width:0;display:grid}.k-mt b{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-weight:700}.k-mt small{color:var(--label2);font-size:13px}
+.k-mk{font-weight:800;white-space:nowrap}.k-mk small{font-weight:500;color:var(--label2);font-size:12px}
+.k-empty{text-align:center;padding:26px 0 30px}
+.k-ei{width:96px;height:96px;margin:0 auto 16px;border-radius:26px;background:rgba(48,176,255,.12);display:grid;place-items:center;color:#30b0ff}.k-ei svg{width:44px;height:44px}
+.k-empty h3{margin:0 0 6px;font-size:19px}.k-empty p{margin:0;color:var(--label2)}
+.k-fab{position:fixed;left:20px;bottom:calc(env(safe-area-inset-bottom) + 96px);width:64px;height:64px;border-radius:50%;border:0;background:#30d158;color:#fff;font-size:38px;line-height:1;box-shadow:0 6px 18px rgba(48,209,88,.4);z-index:20}
+body[data-look="cards"] .tabbar a:not([aria-current="page"]){font-size:0}
+body[data-look="cards"] .tabbar a[aria-current="page"]{grid-auto-flow:column;gap:6px;background:rgba(48,176,255,.18);color:#30b0ff;border-radius:99px;margin:6px 0;padding:0 14px;font-size:15px;font-weight:700}
+.k-log h2{font-size:22px;font-weight:800;margin:4px 0 12px}
+.k-g3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+.k-g2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin:10px 0 22px}
+.k-t{display:grid;justify-items:center;gap:4px;border:1.5px solid var(--sep);background:var(--cell);border-radius:20px;padding:16px 8px;font:inherit;color:var(--label);text-align:center}
+.k-t b{font-size:16px;font-weight:800}.k-t small{color:var(--label2);font-size:13px}
+.k-t.row2{display:flex;align-items:center;gap:10px;text-align:left;padding:12px}.k-t.row2>span:last-child{display:grid;min-width:0}
+.k-ic{width:56px;height:56px;border-radius:16px;display:grid;place-items:center;font-size:28px;position:relative;margin-bottom:6px}
+.k-ic.ai{background:#9b1b4f}.k-ic.ai::after{content:"✦";position:absolute;top:-7px;right:-7px;width:22px;height:22px;border-radius:50%;background:#1c1c1e;color:#ffcc00;font-size:12px;display:grid;place-items:center}
+.k-ic.bl{background:#3a2fb0;color:#fff;width:46px;height:46px;flex:none;margin:0}.k-ic.bl svg{width:24px;height:24px}
+.k-ic.or{background:#a0450f}
+.k-man{text-align:center;margin:22px 0 10px;font-weight:600}.k-man button{border:0;background:none;color:#30d158;font:inherit;font-weight:800}
+body[data-look="cards"] #snapBtn{display:none}
+.k-meal .thumb{flex:none}
+body[data-look="cards"] .tabbar a[aria-current="page"]{display:flex;align-items:center;justify-content:center}
+.k-t.row2 b{font-size:15px;white-space:nowrap}.k-t.row2 small{font-size:12px}
+body[data-look="cards"] .tb-ind{display:none}
 </style>
 </head>
 <body>
@@ -4080,7 +4133,7 @@ function todayMotion(M,t,day){
 }
 /* ---------- Detailed look (Cronometer-style): Energy Summary, diary with subtotals, Nutrient Targets ---------- */
 const lookDense=()=>(S.profile&&S.profile.look)!=='tank';
-const applyLook=()=>{const v=lookDense()?'dense':'tank'; if(document.body.dataset.look!==v) document.body.dataset.look=v};
+const applyLook=()=>{const v=S.profile&&S.profile.look==='cards'?'cards':lookDense()?'dense':'tank'; if(document.body.dataset.look!==v) document.body.dataset.look=v};
 function burnedFor(date){
   const w=whoopDay(date); if(w&&+w.kc>0) return {v:+w.kc,src:'WHOOP'};
   const t=calcTargets(S.profile||{}); if(t) return {v:t.tdee,src:'estimate'};
@@ -4145,6 +4198,7 @@ async function showNtSources(k){
 async function renderToday(){
   const st=streak(), wkWeek=weekDates().filter(d=>Object.values(S.wk).some(w=>w&&!w.deleted&&w.end&&w.date===d)).length;
   const day=await getDay(S.date), P=S.profile, t=totals(day), goal=P.kcal, left=goal-t.kcal, over=left<0, isToday=S.date===TODAY();
+  if(kalOn()){$('#smallTitle').textContent=dayTitle(S.date); $('#v-today').innerHTML=kalToday(day,t,P,isToday,st); renderSelBar(); setSync(syncState); return}
   const macro=(val,g,color,name)=>`<div class="macro">${ringSVG(46,6,g?val/g:0,color)}<b>${r0(val)} g</b><span>of ${r0(g)} g<br>${name}</span></div>`;
   const ghosts=ghostsFor(day), selOn=!!selIds;
   /* Motion plan: on today, animate from what you last saw (or from empty on the first look of the day). */
@@ -4363,7 +4417,7 @@ function autoMeal(){const h=new Date().getHours(); return h<11?'breakfast':h<16?
 function openAdd(){
   /* start fetching the USDA list now (after the sheet has slid in) so search is ready when you type */
   if(!USDA) setTimeout(()=>loadUSDA().catch(()=>{}),450);
-  selMeal=autoMeal(); tray=[]; pendingCode=''; renderSeg(); $('#q').value=''; renderResults(); renderTray(); status('');
+  kalPick=''; selMeal=autoMeal(); tray=[]; pendingCode=''; renderSeg(); $('#q').value=''; renderResults(); renderTray(); status('');
   $('#descBox').hidden=true; $('#manualBox').hidden=true; savingMeal=false; savingRecipe=false; rcDraft={name:'',n:4,w:'',edit:null}; renderAI(); openSheet('#addSheet');
 }
 function renderSeg(){$('#mealSeg').innerHTML=mealList().map(([k,l])=>`<button data-act="meal" data-v="${k}" aria-pressed="${k===selMeal}">${l}</button>`).join(''); renderTray(); renderUsual()}
@@ -4413,7 +4467,8 @@ function renderResults(){
   const q=$('#q').value.trim().toLowerCase(); lastResults=[]; let html='';
   const sec=(title,list)=>{if(!list.length) return; html+=`<h2 class="sec" style="margin-top:6px">${title}</h2><ul class="list">${list.map(f=>{lastResults.push(f); const i=lastResults.length-1;
     return `<li><button class="row" data-act="pick" data-v="${i}"><span class="t">${esc(f.name)}</span><span class="d">${srcTag(f)}${f.ds&&f.ds.uae?'<span class="ds ds-uae">UAE</span>':''}${esc(f.serving)} · ${r0(f.p)} g protein</span><span class="k">${fmt(f.kcal)}</span><svg class="chev" viewBox="0 0 16 16" fill="none" stroke="var(--blue)" stroke-width="2.4" stroke-linecap="round" style="width:16px;height:16px"><path d="M8 3v10M3 8h10"/></svg></button></li>`}).join('')}</ul>`};
-  if(!q){
+  if(!q&&kalPick){const L=kalPick==='prod'?[...S.foods.custom,...Object.values(S.foods.barcodes)]:kalPick==='meals'?S.foods.favs:S.foods.recents; sec(kalPick==='prod'?'Your products':kalPick==='meals'?'Favourites':'Recent',L); if(!L.length) html='<p class="foot">Nothing here yet.</p>'}
+  else if(!q){
     const fk=new Set(S.foods.favs.map(foodKey));
     sec('Favourites',S.foods.favs); sec('Recent',S.foods.recents.filter(f=>!fk.has(foodKey(f))).slice(0,10));
     if(REST) html+=`<h2 class="sec" style="margin-top:6px">Restaurants</h2><div class="rest-chips">${REST.chains.map(c=>`<button class="chip2" data-act="restOpen" data-v="${esc(c.name)}">${esc(c.name)}<small>${c.items.length}</small></button>`).join('')}</div>`;
@@ -5335,7 +5390,7 @@ function renderSettings(){
     <p class="foot">Sports you pick show on the Train tab with quick time buttons.</p>
     ${whoopSettings()}
     <div class="gap" style="height:14px"></div><h2 class="sec">Today Screen</h2>
-    <ul class="list"><li><label class="row single" for="s-tap"><span class="t">Tapping a food</span><select id="s-tap" data-p="tapFood" class="ssel">${[['detail','Opens its details'],['tray','Adds it to the tray']].map(([v,t])=>`<option value="${v}"${(tapDetail()?'detail':'tray')===v?' selected':''}>${t}</option>`).join('')}</select></label></li><li><label class="row single" for="s-look"><span class="t">Layout</span><select id="s-look" data-p="look" class="ssel">${[['dense','Detailed'],['tank','Tank']].map(([v,t])=>`<option value="${v}"${(lookDense()?'dense':'tank')===v?' selected':''}>${t}</option>`).join('')}</select></label></li>${sw('tWeek','Week, water and training')}${sw('tFits','Food ideas and check-in card')}${sw('tVit','Vitamins and fiber')}${sw('tDay','“Logged everything?” questions')}${sw('tMoney','Money spent today')}${whoopHas()||P.whoopLive?sw('tWhoop','WHOOP recovery, sleep and strain'):''}</ul>
+    <ul class="list"><li><label class="row single" for="s-tap"><span class="t">Tapping a food</span><select id="s-tap" data-p="tapFood" class="ssel">${[['detail','Opens its details'],['tray','Adds it to the tray']].map(([v,t])=>`<option value="${v}"${(tapDetail()?'detail':'tray')===v?' selected':''}>${t}</option>`).join('')}</select></label></li><li><label class="row single" for="s-look"><span class="t">Layout</span><select id="s-look" data-p="look" class="ssel">${[['cards','Cards'],['dense','Detailed'],['tank','Tank']].map(([v,t])=>`<option value="${v}"${(kalOn()?'cards':lookDense()?'dense':'tank')===v?' selected':''}>${t}</option>`).join('')}</select></label></li>${sw('tWeek','Week, water and training')}${sw('tFits','Food ideas and check-in card')}${sw('tVit','Vitamins and fiber')}${sw('tDay','“Logged everything?” questions')}${sw('tMoney','Money spent today')}${whoopHas()||P.whoopLive?sw('tWhoop','WHOOP recovery, sleep and strain'):''}</ul>
     <p class="foot">Turn cards off to keep Today short. The weekly check-in is always on Progress.</p>
     <div class="gap" style="height:14px"></div><h2 class="sec">Money</h2>
     <ul class="list"><li><label class="row single" for="s-cur"><span class="t">Currency</span><input type="text" id="s-cur" data-p="cur" class="stxt" maxlength="4" autocapitalize="characters" autocomplete="off" spellcheck="false" placeholder="AED" value="${esc(P.cur||'')}"></label></li>
@@ -6007,6 +6062,61 @@ function gameCard(isToday){
   applyPx(); if(!isToday||S.profile.tGame===0) return ''; const g=gameStats(); if(!g.xp) return '';
   return `<div class="card gm" aria-label="Level ${g.lv}, ${g.st}-day streak, ${g.need} XP to the next level"><div class="gm-top"><b class="gm-lv">LV ${g.lv}</b><span class="gm-st">${g.st?`${g.st}-day streak`:'Log today to start a streak'}</span><span class="gm-td num">+${g.today} XP today</span></div><div class="gm-bar"><i style="width:${g.pct}%"></i></div><span class="s num">${g.need} XP to level ${g.lv+1}</span></div>`;
 }
+
+/* ---------- Cards layout (v45): greeting, week strip, macro cards, meal list, + sheet ---------- */
+let kalPick='', kalMode='c';
+const K_FORK='<svg viewBox="0 0 24 24" fill="currentColor"><path d="M6 2h2v6h1V2h2v6h1V2h2v7a3 3 0 0 1-2.5 3V22h-3V12A3 3 0 0 1 6 9zm12 0c1.7 0 3 2 3 6v5h-2v9h-3V5c0-1.7 .9-3 2-3z"/></svg>';
+const K_BARS='<svg viewBox="0 0 24 24" fill="currentColor"><path d="M2 4h2v16H2zm3 0h1v16H5zm2 0h2v16H7zm3 0h1v16h-1zm3 0h2v16h-2zm3 0h1v16h-1zm2 0h2v16h-2zm3 0h1v16h-1z"/></svg>';
+const K_MAG='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><circle cx="10" cy="10" r="6.5"/><path d="m15 15 6 6"/></svg>';
+const K_M=[['p','Protein','🍗','#ff4562'],['f','Fat','🥑','#30d158'],['c','Carbs','🌾','#0a84ff']];
+const kalOn=()=>S.profile&&S.profile.look==='cards';
+function kalWeek(){const w=new Date(S.date+'T12:00').getDay(), s=addDays(S.date,-w); return [...Array(7)].map((_,i)=>addDays(s,i))}
+function kalGreet(){const h=new Date().getHours(); return h<5||h>=18?'Good evening':h<12?'Good morning':'Good afternoon'}
+function kalToday(day,t,P,isToday,st){
+  const T=TODAY(), rem=kalMode==='r', nm=String(P.name||'').trim().split(/\s+/)[0], val=(v,g)=>rem?Math.max(0,(+g||0)-v):v;
+  const bar=(v,g,c)=>`<div class="k-bar" style="--c:${c}"><i style="width:${g?Math.min(100,v/g*100):0}%"></i></div>`;
+  const days=kalWeek().map(d=>{const dt=new Date(d+'T12:00'), fut=d>T; return `<button class="k-day${d===S.date?' on':''}${fut?' fut':''}" data-kl="day" data-v="${d}"${fut?' disabled':''} aria-label="${dateLong(d)}"><span>${dt.toLocaleDateString('en',{weekday:'short'})}</span><b>${dt.getDate()}</b></button>`}).join('');
+  const es=[...day.entries].sort((a,b)=>(b.t||0)-(a.t||0));
+  const meals=es.length?`<ul class="k-meals">${es.map(e=>`<li><button class="k-meal" data-act="entry" data-v="${e.id}">${thumb(e,46)}<span class="k-mt"><b>${esc(e.name)}</b><small>${clock(e.t,day.date)} · P ${r0(e.p*e.qty)} · F ${r0(e.f*e.qty)} · C ${r0(e.c*e.qty)}</small></span><span class="k-mk num">${fmt(e.kcal*e.qty)}<small> kcal</small></span></button></li>`).join('')}</ul>`
+    :`<div class="k-empty"><div class="k-ei">${K_FORK}</div><h3>No meals for this day</h3><p>Tap the + button to start logging</p></div>`;
+  return `<header class="k-head"><img src="./icons/icon-192.png" alt="" class="k-logo"><div><h1>Fuel</h1><p>${kalGreet()}${nm?', '+esc(nm):''}</p></div><span class="k-streak" aria-label="${st}-day streak">⚡ ${st}</span></header>
+  <div class="badge" data-sync hidden><i></i><span></span></div>
+  <div class="k-week">${days}</div><p class="k-wl">${isToday?'This week':'<button class="txtbtn" data-act="today">Back to today</button>'}</p>
+  <section class="k-card k-cal"><h3>🔥 Calories</h3>${bar(t.kcal,P.kcal,'#ff6b3d')}<p><b class="num">${fmt(val(t.kcal,P.kcal))}</b> ${rem?'kcal left':`/ ${fmt(P.kcal)} kcal`}</p></section>
+  <div class="k-macros">${K_M.map(([k,n,ic,c])=>`<section class="k-card k-m k-${k}"><h3>${ic} ${n}</h3>${bar(t[k],P[k],c)}<p><b class="num">${r0(val(t[k],P[k]))}</b> ${rem?'g left':`/ ${r0(P[k])}g`}</p></section>`).join('')}</div>
+  <div class="k-seg" role="group" aria-label="Show"><button data-kl="mode" data-v="c" aria-pressed="${!rem}">Consumed</button><button data-kl="mode" data-v="r" aria-pressed="${rem}">Remaining</button></div>
+  <h2 class="k-h">Meals (${es.length})</h2>${meals}
+  ${weighRow(isToday)}${gameCard(isToday)}${moneyLine(isToday)}
+  <button class="k-fab" data-kl="log" aria-label="Log a meal">+</button>`;
+}
+function kalSheet(){let s=$('#kalSheet'); if(s) return s; s=document.createElement('div'); s.className='sheet'; s.id='kalSheet'; s.hidden=true;
+  const t3=L=>`<div class="k-g3">${L.map(([k,i,a,b,c])=>`<button class="k-t" data-kl="${k}"><span class="k-ic ${c}">${i}</span><b>${a}</b><small>${b}</small></button>`).join('')}</div>`;
+  s.innerHTML=`<div class="panel" role="dialog" aria-modal="true" aria-label="Log a new meal"><div class="grab"><div class="grabber"></div></div><div class="sheet-body k-log">
+  <h2>Log a new meal</h2>${t3([['photo','📸','Photo','Snap a meal','ai'],['voice','🎤','Voice','Describe it','ai'],['text','💬','Text','Type it in','ai']])}
+  <div class="k-g2"><button class="k-t row2" data-kl="code"><span class="k-ic bl">${K_BARS}</span><span><b>Scan barcode</b><small>Packaged foods</small></span></button><button class="k-t row2" data-kl="find"><span class="k-ic bl">${K_MAG}</span><span><b>Search</b><small>Foods, restaurants</small></span></button></div>
+  <h2>From your collection</h2>${t3([['prod','🛒','Products','Your foods','or'],['meals','🍽️','Meals','Favourites','or'],['hist','📋','History','Recent foods','or']])}
+  <p class="k-man">Know the nutrition? <button data-kl="man">Enter it manually ✎</button></p></div></div>`;
+  document.body.appendChild(s); s.addEventListener('click',e=>{if(e.target===s) closeSheet('#kalSheet')}); return s}
+function kalVoice(){
+  const R=window.SpeechRecognition||window.webkitSpeechRecognition, box=$('#descIn'); if(!R){box.focus(); return}
+  const r=new R(); r.lang='en-US'; r.interimResults=true;
+  r.onresult=e=>{box.value=[...e.results].map(x=>x[0].transcript).join(' ')}; r.onend=()=>{status(''); if(box.value.trim()) $('#estBtn').click()}; r.onerror=()=>{status(''); box.focus()};
+  try{r.start(); status('<div>Listening… say what you ate.</div>')}catch(e){box.focus()}
+}
+function kalGo(k){
+  closeSheet('#kalSheet'); openAdd();
+  if(k==='photo'||k==='code') $('#snapIn').click();
+  else if(k==='text'||k==='voice'){$('#descTile').click(); if(k==='voice') kalVoice(); else setTimeout(()=>$('#descIn').focus(),350)}
+  else if(k==='find') setTimeout(()=>$('#q').focus(),350);
+  else if(k==='man') $('#exactTile').click();
+  else {kalPick=k; renderResults()}
+}
+document.addEventListener('click',e=>{const b=e.target.closest('[data-kl]'); if(!b) return; const k=b.dataset.kl;
+  if(k==='day'){S.date=b.dataset.v; renderToday()}
+  else if(k==='mode'){kalMode=b.dataset.v; renderToday()}
+  else if(k==='log'){kalSheet(); openSheet('#kalSheet')}
+  else if(['photo','voice','text','code','find','man','prod','meals','hist'].includes(k)) kalGo(k);
+});
 
 /* ===================== MONEY =====================
    Plain tracking: what was spent and where it went. No budget, no limit, no bank login (UAE bank data is only open to
