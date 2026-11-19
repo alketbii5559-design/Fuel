@@ -1964,6 +1964,25 @@ body[data-look="cards"] .tb-on{display:none}
 .k-head p{font-size:clamp(14px,4.2vw,17px)}
 .k-fab{display:grid;place-items:center;padding:0;font-size:0}.k-fab svg{width:30px;height:30px;display:block}
 @media (max-height:700px){.k-fab svg{width:26px;height:26px}}
+/* v53 council build */
+.k-pace{display:flex;align-items:center;gap:12px;background:var(--cell);margin:0 0 8px;text-decoration:none;color:var(--label);padding:12px 14px}
+.k-pace>span:nth-child(2){flex:1;min-width:0;display:grid;gap:2px}.k-pace b{font-size:15px;font-weight:700}.k-pace small{color:var(--label2);font-size:13px}
+.k-pi{font-size:22px}.k-pace em{font-style:normal}.k-ok{color:#30d158}.k-warn{color:#ff9f0a}.k-pace svg{width:14px;height:14px;color:var(--label3)}
+.k-pline{margin:10px 2px 0;font-size:14px;color:var(--label2)}.k-pline b{color:var(--label)}
+.k-sub2{font-size:17px;font-weight:800;margin:0 0 8px}.k-sub2 small{font-size:12px;font-weight:600;color:var(--label3);margin-left:6px}
+.k-usual{display:flex;gap:8px;overflow-x:auto;margin:0 -16px 18px;padding:0 16px 2px;scrollbar-width:none}.k-usual::-webkit-scrollbar{display:none}
+.k-usual button{flex:none;display:grid;grid-template-columns:auto 26px;align-items:center;column-gap:10px;text-align:left;border:1.5px solid var(--sep);background:var(--cell);border-radius:16px;padding:10px 10px 10px 14px;font:inherit;color:var(--label);max-width:220px}
+.k-usual b{font-size:15px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.k-usual small{grid-column:1;font-size:12px;color:var(--label2)}
+.k-usual i{grid-row:1/3;grid-column:2;font-style:normal;width:26px;height:26px;border-radius:50%;background:#30d158;color:#fff;display:grid;place-items:center;font-weight:800;font-size:18px;line-height:1}
+.k-sb{font-style:normal;font-size:10px;font-weight:800;letter-spacing:.02em;text-transform:uppercase;padding:1px 5px;border-radius:5px;margin-right:6px;vertical-align:1px}
+.k-sb-off{background:rgba(48,209,88,.14);color:#30d158}.k-sb-est{background:rgba(255,159,10,.16);color:#ff9f0a}.k-sb-you{background:rgba(48,176,255,.14);color:#30b0ff}
+.k-h{display:flex;align-items:baseline;justify-content:space-between;gap:8px}.k-estn{font-size:12px;font-weight:700;color:#ff9f0a}
+.k-bk{display:flex;align-items:center;gap:12px;background:var(--cell);margin-bottom:16px;padding:12px 14px}.k-bk>span:nth-child(2){flex:1;display:grid}.k-bk small{color:var(--label2);font-size:13px}
+.k-bk button{border:0;border-radius:99px;background:#30b0ff;color:#fff;font:inherit;font-weight:800;padding:9px 16px}
+.k-sbtn{display:flex;align-items:center;gap:12px;width:100%;border:0;background:#1d1f27;border-radius:16px;padding:15px 16px;font:inherit;font-size:16px;color:var(--label3);margin-bottom:12px;text-align:left}.k-sbtn svg{width:20px;height:20px;flex:none}
+.k-g4{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;margin-bottom:20px}.k-g4 .k-t{padding:12px 4px}.k-g4 .k-ic{width:48px;height:48px;font-size:24px}.k-g4 .k-ic.bl{width:48px;height:48px;margin-bottom:6px}.k-g4 b{font-size:13px}
+#kalSheetUsual .k-usual{margin:0 0 6px;padding:0 0 2px}
+.k-usual i svg{width:14px;height:14px;display:block}
 </style>
 </head>
 <body>
@@ -5499,7 +5518,7 @@ function renderSettings(){
     <p class="foot">Walks through everything again with your current answers filled in. Your logs stay as they are.</p>
     ${shareSection()}
     <div class="gap"></div><h2 class="sec">Motion, Sounds &amp; Haptics</h2>
-    <ul class="list"><li><label class="row single" for="s-motion"><span class="t">Motion</span><select id="s-motion" data-p="motion" class="ssel">${[['calm','Calm'],['balanced','Balanced'],['lively','Lively']].map(([v,t])=>`<option value="${v}"${(P.motion||'balanced')===v?' selected':''}>${t}</option>`).join('')}</select></label></li>${sw('hap','Haptics')}${sw('snd','Sounds')}<li><label class="row single" for="s-px"><span class="t">Pixel Style</span><input type="checkbox" switch id="s-px" data-p="px"${P.px===1?' checked':''}></label></li>${sw('tGame','Level & Streak Card')}</ul>
+    <ul class="list"><li><label class="row single" for="s-motion"><span class="t">Motion</span><select id="s-motion" data-p="motion" class="ssel">${[['calm','Calm'],['balanced','Balanced'],['lively','Lively']].map(([v,t])=>`<option value="${v}"${(P.motion||'balanced')===v?' selected':''}>${t}</option>`).join('')}</select></label></li>${sw('hap','Haptics')}${sw('snd','Sounds')}<li><label class="row single" for="s-px"><span class="t">Pixel Style</span><input type="checkbox" switch id="s-px" data-p="px"${P.px===1?' checked':''}></label></li><li><label class="row single" for="s-tGame"><span class="t">Level & XP Card</span><input type="checkbox" switch id="s-tGame" data-p="tGame"${P.tGame===1?' checked':''}></label></li></ul>
     <p class="foot">Calm keeps only the food drop and rolling numbers. Lively adds a living tank surface and more movement between tabs. Reduce Motion in iPhone settings always wins.</p>
     <p class="foot">Sounds are the soft clicks, the drop into the tank, stamps and the rest-timer chime. They follow your ringer switch and don’t stop your music.</p>
     ${STANDALONE?`<div class="gap"></div><h2 class="sec">AI Estimates</h2>
@@ -6152,7 +6171,7 @@ function gameStats(){
   return {xp,lv,st,today:dayXP(H[T]),pct:Math.round((xp-lo)/(hi-lo)*100),need:hi-xp};
 }
 function gameCard(isToday){
-  applyPx(); if(!isToday||S.profile.tGame===0) return ''; const g=gameStats(); if(!g.xp) return '';
+  applyPx(); if(!isToday||S.profile.tGame!==1) return ''; const g=gameStats(); if(!g.xp) return '';
   return `<div class="card gm" aria-label="Level ${g.lv}, ${g.st}-day streak, ${g.need} XP to the next level"><div class="gm-top"><b class="gm-lv">LV ${g.lv}</b><span class="gm-st">${g.st?`${g.st}-day streak`:'Log today to start a streak'}</span><span class="gm-td num">+${g.today} XP today</span></div><div class="gm-bar"><i style="width:${g.pct}%"></i></div><span class="s num">${g.need} XP to level ${g.lv+1}</span></div>`;
 }
 
@@ -6169,25 +6188,28 @@ function kalToday(day,t,P,isToday,st){
   const T=TODAY(), rem=kalMode==='r', nm=String(P.name||'').trim().split(/\s+/)[0], val=(v,g)=>rem?Math.max(0,(+g||0)-v):v;
   const bar=(v,g,c)=>`<div class="k-bar" style="--c:${c}"><i style="width:${g?Math.min(100,v/g*100):0}%"></i></div>`;
   const days=kalWeek().map(d=>{const dt=new Date(d+'T12:00'), fut=d>T; return `<button class="k-day${d===S.date?' on':''}${fut?' fut':''}" data-kl="day" data-v="${d}"${fut?' disabled':''} aria-label="${dateLong(d)}"><span>${dt.toLocaleDateString('en',{weekday:'short'})}</span><b>${dt.getDate()}</b></button>`}).join('');
-  const es=[...day.entries].sort((a,b)=>(b.t||0)-(a.t||0));
-  const meals=es.length?`<ul class="k-meals">${es.map(e=>`<li><button class="k-meal" data-act="entry" data-v="${e.id}">${thumb(e,46)}<span class="k-mt"><b>${esc(e.name)}</b><small>${clock(e.t,day.date)} · P ${r0(e.p*e.qty)} · F ${r0(e.f*e.qty)} · C ${r0(e.c*e.qty)}</small></span><span class="k-mk num">${fmt(e.kcal*e.qty)}<small> kcal</small></span></button></li>`).join('')}</ul>`
+  const es=[...day.entries].sort((a,b)=>(b.t||0)-(a.t||0)), estK=es.filter(e=>kSrc(e)==='est').reduce((a,e)=>a+e.kcal*e.qty,0);
+  const meals=es.length?`<ul class="k-meals">${es.map(e=>`<li><button class="k-meal" data-act="entry" data-v="${e.id}">${thumb(e,46)}<span class="k-mt"><b>${esc(e.name)}</b><small>${(x=>x&&x!=='off'?`<i class="k-sb k-sb-${x}" title="${K_SRC[x][1]}">${K_SRC[x][0]}</i>`:'')(kSrc(e))}${clock(e.t,day.date)} · P ${r0(e.p*e.qty)} · F ${r0(e.f*e.qty)} · C ${r0(e.c*e.qty)}</small></span><span class="k-mk num">${fmt(e.kcal*e.qty)}<small> kcal</small></span></button></li>`).join('')}</ul>`
     :`<div class="k-empty"><div class="k-ei">${K_FORK}</div><h3>No meals for this day</h3><p>Tap the + button to start logging</p></div>`;
   return `<header class="k-head"><img src="./icons/icon-192.png" alt="" class="k-logo"><div><h1>Fuel</h1><p>${kalGreet()}${nm?', '+esc(nm):''}</p></div><span class="k-streak" aria-label="${st}-day streak">⚡ ${st}</span></header>
   <div class="badge" data-sync hidden><i></i><span></span></div>
   <div class="k-week">${days}</div><p class="k-wl">${isToday?'This week':'<button class="txtbtn" data-act="today">Back to today</button>'}</p>
+  ${kPace(isToday)}
   <section class="k-card k-cal"><h3>🔥 Calories</h3>${bar(t.kcal,P.kcal,'#ff6b3d')}<p><b class="num">${fmt(val(t.kcal,P.kcal))}</b> ${rem?'kcal left':`/ ${fmt(P.kcal)} kcal`}</p></section>
   <div class="k-macros">${K_M.map(([k,n,ic,c])=>`<section class="k-card k-m k-${k}"><h3>${ic} ${n}</h3>${bar(t[k],P[k],c)}<p><b class="num">${r0(val(t[k],P[k]))}</b> ${rem?'g left':`/ ${r0(P[k])}g`}</p></section>`).join('')}</div>
+  ${kProtein(t,P,isToday)}
   <div class="k-seg" role="group" aria-label="Show"><button data-kl="mode" data-v="c" aria-pressed="${!rem}">Consumed</button><button data-kl="mode" data-v="r" aria-pressed="${rem}">Remaining</button></div>
-  <h2 class="k-h">Meals (${es.length})</h2>${meals}
-  ${weighRow(isToday)}${gameCard(isToday)}${moneyLine(isToday)}
+  ${kUsual(isToday)}${kBackup(isToday)}
+  <h2 class="k-h">Meals (${es.length})${estK>20?`<small class="k-estn">${fmt(estK)} kcal estimated</small>`:''}</h2>${meals}
+  ${weighRow(isToday)}${S.profile.tGame===1?gameCard(isToday):''}${moneyLine(isToday)}
   <button class="k-fab" data-kl="log" aria-label="Log a meal"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg></button>`;
 }
 function kalSheet(){let s=$('#kalSheet'); if(s) return s; s=document.createElement('div'); s.className='sheet'; s.id='kalSheet'; s.hidden=true;
   const t3=L=>`<div class="k-g3">${L.map(([k,i,a,b,c])=>`<button class="k-t" data-kl="${k}"><span class="k-ic ${c}">${i}</span><b>${a}</b><small>${b}</small></button>`).join('')}</div>`;
   s.innerHTML=`<div class="panel" role="dialog" aria-modal="true" aria-label="Log a new meal"><div class="grab"><div class="grabber"></div></div><div class="sheet-body k-log">
-  <h2>Log a new meal</h2>${t3([['photo','📸','Photo','Snap a meal','ai'],['voice','🎤','Voice','Describe it','ai'],['text','💬','Text','Type it in','ai']])}
-  <div class="k-g2"><button class="k-t row2" data-kl="code"><span class="k-ic bl">${K_BARS}</span><span><b>Scan barcode</b><small>Packaged foods</small></span></button><button class="k-t row2" data-kl="find"><span class="k-ic bl">${K_MAG}</span><span><b>Search</b><small>Foods, restaurants</small></span></button></div>
-  <h2>From your collection</h2>${t3([['prod','🛒','Products','Packaged foods','or'],['meals','🍽️','Meals','Favourites','or'],['hist','📋','History','Recent foods','or']])}
+  <h2>Log a new meal</h2><button class="k-sbtn" data-kl="find">${K_MAG}<span>Search foods, restaurants, products…</span></button>
+  <div class="k-g4">${[['photo','📸','Photo','ai'],['code',K_BARS,'Barcode','bl'],['text','💬','Describe','ai'],['voice','🎤','Voice','ai']].map(([k,i,a,c])=>`<button class="k-t" data-kl="${k}"><span class="k-ic ${c}">${i}</span><b>${a}</b></button>`).join('')}</div>
+  <div id="kalSheetUsual"></div>
   <p class="k-man">Know the nutrition? <button data-kl="man">Enter it manually ✎</button></p></div></div>`;
   document.body.appendChild(s); s.addEventListener('click',e=>{if(e.target===s) closeSheet('#kalSheet')}); return s}
 function kalVoice(){
@@ -6206,7 +6228,7 @@ function kalGo(k){
 document.addEventListener('click',e=>{const b=e.target.closest('[data-kl]'); if(!b) return; const k=b.dataset.kl;
   if(k==='day'){S.date=b.dataset.v; renderToday()}
   else if(k==='mode'){kalMode=b.dataset.v; renderToday()}
-  else if(k==='log'){kalSheet(); openSheet('#kalSheet')}
+  else if(k==='log'){kalSheet(); const u=$('#kalSheetUsual'); if(u) u.innerHTML=S.date===TODAY()?kUsual(true):''; openSheet('#kalSheet')}
   else if(['photo','voice','text','code','find','man','prod','meals','hist'].includes(k)) kalGo(k);
 });
 /* Products: packaged foods from Open Food Facts (UAE first), plus your saved products when the box is empty */
@@ -6221,7 +6243,7 @@ function kpShow(){
   const list=(L,h)=>{kpL=L; box.innerHTML=L.length?`${h?`<h3 class="k-sub">${h}</h3>`:''}<ul class="k-meals">${L.map(kpRow).join('')}</ul>`:`<div class="k-empty k-pe"><div class="k-ei">${K_MAG}</div><h3>${q?'No matches':T[2]}</h3><p>${q?'Try another word, or scan the barcode.':T[3]}</p></div>`};
   if(kpM==='meals') return list(S.foods.favs.filter(hit));
   if(kpM==='hist') return list(S.foods.recents.filter(hit));
-  if(kpM==='all'){ if(!q) return list(S.foods.recents.slice(0,15),S.foods.recents.length?'Recent':'');
+  if(kpM==='all'){ if(!q){const fk=new Set(S.foods.favs.map(foodKey)), L=[...S.foods.favs,...S.foods.recents.filter(f=>!fk.has(foodKey(f)))].slice(0,25); return list(L,S.foods.favs.length?'Favourites and recent':L.length?'Recent':'')}
     $('#q').value=q; renderResults(); return kpMirror()}
   if(!q) return list([...S.foods.custom,...Object.values(S.foods.barcodes)].filter(f=>f&&f.name),kpL.length?'Your products':'');
   if(q.length<2) return; const n=++kpN; box.innerHTML='<p class="k-load">Searching…</p>';
@@ -6330,6 +6352,29 @@ document.addEventListener('click',e=>{const b=e.target.closest('[data-kl]'); if(
   else if(k==='kaclose') closeSheet('#kalAI');
 });
 document.addEventListener('input',e=>{if(!/^ka[PCF]$/.test(e.target.id)) return; const g=id=>+($('#ka'+id).value)||0, k=$('#kaK'); if(k) k.placeholder=String(r0(4*g('P')+4*g('C')+9*g('F'))||0)});
+/* ---------- Council build (v53): on-pace line, one-tap usual, protein line, sources, backup ---------- */
+const kSrc=e=>{const d=dsOf(e); if(!d) return ''; if(d.t==='ai'||(d.t==='chain'&&d.ap)) return 'est'; if(d.t==='you') return 'you'; if(d.t==='meal') return ''; return 'off'};
+const K_SRC={off:['Official','Numbers from a label, database or the restaurant'],est:['Estimate','AI guess or approximate restaurant numbers'],you:['Yours','Numbers you entered']};
+function kPace(isToday){ if(!isToday) return ''; let m; try{m=measuredTDEE()}catch(e){return ''}
+  if(!m||m.short){const n=m&&m.weighs||0; return `<a class="k-card k-pace" href="#progress"><span class="k-pi">📈</span><span><b>Trend shows after 2 weeks</b><small>${n} weigh-in${n===1?'':'s'} and ${m&&m.days||0} full days logged so far</small></span>${CHEV}</a>`}
+  const aim=aimRate(), r=m.rate, d=r-aim, st=Math.abs(d)<=0.15?['on pace','ok']:aim<0?(d>0?['slower than plan','warn']:['faster than plan','warn']):(d>0?['faster than plan','warn']:['slower than plan','warn']);
+  return `<a class="k-card k-pace" href="#progress" aria-label="Weight trend ${r1(m.trend)} kg, ${r1(r)} kg per week, ${st[0]}"><span class="k-pi">📈</span><span><b><span class="num">${r1(m.trend)} kg</span> · <span class="num">${r>0?'+':''}${r1(r)} kg/wk</span> · <em class="k-${st[1]}">${st[0]}</em></b><small>Your real maintenance is about <span class="num">${fmt(m.tdee)}</span> kcal</small></span>${CHEV}</a>`}
+function kProtein(t,P,isToday){ if(!isToday||!(+P.p)) return ''; const left=Math.round(P.p-t.p);
+  if(left<=3) return `<p class="k-pline">🍗 Protein goal hit. Nice.</p>`;
+  const seen=new Set(), L=[...S.foods.favs,...S.foods.recents,...S.foods.custom].filter(f=>{const k=foodKey(f); if(seen.has(k)||!(f.p>=8)||!(f.kcal>0)||f.p*4/f.kcal<0.35) return false; seen.add(k); return true});
+  const f=L[0]; if(!f) return `<p class="k-pline">🍗 <b class="num">${left} g</b> protein left today</p>`;
+  const sv=left/f.p, amt=f.sz?`${Math.max(5,Math.round(sv*f.sz/5)*5)} ${f.un||'g'}`:`${r1(sv)} ×`;
+  return `<p class="k-pline">🍗 <b class="num">${left} g</b> protein left · about ${amt} ${esc(f.name.split(',')[0].split(' · ')[0])}</p>`}
+let K_US=[], K_UM='';
+function kUsual(isToday){ if(!isToday) return ''; K_UM=autoMeal(); try{K_US=quickFoods(K_UM).slice(0,6)}catch(e){K_US=[]} if(!K_US.length) return '';
+  return `<h3 class="k-sub2">Your usual ${esc(mealName(K_UM).toLowerCase())} <small>one tap logs it</small></h3><div class="k-usual">${K_US.map((e,i)=>`<button data-kl="usual" data-v="${i}"><b>${esc(e.name.split(',')[0].split(' · ')[0])}</b><small class="num">${fmt(e.kcal*e.qty)} kcal · ${r0(e.p*e.qty)} g P</small><i><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><path d="M12 6v12M6 12h12"/></svg></i></button>`).join('')}</div>`}
+async function kUsualAdd(i){const e=K_US[i]; if(!e) return; const {id,t,u,meal,...rest}=e; selMeal=K_UM; await commitItems([rest])}
+function kBackup(isToday){ if(!isToday||typeof base==='undefined'||base) return ''; let last=0; try{last=+localStorage.getItem('fuel-bk')||0}catch(e){}
+  if(Date.now()-last<7*864e5) return ''; return `<div class="k-card k-bk"><span>💾</span><span><b>Back up your data</b><small>Sync is off, so a weekly backup file keeps your log safe.</small></span><button data-kl="backup">Save</button></div>`}
+document.addEventListener('click',e=>{const b=e.target.closest('[data-kl]'); if(!b) return; const k=b.dataset.kl;
+  if(k==='usual') kUsualAdd(+b.dataset.v);
+  else if(k==='backup'){try{exportJSON(); localStorage.setItem('fuel-bk',Date.now())}catch(x){} renderToday()}
+});
 
 /* ===================== MONEY =====================
    Plain tracking: what was spent and where it went. No budget, no limit, no bank login (UAE bank data is only open to
