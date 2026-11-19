@@ -1962,6 +1962,8 @@ body[data-look="cards"] .tb-on{display:none}
 @media (max-height:700px){.k-fab{width:56px;height:56px;font-size:32px;bottom:calc(env(safe-area-inset-bottom) + 88px)}}
 .dy-add,.cup{position:relative}.dy-add::after{content:"";position:absolute;inset:-9px}.cup::after{content:"";position:absolute;inset:-11px -1px}
 .k-head p{font-size:clamp(14px,4.2vw,17px)}
+.k-fab{display:grid;place-items:center;padding:0;font-size:0}.k-fab svg{width:30px;height:30px;display:block}
+@media (max-height:700px){.k-fab svg{width:26px;height:26px}}
 </style>
 </head>
 <body>
@@ -6178,7 +6180,7 @@ function kalToday(day,t,P,isToday,st){
   <div class="k-seg" role="group" aria-label="Show"><button data-kl="mode" data-v="c" aria-pressed="${!rem}">Consumed</button><button data-kl="mode" data-v="r" aria-pressed="${rem}">Remaining</button></div>
   <h2 class="k-h">Meals (${es.length})</h2>${meals}
   ${weighRow(isToday)}${gameCard(isToday)}${moneyLine(isToday)}
-  <button class="k-fab" data-kl="log" aria-label="Log a meal">+</button>`;
+  <button class="k-fab" data-kl="log" aria-label="Log a meal"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg></button>`;
 }
 function kalSheet(){let s=$('#kalSheet'); if(s) return s; s=document.createElement('div'); s.className='sheet'; s.id='kalSheet'; s.hidden=true;
   const t3=L=>`<div class="k-g3">${L.map(([k,i,a,b,c])=>`<button class="k-t" data-kl="${k}"><span class="k-ic ${c}">${i}</span><b>${a}</b><small>${b}</small></button>`).join('')}</div>`;
