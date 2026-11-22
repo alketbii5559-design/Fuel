@@ -6260,7 +6260,7 @@ function kalProducts(m){kpM=m||'prod'; let s=$('#kalProd'); if(!s){s=document.cr
   <label class="k-sbox">${K_MAG}<input id="kpQ" type="search" placeholder="Search for a product…" autocomplete="off" enterkeyhint="search"></label><div id="kpRes"></div></div></div>`;
   document.body.appendChild(s); s.addEventListener('click',e=>{if(e.target===s) closeSheet('#kalProd')});
   $('#kpQ').addEventListener('input',()=>{clearTimeout(kpT); kpT=setTimeout(kpShow,350)})}
-  const T=KP_T[kpM]; $('#kpTitle').textContent=T[0]; $('#kpQ').placeholder=T[1]; $('#kalProd .k-scan').hidden=kpM==='meals'||kpM==='hist'; $('#kpQ').value=''; if(kpF) kpBack(); else kpShow(); openSheet('#kalProd'); if(kpM==='all') setTimeout(()=>$('#kpQ').focus(),300);
+  const T=KP_T[kpM]; $('#kpTitle').textContent=T[0]; $('#kpQ').placeholder=T[1]; $('#kalProd .k-scan').hidden=kpM==='meals'||kpM==='hist'; $('#kpQ').value=''; kpF=null; $('#kalProd .k-ph').hidden=false; $('#kalProd .k-sbox').hidden=false; kpShow(); openSheet('#kalProd'); if(kpM==='all') setTimeout(()=>$('#kpQ').focus(),300);
 }
 let kpF=null, kpAmt=0, kpMeal='', kpSave=true;
 const K_MEALI=['🌅','☀️','🌙','⚡'], K_MEALC=['#8a3a12','#8a4b0e','#4a23a8','#9b1b4f'];
