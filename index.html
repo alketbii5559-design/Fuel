@@ -1983,6 +1983,13 @@ body[data-look="cards"] .tb-on{display:none}
 .k-g4{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;margin-bottom:20px}.k-g4 .k-t{padding:12px 4px}.k-g4 .k-ic{width:48px;height:48px;font-size:24px}.k-g4 .k-ic.bl{width:48px;height:48px;margin-bottom:6px}.k-g4 b{font-size:13px}
 #kalSheetUsual .k-usual{margin:0 0 6px;padding:0 0 2px}
 .k-usual i svg{width:14px;height:14px;display:block}
+.k-rbtn{display:flex;align-items:center;gap:12px;width:100%;border:1.5px solid var(--sep);background:#1d1f27;border-radius:16px;padding:12px 14px;font:inherit;color:var(--label);margin-bottom:14px;text-align:left}
+.k-rbtn>span{font-size:22px}.k-rbtn b{font-size:16px}.k-rbtn small{flex:1;color:var(--label2);font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.k-rbtn svg{width:14px;height:14px;color:var(--label3);flex:none}
+.k-chains{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.k-chain{display:grid;grid-template-columns:40px 1fr;grid-template-rows:auto auto auto;column-gap:10px;row-gap:2px;align-items:center;text-align:left;border:1.5px solid var(--sep);background:#1d1f27;border-radius:18px;padding:12px;font:inherit;color:var(--label)}
+.k-cl{grid-row:1/4;width:40px;height:40px;border-radius:12px;background:#a0450f;color:#fff;display:grid;place-items:center;font-weight:800;font-size:18px}
+.k-chain b{font-size:15px;line-height:1.2}.k-chain small{color:var(--label2);font-size:12px}.k-chain .k-sb{justify-self:start;margin:2px 0 0}
+.k-ch-head{display:flex;align-items:center;gap:10px}.k-ch-head h3{margin:0;font-size:22px;font-weight:800}
 </style>
 </head>
 <body>
@@ -6208,6 +6215,7 @@ function kalSheet(){let s=$('#kalSheet'); if(s) return s; s=document.createEleme
   const t3=L=>`<div class="k-g3">${L.map(([k,i,a,b,c])=>`<button class="k-t" data-kl="${k}"><span class="k-ic ${c}">${i}</span><b>${a}</b><small>${b}</small></button>`).join('')}</div>`;
   s.innerHTML=`<div class="panel" role="dialog" aria-modal="true" aria-label="Log a new meal"><div class="grab"><div class="grabber"></div></div><div class="sheet-body k-log">
   <h2>Log a new meal</h2><button class="k-sbtn" data-kl="find">${K_MAG}<span>Search foods, restaurants, products…</span></button>
+  <button class="k-rbtn" data-kl="rests"><span>🍔</span><b>Restaurants</b><small>McDonald’s, KFC, Five Guys and more</small>${CHEV}</button>
   <div class="k-g4">${[['photo','📸','Photo','ai'],['code',K_BARS,'Barcode','bl'],['text','💬','Describe','ai'],['voice','🎤','Voice','ai']].map(([k,i,a,c])=>`<button class="k-t" data-kl="${k}"><span class="k-ic ${c}">${i}</span><b>${a}</b></button>`).join('')}</div>
   <div id="kalSheetUsual"></div>
   <p class="k-man">Know the nutrition? <button data-kl="man">Enter it manually ✎</button></p></div></div>`;
@@ -6233,7 +6241,8 @@ document.addEventListener('click',e=>{const b=e.target.closest('[data-kl]'); if(
 });
 /* Products: packaged foods from Open Food Facts (UAE first), plus your saved products when the box is empty */
 let kpT=0, kpN=0, kpL=[], kpM='prod';
-const KP_T={all:['Search foods','Search foods, dishes, restaurants…','Search everything','Fuel’s foods, UAE restaurants, USDA and packaged products.'],prod:['Products','Search for a product…','Find a packaged product','Search by name or brand. UAE products come first.'],meals:['Meals','Search your favourites…','No saved meals yet','Star a food when you log it and it shows here.'],hist:['History','Search past foods…','Nothing logged yet','Foods you log show up here.']};
+const KP_T={all:['Search foods','Search foods, dishes, restaurants…','Search everything','Fuel’s foods, UAE restaurants, USDA and packaged products.'],prod:['Products','Search for a product…','Find a packaged product','Search by name or brand. UAE products come first.'],meals:['Meals','Search your favourites…','No saved meals yet','Star a food when you log it and it shows here.'],hist:['History','Search past foods…','Nothing logged yet','Foods you log show up here.'],rest:['Restaurants','Search restaurants or dishes…','No restaurants loaded','Check your connection and try again.']};
+let kpChain='';
 const K_BAG='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M5 8h14l-1 13H6zM9 8V6a3 3 0 0 1 6 0v2"/></svg>', K_GLOBE='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c3 3.2 3 14.8 0 18M12 3c-3 3.2-3 14.8 0 18"/></svg>', K_MARK='<svg viewBox="0 0 24 24" fill="currentColor"><path d="M6 3h12v18l-6-4-6 4z"/></svg>';
 const kChips=(k,p,f,c)=>`<span class="k-chips"><i class="kc-k">🔥 ${fmt(k)}</i><i class="kc-p">🍗 ${r0(p)}g</i><i class="kc-f">🥑 ${r0(f)}g</i><i class="kc-c">🌾 ${r0(c)}g</i></span>`;
 function kpRow(f,i){const off=f.ds&&f.ds.t==='off', mine=!off&&S.foods.custom.some(x=>foodKey(x)===foodKey(f));
@@ -6241,6 +6250,7 @@ function kpRow(f,i){const off=f.ds&&f.ds.t==='off', mine=!off&&S.foods.custom.so
 function kpShow(){
   const q=$('#kpQ').value.trim(), box=$('#kpRes'), T=KP_T[kpM], ql=q.toLowerCase(), hit=f=>!ql||ql.split(/\s+/).every(t=>f.name.toLowerCase().includes(t));
   const list=(L,h)=>{kpL=L; box.innerHTML=L.length?`${h?`<h3 class="k-sub">${h}</h3>`:''}<ul class="k-meals">${L.map(kpRow).join('')}</ul>`:`<div class="k-empty k-pe"><div class="k-ei">${K_MAG}</div><h3>${q?'No matches':T[2]}</h3><p>${q?'Try another word, or scan the barcode.':T[3]}</p></div>`};
+  if(kpM==='rest') return kpRest(q);
   if(kpM==='meals') return list(S.foods.favs.filter(hit));
   if(kpM==='hist') return list(S.foods.recents.filter(hit));
   if(kpM==='all'){ if(!q){const fk=new Set(S.foods.favs.map(foodKey)), L=[...S.foods.favs,...S.foods.recents.filter(f=>!fk.has(foodKey(f)))].slice(0,25); return list(L,S.foods.favs.length?'Favourites and recent':L.length?'Recent':'')}
@@ -6260,7 +6270,7 @@ function kalProducts(m){kpM=m||'prod'; let s=$('#kalProd'); if(!s){s=document.cr
   <label class="k-sbox">${K_MAG}<input id="kpQ" type="search" placeholder="Search for a product…" autocomplete="off" enterkeyhint="search"></label><div id="kpRes"></div></div></div>`;
   document.body.appendChild(s); s.addEventListener('click',e=>{if(e.target===s) closeSheet('#kalProd')});
   $('#kpQ').addEventListener('input',()=>{clearTimeout(kpT); kpT=setTimeout(kpShow,350)})}
-  const T=KP_T[kpM]; $('#kpTitle').textContent=T[0]; $('#kpQ').placeholder=T[1]; $('#kalProd .k-scan').hidden=kpM==='meals'||kpM==='hist'; $('#kpQ').value=''; kpF=null; $('#kalProd .k-ph').hidden=false; $('#kalProd .k-sbox').hidden=false; kpShow(); openSheet('#kalProd'); if(kpM==='all') setTimeout(()=>$('#kpQ').focus(),300);
+  const T=KP_T[kpM]; $('#kpTitle').textContent=T[0]; $('#kpQ').placeholder=T[1]; $('#kalProd .k-scan').hidden=kpM==='meals'||kpM==='hist'||kpM==='rest'; kpChain=''; $('#kpQ').value=''; kpF=null; $('#kalProd .k-ph').hidden=false; $('#kalProd .k-sbox').hidden=false; kpShow(); openSheet('#kalProd'); if(kpM==='all') setTimeout(()=>$('#kpQ').focus(),300);
 }
 let kpF=null, kpAmt=0, kpMeal='', kpSave=true;
 const K_MEALI=['🌅','☀️','🌙','⚡'], K_MEALC=['#8a3a12','#8a4b0e','#4a23a8','#9b1b4f'];
@@ -6374,6 +6384,25 @@ function kBackup(isToday){ if(!isToday||typeof base==='undefined'||base) return 
 document.addEventListener('click',e=>{const b=e.target.closest('[data-kl]'); if(!b) return; const k=b.dataset.kl;
   if(k==='usual') kUsualAdd(+b.dataset.v);
   else if(k==='backup'){try{exportJSON(); localStorage.setItem('fuel-bk',Date.now())}catch(x){} renderToday()}
+});
+
+/* Restaurants: every chain in rest.json, then its full menu */
+function kpRest(q){const box=$('#kpRes');
+  if(!REST){box.innerHTML='<p class="k-load">Loading restaurants…</p>'; loadRest().then(()=>{if(kpM==='rest'&&!$('#kalProd').hidden) kpShow()}).catch(()=>{box.innerHTML='<p class="k-load">Couldn’t load restaurants. Check your connection.</p>'}); return}
+  const c=kpChain&&REST.chains.find(x=>x.id===kpChain);
+  if(c){const nq=normT(q), rows=REST.all.filter(r=>r.chain===c&&(!nq||nq.split(' ').every(t=>r.txt.includes(t))));
+    kpL=rows.map(restItem); let cat='', i=0;
+    box.innerHTML=`<button class="k-back" data-kl="kchainback">← All restaurants</button><div class="k-ch-head"><h3>${esc(c.name)}</h3><span class="k-sb ${c.approx?'k-sb-est':'k-sb-off'}">${c.approx?'Approximate':'Official'}</span></div><p class="k-hint">${c.items.length} items · ${esc(c.approx?'Brand’s published numbers from outside the UAE; portions here can differ.':(c.src||'Official nutrition information'))}</p>`+
+      (rows.length?`<ul class="k-meals">${rows.map(r=>{const h=r.cat&&r.cat!==cat?`</ul><h3 class="k-sub">${esc(cat=r.cat)}</h3><ul class="k-meals">`:''; return h+kpRow(kpL[i],i++)}).join('')}</ul>`:'<p class="k-load">No items match.</p>'); return}
+  if(q){const R=restSearch(q), rows=R?R.chain?REST.all.filter(r=>r.chain===R.chain):R.items:[]; kpL=rows.map(restItem);
+    box.innerHTML=kpL.length?`<ul class="k-meals">${kpL.map(kpRow).join('')}</ul>`:'<p class="k-load">No restaurant items match.</p>'; return}
+  const L=[...REST.chains].sort((a,b)=>(a.approx?1:0)-(b.approx?1:0)||a.name.localeCompare(b.name));
+  box.innerHTML=`<p class="k-hint">${L.length} restaurants · ${REST.all.length} menu items</p><div class="k-chains">${L.map(c=>`<button class="k-chain" data-kl="kchain" data-v="${esc(c.id)}"><span class="k-cl">${esc(c.name.slice(0,1))}</span><b>${esc(c.name)}</b><small>${c.items.length} items</small><i class="k-sb ${c.approx?'k-sb-est':'k-sb-off'}">${c.approx?'Approx':'Official'}</i></button>`).join('')}</div>`;
+}
+document.addEventListener('click',e=>{const b=e.target.closest('[data-kl]'); if(!b) return; const k=b.dataset.kl;
+  if(k==='kchain'){kpChain=b.dataset.v; $('#kpQ').value=''; $('#kpQ').placeholder='Search this menu…'; kpShow(); $('#kalProd .sheet-body').scrollTop=0}
+  else if(k==='kchainback'){kpChain=''; $('#kpQ').value=''; $('#kpQ').placeholder=KP_T.rest[1]; kpShow()}
+  else if(k==='rests'){closeSheet('#kalSheet'); kalProducts('rest')}
 });
 
 /* ===================== MONEY =====================
