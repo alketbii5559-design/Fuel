@@ -3830,7 +3830,7 @@ function loadUSDA(){
   return usdaP;
 }
 /* ---------- Restaurant chains: each chain's own published nutrition (rest.json), never estimates ---------- */
-let REST=null, restP=null; const REST_V='11';   /* bump when rest.json changes so no cache can serve an old list */
+let REST=null, restP=null; const REST_V='12';   /* bump when rest.json changes so no cache can serve an old list */
 const normT=t=>String(t||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[’'`]/g,'').replace(/[^a-z0-9 ]+/g,' ').replace(/\s+/g,' ').trim();
 function loadRest(){
   if(REST) return Promise.resolve(REST);
