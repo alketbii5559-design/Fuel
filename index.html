@@ -1990,6 +1990,10 @@ body[data-look="cards"] .tb-on{display:none}
 .k-cl{grid-row:1/4;width:40px;height:40px;border-radius:12px;background:#a0450f;color:#fff;display:grid;place-items:center;font-weight:800;font-size:18px}
 .k-chain b{font-size:15px;line-height:1.2}.k-chain small{color:var(--label2);font-size:12px}.k-chain .k-sb{justify-self:start;margin:2px 0 0}
 .k-ch-head{display:flex;align-items:center;gap:10px}.k-ch-head h3{margin:0;font-size:22px;font-weight:800}
+.k-sort{display:flex;gap:6px;overflow-x:auto;margin:0 0 12px;scrollbar-width:none}.k-sort::-webkit-scrollbar{display:none}
+.k-sort button{flex:none;border:1.5px solid var(--sep);background:#1d1f27;color:var(--label2);border-radius:99px;padding:7px 12px;font:inherit;font-size:13px;font-weight:700}
+.k-sort button[aria-pressed="true"]{background:rgba(48,176,255,.16);border-color:rgba(48,176,255,.5);color:#30b0ff}
+.k-flag{color:#ff9f0a;font-size:13px;margin:-6px 0 10px}.k-hint a{color:#30b0ff}
 </style>
 </head>
 <body>
@@ -3826,7 +3830,7 @@ function loadUSDA(){
   return usdaP;
 }
 /* ---------- Restaurant chains: each chain's own published nutrition (rest.json), never estimates ---------- */
-let REST=null, restP=null; const REST_V='6';   /* bump when rest.json changes so no cache can serve an old list */
+let REST=null, restP=null; const REST_V='10';   /* bump when rest.json changes so no cache can serve an old list */
 const normT=t=>String(t||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[’'`]/g,'').replace(/[^a-z0-9 ]+/g,' ').replace(/\s+/g,' ').trim();
 function loadRest(){
   if(REST) return Promise.resolve(REST);
@@ -6270,7 +6274,7 @@ function kalProducts(m){kpM=m||'prod'; let s=$('#kalProd'); if(!s){s=document.cr
   <label class="k-sbox">${K_MAG}<input id="kpQ" type="search" placeholder="Search for a product…" autocomplete="off" enterkeyhint="search"></label><div id="kpRes"></div></div></div>`;
   document.body.appendChild(s); s.addEventListener('click',e=>{if(e.target===s) closeSheet('#kalProd')});
   $('#kpQ').addEventListener('input',()=>{clearTimeout(kpT); kpT=setTimeout(kpShow,350)})}
-  const T=KP_T[kpM]; $('#kpTitle').textContent=T[0]; $('#kpQ').placeholder=T[1]; $('#kalProd .k-scan').hidden=kpM==='meals'||kpM==='hist'||kpM==='rest'; kpChain=''; $('#kpQ').value=''; kpF=null; $('#kalProd .k-ph').hidden=false; $('#kalProd .k-sbox').hidden=false; kpShow(); openSheet('#kalProd'); if(kpM==='all') setTimeout(()=>$('#kpQ').focus(),300);
+  const T=KP_T[kpM]; $('#kpTitle').textContent=T[0]; $('#kpQ').placeholder=T[1]; $('#kalProd .k-scan').hidden=kpM==='meals'||kpM==='hist'||kpM==='rest'; kpChain=''; kpSort=''; $('#kpQ').value=''; kpF=null; $('#kalProd .k-ph').hidden=false; $('#kalProd .k-sbox').hidden=false; kpShow(); openSheet('#kalProd'); if(kpM==='all') setTimeout(()=>$('#kpQ').focus(),300);
 }
 let kpF=null, kpAmt=0, kpMeal='', kpSave=true;
 const K_MEALI=['🌅','☀️','🌙','⚡'], K_MEALC=['#8a3a12','#8a4b0e','#4a23a8','#9b1b4f'];
@@ -6387,22 +6391,34 @@ document.addEventListener('click',e=>{const b=e.target.closest('[data-kl]'); if(
 });
 
 /* Restaurants: every chain in rest.json, then its full menu */
+let kpCity='', kpSort='';
+const K_ST={official:['Official','k-sb-off'],delivery:['Delivery app','k-sb-you'],approx:['Approx','k-sb-est']};
+const kStype=c=>K_ST[c.stype||(c.approx?'approx':'official')]||K_ST.official;
+function kSortRows(L){const by={p:(a,b)=>b.p-a.p,k:(a,b)=>a.kcal-b.kcal,pk:(a,b)=>(b.p/Math.max(b.kcal,1))-(a.p/Math.max(a.kcal,1))}[kpSort]; return by?[...L].sort(by):L}
+const kSortBar=()=>`<div class="k-sort" role="group" aria-label="Sort">${[['','Menu order'],['p','Most protein'],['k','Fewest kcal'],['pk','Protein per kcal']].map(([v,l])=>`<button data-kl="ksort" data-v="${v}" aria-pressed="${kpSort===v}">${l}</button>`).join('')}</div>`;
+const kCityOk=c=>!kpCity||(c.cities||[]).includes(kpCity);
 function kpRest(q){const box=$('#kpRes');
   if(!REST){box.innerHTML='<p class="k-load">Loading restaurants…</p>'; loadRest().then(()=>{if(kpM==='rest'&&!$('#kalProd').hidden) kpShow()}).catch(()=>{box.innerHTML='<p class="k-load">Couldn’t load restaurants. Check your connection.</p>'}); return}
   const c=kpChain&&REST.chains.find(x=>x.id===kpChain);
-  if(c){const nq=normT(q), rows=REST.all.filter(r=>r.chain===c&&(!nq||nq.split(' ').every(t=>r.txt.includes(t))));
-    kpL=rows.map(restItem); let cat='', i=0;
-    box.innerHTML=`<button class="k-back" data-kl="kchainback">← All restaurants</button><div class="k-ch-head"><h3>${esc(c.name)}</h3><span class="k-sb ${c.approx?'k-sb-est':'k-sb-off'}">${c.approx?'Approximate':'Official'}</span></div><p class="k-hint">${c.items.length} items · ${esc(c.approx?'Brand’s published numbers from outside the UAE; portions here can differ.':(c.src||'Official nutrition information'))}</p>`+
-      (rows.length?`<ul class="k-meals">${rows.map(r=>{const h=r.cat&&r.cat!==cat?`</ul><h3 class="k-sub">${esc(cat=r.cat)}</h3><ul class="k-meals">`:''; return h+kpRow(kpL[i],i++)}).join('')}</ul>`:'<p class="k-load">No items match.</p>'); return}
-  if(q){const R=restSearch(q), rows=R?R.chain?REST.all.filter(r=>r.chain===R.chain):R.items:[]; kpL=rows.map(restItem);
-    box.innerHTML=kpL.length?`<ul class="k-meals">${kpL.map(kpRow).join('')}</ul>`:'<p class="k-load">No restaurant items match.</p>'; return}
-  const L=[...REST.chains].sort((a,b)=>(a.approx?1:0)-(b.approx?1:0)||a.name.localeCompare(b.name));
-  box.innerHTML=`<p class="k-hint">${L.length} restaurants · ${REST.all.length} menu items</p><div class="k-chains">${L.map(c=>`<button class="k-chain" data-kl="kchain" data-v="${esc(c.id)}"><span class="k-cl">${esc(c.name.slice(0,1))}</span><b>${esc(c.name)}</b><small>${c.items.length} items</small><i class="k-sb ${c.approx?'k-sb-est':'k-sb-off'}">${c.approx?'Approx':'Official'}</i></button>`).join('')}</div>`;
+  if(c){const nq=normT(q), rows=REST.all.filter(r=>r.chain===c&&(!nq||nq.split(' ').every(t=>r.txt.includes(t)))); let L=rows.map(restItem); const st=kStype(c);
+    const flags=(c.flags||[]).length?`<p class="k-flag">⚠️ ${esc(c.flags.join(' · '))}</p>`:'';
+    const head=`<button class="k-back" data-kl="kchainback">← All restaurants</button><div class="k-ch-head"><h3>${esc(c.name)}</h3><span class="k-sb ${st[1]}">${st[0]}</span></div><p class="k-hint">${esc([c.rcat,(c.cities||[]).join(' & '),c.branch].filter(Boolean).join(' · '))}<br>${c.items.length} items · ${esc(c.src||'')}${c.url?` · <a href="${esc(c.url)}" target="_blank" rel="noopener">Source</a>`:''}${c.checked?` · checked ${esc(c.checked)}`:''}</p>${flags}${kSortBar()}`;
+    if(kpSort){L=kSortRows(L); kpL=L; box.innerHTML=head+(L.length?`<ul class="k-meals">${L.map(kpRow).join('')}</ul>`:'<p class="k-load">No items match.</p>'); return}
+    kpL=L; let cat='', i=0;
+    box.innerHTML=head+(rows.length?`<ul class="k-meals">${rows.map(r=>{const h=r.cat&&r.cat!==cat?`</ul><h3 class="k-sub">${esc(cat=r.cat)}</h3><ul class="k-meals">`:''; return h+kpRow(kpL[i],i++)}).join('')}</ul>`:'<p class="k-load">No items match.</p>'); return}
+  const cityBar=`<div class="k-sort" role="group" aria-label="City">${[['','All'],['Dubai','Dubai'],['Abu Dhabi','Abu Dhabi']].map(([v,l])=>`<button data-kl="kcity" data-v="${v}" aria-pressed="${kpCity===v}">${l}</button>`).join('')}</div>`;
+  if(q){const R=restSearch(q); let rows=R?R.chain?REST.all.filter(r=>r.chain===R.chain):R.items:[]; rows=rows.filter(r=>kCityOk(r.chain)); kpL=kSortRows(rows.map(restItem));
+    box.innerHTML=cityBar+kSortBar()+(kpL.length?`<ul class="k-meals">${kpL.map(kpRow).join('')}</ul>`:'<p class="k-load">No restaurant items match.</p>'); return}
+  const L=REST.chains.filter(kCityOk).sort((a,b)=>({official:0,delivery:1,approx:2}[a.stype]??1)-({official:0,delivery:1,approx:2}[b.stype]??1)||a.name.localeCompare(b.name));
+  const n=L.reduce((a,c)=>a+c.items.length,0);
+  box.innerHTML=`${cityBar}<p class="k-hint">${L.length} restaurants · ${n} menu items</p><div class="k-chains">${L.map(c=>{const st=kStype(c); return `<button class="k-chain" data-kl="kchain" data-v="${esc(c.id)}"><span class="k-cl">${esc(c.name.slice(0,1))}</span><b>${esc(c.name)}</b><small>${esc(c.rcat||'')} · ${c.items.length} items</small><i class="k-sb ${st[1]}">${st[0]}</i></button>`}).join('')}</div>`;
 }
 document.addEventListener('click',e=>{const b=e.target.closest('[data-kl]'); if(!b) return; const k=b.dataset.kl;
   if(k==='kchain'){kpChain=b.dataset.v; $('#kpQ').value=''; $('#kpQ').placeholder='Search this menu…'; kpShow(); $('#kalProd .sheet-body').scrollTop=0}
   else if(k==='kchainback'){kpChain=''; $('#kpQ').value=''; $('#kpQ').placeholder=KP_T.rest[1]; kpShow()}
   else if(k==='rests'){closeSheet('#kalSheet'); kalProducts('rest')}
+  else if(k==='kcity'){kpCity=b.dataset.v; kpShow()}
+  else if(k==='ksort'){kpSort=b.dataset.v; kpShow()}
 });
 
 /* ===================== MONEY =====================
